@@ -98,6 +98,24 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'RoomNMeal API is running!',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      users: '/api/users', 
+      rooms: '/api/rooms',
+      mess: '/api/mess',
+      bookings: '/api/bookings',
+      payments: '/api/payments',
+      admin: '/api/admin',
+      chat: '/api/chat'
+    }
+  });
+});
+
 // 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
