@@ -11,7 +11,10 @@
     "install-all": "npm install && cd server && npm install && cd ../client && npm install",
     "setup-atlas": "node setup-atlas.js",
     "migrate-atlas": "cd server && npm run migrate-atlas",
-    "create-env": "node create-env.js"
+    "create-env": "node create-env.js",
+    "start": "cd server && npm start",
+    "heroku-postbuild": "cd client && npm install && npm run build",
+    "deploy": "node deploy.js"
   },
   "keywords": ["mern", "student", "accommodation", "mess", "booking"],
   "author": "RoomNMeal Team",
