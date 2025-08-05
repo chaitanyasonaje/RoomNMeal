@@ -190,12 +190,23 @@ const createSampleData = async () => {
         title: 'Sample Room',
         description: 'A comfortable room with all amenities',
         host: host._id,
-        location: 'Near College',
-        price: 5000,
+        propertyType: 'PG',
         roomType: 'Single',
+        rent: 5000,
+        address: {
+          street: 'Sample Street',
+          city: 'Sample City',
+          state: 'Sample State',
+          pincode: '123456'
+        },
         amenities: ['WiFi', 'AC', 'Attached Bathroom'],
+        rules: ['No smoking', 'No pets'],
         images: [],
-        isAvailable: true,
+        availability: {
+          isAvailable: true,
+          totalRooms: 5,
+          occupiedRooms: 0
+        },
         isActive: true
       });
       await room.save();
