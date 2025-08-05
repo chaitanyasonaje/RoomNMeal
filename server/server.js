@@ -24,25 +24,40 @@ const io = socketIo(server, {
 const allowedOrigins = [
   process.env.CLIENT_URL || "http://localhost:3000",
   "https://roomnmeal.netlify.app",
-  "https://www.roomnmeal.netlify.app"
+  "https://www.roomnmeal.netlify.app",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000"
 ];
 
+console.log('Allowed CORS origins:', allowedOrigins);
+
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
 app.use(cors({
   origin: function (origin, callback) {
+    console.log('CORS request from origin:', origin);
+    
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log('Allowing request with no origin');
+      return callback(null, true);
+    }
     
     if (allowedOrigins.indexOf(origin) !== -1) {
+      console.log('Origin allowed:', origin);
       callback(null, true);
     } else {
+      console.log('Origin blocked:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Content-Length', 'X-Requested-With']
 }));
 
 // Rate limiting
@@ -54,6 +69,15 @@ app.use(limiter);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Test endpoint to verify CORS
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    message: 'CORS test successful', 
+    timestamp: new Date().toISOString(),
+    origin: req.headers.origin 
+  });
+});
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/roomnmeal', {
