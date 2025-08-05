@@ -133,73 +133,97 @@ const createSampleData = async () => {
   try {
     console.log('Creating sample data for development...');
 
-    // Create sample host
-    const host = new User({
-      name: 'Sample Host',
-      email: 'host@roomnmeal.com',
-      password: 'host123',
-      phone: '8888888888',
-      role: 'host',
-      isVerified: true,
-      isActive: true,
-      hostDetails: {
-        propertyType: 'PG',
-        totalRooms: 10,
-        availableRooms: 5,
-        amenities: ['WiFi', 'AC', 'Food'],
-        rules: ['No smoking', 'No pets']
-      }
-    });
-    await host.save();
+    // Check if sample host already exists
+    let host = await User.findOne({ email: 'host@roomnmeal.com' });
+    if (!host) {
+      host = new User({
+        name: 'Sample Host',
+        email: 'host@roomnmeal.com',
+        password: 'host123',
+        phone: '8888888888',
+        role: 'host',
+        isVerified: true,
+        isActive: true,
+        hostDetails: {
+          propertyType: 'PG',
+          totalRooms: 10,
+          availableRooms: 5,
+          amenities: ['WiFi', 'AC', 'Food'],
+          rules: ['No smoking', 'No pets']
+        }
+      });
+      await host.save();
+      console.log('✅ Sample host created');
+    } else {
+      console.log('ℹ️ Sample host already exists');
+    }
 
-    // Create sample mess provider
-    const messProvider = new User({
-      name: 'Sample Mess Provider',
-      email: 'mess@roomnmeal.com',
-      password: 'mess123',
-      phone: '7777777777',
-      role: 'messProvider',
-      isVerified: true,
-      isActive: true,
-      messDetails: {
-        messName: 'Sample Mess',
-        cuisine: ['North Indian', 'South Indian'],
+    // Check if sample mess provider already exists
+    let messProvider = await User.findOne({ email: 'mess@roomnmeal.com' });
+    if (!messProvider) {
+      messProvider = new User({
+        name: 'Sample Mess Provider',
+        email: 'mess@roomnmeal.com',
+        password: 'mess123',
+        phone: '7777777777',
+        role: 'messProvider',
+        isVerified: true,
+        isActive: true,
+        messDetails: {
+          messName: 'Sample Mess',
+          cuisine: ['North Indian', 'South Indian'],
+          mealTypes: ['Breakfast', 'Lunch', 'Dinner'],
+          capacity: 50,
+          hygieneRating: 4.5
+        }
+      });
+      await messProvider.save();
+      console.log('✅ Sample mess provider created');
+    } else {
+      console.log('ℹ️ Sample mess provider already exists');
+    }
+
+    // Check if sample room already exists
+    const existingRoom = await Room.findOne({ title: 'Sample Room' });
+    if (!existingRoom && host) {
+      const room = new Room({
+        title: 'Sample Room',
+        description: 'A comfortable room with all amenities',
+        host: host._id,
+        location: 'Near College',
+        price: 5000,
+        roomType: 'Single',
+        amenities: ['WiFi', 'AC', 'Attached Bathroom'],
+        images: [],
+        isAvailable: true,
+        isActive: true
+      });
+      await room.save();
+      console.log('✅ Sample room created');
+    } else {
+      console.log('ℹ️ Sample room already exists or host not available');
+    }
+
+    // Check if sample mess plan already exists
+    const existingMessPlan = await MessPlan.findOne({ name: 'Monthly Plan' });
+    if (!existingMessPlan && messProvider) {
+      const messPlan = new MessPlan({
+        name: 'Monthly Plan',
+        description: 'Complete monthly meal plan',
+        provider: messProvider._id,
+        price: 3000,
+        duration: 30,
         mealTypes: ['Breakfast', 'Lunch', 'Dinner'],
-        capacity: 50,
-        hygieneRating: 4.5
-      }
-    });
-    await messProvider.save();
+        cuisine: ['North Indian', 'South Indian'],
+        isActive: true
+      });
+      await messPlan.save();
+      console.log('✅ Sample mess plan created');
+    } else {
+      console.log('ℹ️ Sample mess plan already exists or provider not available');
+    }
 
-    // Create sample room
-    const room = new Room({
-      title: 'Sample Room',
-      description: 'A comfortable room with all amenities',
-      host: host._id,
-      location: 'Near College',
-      price: 5000,
-      roomType: 'Single',
-      amenities: ['WiFi', 'AC', 'Attached Bathroom'],
-      images: [],
-      isAvailable: true,
-      isActive: true
-    });
-    await room.save();
-
-    // Create sample mess plan
-    const messPlan = new MessPlan({
-      name: 'Monthly Plan',
-      description: 'Complete monthly meal plan',
-      provider: messProvider._id,
-      price: 3000,
-      duration: 30,
-      mealTypes: ['Breakfast', 'Lunch', 'Dinner'],
-      cuisine: ['North Indian', 'South Indian'],
-      isActive: true
-    });
-    await messPlan.save();
-
-    console.log('✅ Sample data created successfully');
+    console.log('✅ Sample data creation completed');
   } catch (error) {
     console.error('❌ Sample data creation failed:', error);
   }
@@ -209,15 +233,14 @@ const optimizeDatabase = async () => {
   try {
     console.log('Optimizing database performance...');
 
-    // Set MongoDB options for better performance
-    await mongoose.connection.db.admin().command({
-      setParameter: 1,
-      maxTransactionLockRequestTimeoutMillis: 5000
-    });
-
-    // Enable MongoDB query profiler for development
+    // Enable MongoDB query profiler for development (only if allowed)
     if (process.env.NODE_ENV === 'development') {
-      await mongoose.connection.db.setProfilingLevel(1, { slowms: 100 });
+      try {
+        await mongoose.connection.db.setProfilingLevel('slow_only', { slowms: 100 });
+        console.log('✅ Query profiling enabled for development');
+      } catch (profilingError) {
+        console.log('ℹ️ Query profiling not available on this cluster');
+      }
     }
 
     console.log('✅ Database optimization completed');
