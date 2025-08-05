@@ -216,16 +216,25 @@ const createSampleData = async () => {
     }
 
     // Check if sample mess plan already exists
-    const existingMessPlan = await MessPlan.findOne({ name: 'Monthly Plan' });
+    const existingMessPlan = await MessPlan.findOne({ planName: 'Monthly Plan' });
     if (!existingMessPlan && messProvider) {
       const messPlan = new MessPlan({
-        name: 'Monthly Plan',
-        description: 'Complete monthly meal plan',
+        planName: 'Monthly Plan',
+        description: 'Complete monthly meal plan with all three meals',
         provider: messProvider._id,
-        price: 3000,
+        planType: 'monthly',
         duration: 30,
-        mealTypes: ['Breakfast', 'Lunch', 'Dinner'],
+        price: 3000,
+        mealTypes: ['breakfast', 'lunch', 'dinner'],
         cuisine: ['North Indian', 'South Indian'],
+        dietaryOptions: ['Veg', 'Non-Veg'],
+        capacity: 50,
+        mealTimings: {
+          breakfast: '8:00 AM - 9:00 AM',
+          lunch: '1:00 PM - 2:00 PM',
+          dinner: '8:00 PM - 9:00 PM'
+        },
+        features: ['Home-cooked', 'Fresh ingredients', 'Hygienic kitchen'],
         isActive: true
       });
       await messPlan.save();
