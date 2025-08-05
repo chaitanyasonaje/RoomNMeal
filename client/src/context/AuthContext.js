@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
     const checkAuth = async () => {
       if (token) {
         try {
-          const response = await axios.get('/api/auth/me');
+          const response = await axios.get('https://roomnmeal-backend.onrender.com/api/auth/me');
           setUser(response.data.user);
         } catch (error) {
           console.error('Auth check failed:', error);
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await axios.post('https://roomnmeal-backend.onrender.com/api/auth/login', { email, password });
       const { token: newToken, user: userData } = response.data;
       
       setToken(newToken);
@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('/api/auth/register', userData);
+      const response = await axios.post('https://roomnmeal-backend.onrender.com/api/auth/register', userData);
       const { token: newToken, user: userInfo } = response.data;
       
       setToken(newToken);
@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (profileData) => {
     try {
-      const response = await axios.put('/api/users/profile', profileData);
+      const response = await axios.put('https://roomnmeal-backend.onrender.com/api/users/profile', profileData);
       setUser(response.data.user);
       toast.success('Profile updated successfully!');
       return { success: true };

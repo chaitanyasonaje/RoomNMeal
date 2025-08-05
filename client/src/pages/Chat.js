@@ -32,7 +32,7 @@ const Chat = () => {
   useEffect(() => {
     const loadConversations = async () => {
       try {
-        const response = await axios.get('/api/chat/conversations');
+        const response = await axios.get('https://roomnmeal-backend.onrender.com/api/chat/conversations');
         setConversations(response.data.conversations);
       } catch (error) {
         console.error('Failed to load conversations:', error);
@@ -86,7 +86,7 @@ const Chat = () => {
 
       try {
         setLoading(true);
-        const response = await axios.get(`/api/chat/messages/${selectedConversation._id}`);
+        const response = await axios.get(`https://roomnmeal-backend.onrender.com/api/chat/messages/${selectedConversation._id}`);
         setMessages(response.data.messages);
       } catch (error) {
         console.error('Failed to load messages:', error);
@@ -127,7 +127,7 @@ const Chat = () => {
       sendMessage(selectedConversation._id, newMessage.trim());
 
       // Save to database
-      await axios.post('/api/chat/send', messageData);
+      await axios.post('https://roomnmeal-backend.onrender.com/api/chat/send', messageData);
 
     } catch (error) {
       console.error('Failed to send message:', error);
