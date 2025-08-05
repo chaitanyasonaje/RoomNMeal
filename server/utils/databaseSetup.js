@@ -29,10 +29,10 @@ const setupDatabase = async () => {
     await Room.collection.createIndex({ isAvailable: 1 });
     await Room.collection.createIndex({ amenities: 1 });
     await Room.collection.createIndex({ createdAt: -1 });
-    await Room.collection.createIndex({ 
-      location: 'text', 
-      title: 'text', 
-      description: 'text' 
+    await Room.collection.createIndex({
+      location: 'text',
+      title: 'text',
+      description: 'text'
     });
 
     // Booking collection indexes
@@ -44,9 +44,9 @@ const setupDatabase = async () => {
     await Booking.collection.createIndex({ checkIn: 1 });
     await Booking.collection.createIndex({ checkOut: 1 });
     await Booking.collection.createIndex({ createdAt: -1 });
-    await Booking.collection.createIndex({ 
-      student: 1, 
-      status: 1 
+    await Booking.collection.createIndex({
+      student: 1,
+      status: 1
     });
 
     // MessPlan collection indexes
@@ -71,15 +71,15 @@ const setupDatabase = async () => {
     await Transaction.collection.createIndex({ status: 1 });
     await Transaction.collection.createIndex({ paymentMethod: 1 });
     await Transaction.collection.createIndex({ createdAt: -1 });
-    await Transaction.collection.createIndex({ 
-      user: 1, 
-      status: 1 
+    await Transaction.collection.createIndex({
+      user: 1,
+      status: 1
     });
-    await Transaction.collection.createIndex({ 
-      razorpayOrderId: 1 
+    await Transaction.collection.createIndex({
+      razorpayOrderId: 1
     }, { sparse: true });
-    await Transaction.collection.createIndex({ 
-      razorpayPaymentId: 1 
+    await Transaction.collection.createIndex({
+      razorpayPaymentId: 1
     }, { sparse: true });
 
     // ChatMessage collection indexes
@@ -87,14 +87,14 @@ const setupDatabase = async () => {
     await ChatMessage.collection.createIndex({ receiver: 1 });
     await ChatMessage.collection.createIndex({ isRead: 1 });
     await ChatMessage.collection.createIndex({ createdAt: -1 });
-    await ChatMessage.collection.createIndex({ 
-      sender: 1, 
-      receiver: 1, 
-      createdAt: -1 
+    await ChatMessage.collection.createIndex({
+      sender: 1,
+      receiver: 1,
+      createdAt: -1
     });
-    await ChatMessage.collection.createIndex({ 
-      receiver: 1, 
-      isRead: 1 
+    await ChatMessage.collection.createIndex({
+      receiver: 1,
+      isRead: 1
     });
 
     console.log('✅ Database indexes created successfully');
@@ -252,4 +252,4 @@ const optimizeDatabase = async () => {
 module.exports = {
   setupDatabase,
   optimizeDatabase
-}; 
+};
