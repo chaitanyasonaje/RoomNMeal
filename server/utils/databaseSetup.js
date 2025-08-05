@@ -134,22 +134,7 @@ const createSampleData = async () => {
     console.log('Creating sample data for development...');
 
     // Create sample host
-    const host = new User({
-      name: 'Sample Host',
-      email: 'host@roomnmeal.com',
-      password: 'host123',
-      phone: '8888888888',
-      role: 'host',
-      isVerified: true,
-      isActive: true,
-      hostDetails: {
-        propertyType: 'PG',
-        totalRooms: 10,
-        availableRooms: 5,
-        amenities: ['WiFi', 'AC', 'Food'],
-        rules: ['No smoking', 'No pets']
-      }
-    });
+
     await host.save();
 
     // Create sample mess provider
