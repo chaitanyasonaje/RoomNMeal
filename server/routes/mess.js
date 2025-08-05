@@ -1,0 +1,93 @@
+const express = require('express');
+const MessPlan = require('../models/MessPlan');
+const MessSubscription = require('../models/MessSubscription');
+const { auth, requireRole } = require('../middlewares/auth');
+
+const router = express.Router();
+
+// Get all mess plans
+router.get('/plans', async (req, res) => {
+  try {
+    const plans = await MessPlan.find({ isActive: true })
+      .populate('provider', 'name phone messDetails')
+      .sort({ createdAt: -1 });
+
+    res.json({ plans });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get single mess plan
+router.get('/plans/:id', async (req, res) => {
+  try {
+    const plan = await MessPlan.findById(req.params.id)
+      .populate('provider', 'name phone messDetails');
+
+    if (!plan) {
+      return res.status(404).json({ message: 'Mess plan not found' });
+    }
+
+    res.json({ plan });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Create mess plan (Mess Provider only)
+router.post('/plans', auth, requireRole(['messProvider']), async (req, res) => {
+  try {
+    const plan = new MessPlan({
+      ...req.body,
+      provider: req.user._id
+    });
+
+    await plan.save();
+    res.status(201).json({ message: 'Mess plan created', plan });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Subscribe to mess plan
+router.post('/subscribe', auth, async (req, res) => {
+  try {
+    const { planId, startDate, endDate, mealPreferences } = req.body;
+
+    const plan = await MessPlan.findById(planId);
+    if (!plan) {
+      return res.status(404).json({ message: 'Mess plan not found' });
+    }
+
+    const subscription = new MessSubscription({
+      student: req.user._id,
+      messPlan: planId,
+      startDate,
+      endDate,
+      totalAmount: plan.price,
+      mealPreferences
+    });
+
+    await subscription.save();
+    await plan.addSubscriber();
+
+    res.status(201).json({ message: 'Subscribed successfully', subscription });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get user's subscriptions
+router.get('/my-subscriptions', auth, async (req, res) => {
+  try {
+    const subscriptions = await MessSubscription.find({ student: req.user._id })
+      .populate('messPlan')
+      .sort({ createdAt: -1 });
+
+    res.json({ subscriptions });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+module.exports = router; 
