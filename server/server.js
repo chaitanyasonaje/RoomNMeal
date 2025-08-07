@@ -7,20 +7,8 @@ const dotenv = require('dotenv');
 const http = require('http');
 const socketIo = require('socket.io');
 
-// Load environment variables
 dotenv.config();
 
-const app = express();
-const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true
-  }
-});
-
-// CORS configuration
 const allowedOrigins = [
   process.env.CLIENT_URL || "http://localhost:3000",
   "https://roomnmeal.netlify.app",
@@ -31,7 +19,17 @@ const allowedOrigins = [
 
 console.log('Allowed CORS origins:', allowedOrigins);
 
-// Middleware
+const app = express();
+const server = http.createServer(app);
+
+const io = socketIo(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true
+  }
+});
+
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
@@ -39,19 +37,12 @@ app.use(helmet({
 app.use(cors({
   origin: function (origin, callback) {
     console.log('CORS request from origin:', origin);
-    
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) {
-      console.log('Allowing request with no origin');
-      return callback(null, true);
-    }
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (!origin || allowedOrigins.includes(origin)) {
       console.log('Origin allowed:', origin);
-      callback(null, true);
+      return callback(null, true);
     } else {
       console.log('Origin blocked:', origin);
-      callback(new Error('Not allowed by CORS'));
+      return callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
@@ -60,17 +51,15 @@ app.use(cors({
   exposedHeaders: ['Content-Length', 'X-Requested-With']
 }));
 
-// Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100
 });
 app.use(limiter);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Test endpoint to verify CORS
 app.get('/api/test', (req, res) => {
   res.json({ 
     message: 'CORS test successful', 
@@ -79,22 +68,18 @@ app.get('/api/test', (req, res) => {
   });
 });
 
-// Database connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/roomnmeal', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
 .then(async () => {
   console.log('Connected to MongoDB');
-  
-  // Setup database indexes and optimizations
   const { setupDatabase, optimizeDatabase } = require('./utils/databaseSetup');
   await setupDatabase();
   await optimizeDatabase();
 })
 .catch(err => console.error('MongoDB connection error:', err));
 
-// Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/rooms', require('./routes/rooms'));
@@ -105,27 +90,22 @@ app.use('/api/payments', require('./routes/payments'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/chat', require('./routes/chat'));
 
-// Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  // Join user to their room for private messages
   socket.on('join', (userId) => {
     socket.join(userId);
     console.log(`User ${userId} joined their room`);
   });
 
-  // Handle chat messages
   socket.on('sendMessage', (data) => {
     io.to(data.receiverId).emit('receiveMessage', data);
   });
 
-  // Handle typing indicators
   socket.on('typing', (data) => {
     socket.to(data.receiverId).emit('userTyping', data);
   });
 
-  // Handle service status updates
   socket.on('serviceUpdate', (data) => {
     io.to(data.userId).emit('serviceStatusChanged', data);
   });
@@ -135,13 +115,11 @@ io.on('connection', (socket) => {
   });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
-// Root route
 app.get('/', (req, res) => {
   res.json({ 
     message: 'RoomNMeal API is running!',
@@ -159,7 +137,6 @@ app.get('/', (req, res) => {
   });
 });
 
-// 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
@@ -170,4 +147,4 @@ server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-module.exports = { app, io }; 
+module.exports = { app, io };
