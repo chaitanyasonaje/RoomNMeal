@@ -1,3 +1,4 @@
+// server.js (main backend entry point)
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -17,8 +18,6 @@ const allowedOrigins = [
   "http://127.0.0.1:3000"
 ];
 
-console.log('Allowed CORS origins:', allowedOrigins);
-
 const app = express();
 const server = http.createServer(app);
 
@@ -30,18 +29,13 @@ const io = socketIo(server, {
   }
 });
 
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
 app.use(cors({
   origin: function (origin, callback) {
-    console.log('CORS request from origin:', origin);
     if (!origin || allowedOrigins.includes(origin)) {
-      console.log('Origin allowed:', origin);
       return callback(null, true);
     } else {
-      console.log('Origin blocked:', origin);
       return callback(new Error('Not allowed by CORS'));
     }
   },
@@ -51,35 +45,26 @@ app.use(cors({
   exposedHeaders: ['Content-Length', 'X-Requested-With']
 }));
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
-});
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 app.use(limiter);
-
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/api/test', (req, res) => {
-  res.json({ 
-    message: 'CORS test successful', 
-    timestamp: new Date().toISOString(),
-    origin: req.headers.origin 
-  });
+  res.json({ message: 'CORS test successful', timestamp: new Date().toISOString(), origin: req.headers.origin });
 });
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/roomnmeal', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-})
-.then(async () => {
+}).then(async () => {
   console.log('Connected to MongoDB');
   const { setupDatabase, optimizeDatabase } = require('./utils/databaseSetup');
   await setupDatabase();
   await optimizeDatabase();
-})
-.catch(err => console.error('MongoDB connection error:', err));
+}).catch(err => console.error('MongoDB connection error:', err));
 
+// API routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/rooms', require('./routes/rooms'));
@@ -90,6 +75,7 @@ app.use('/api/payments', require('./routes/payments'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/chat', require('./routes/chat'));
 
+// Socket.IO handlers
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
@@ -115,11 +101,13 @@ io.on('connection', (socket) => {
   });
 });
 
+// Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
+// Default route
 app.get('/', (req, res) => {
   res.json({ 
     message: 'RoomNMeal API is running!',
@@ -137,12 +125,12 @@ app.get('/', (req, res) => {
   });
 });
 
+// Fallback for unknown routes
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
 const PORT = process.env.PORT || 5000;
-
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
