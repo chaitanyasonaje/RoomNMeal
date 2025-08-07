@@ -1,3 +1,4 @@
+// server.js (main backend entry point)
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -19,6 +20,8 @@ const allowedOrigins = [
   "http://127.0.0.1:3000"
 ];
 
+console.log('Allowed CORS origins:', allowedOrigins);
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -28,8 +31,6 @@ const io = socketIo(server, {
     credentials: true
   }
 });
-
-console.log('Allowed CORS origins:', allowedOrigins);
 
 // Middleware
 app.use(helmet({
@@ -107,18 +108,14 @@ app.get('/api/health', (req, res) => {
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/roomnmeal', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-})
-.then(async () => {
+}).then(async () => {
   console.log('Connected to MongoDB');
-  
-  // Setup database indexes and optimizations
   const { setupDatabase, optimizeDatabase } = require('./utils/databaseSetup');
   await setupDatabase();
   await optimizeDatabase();
-})
-.catch(err => console.error('MongoDB connection error:', err));
+}).catch(err => console.error('MongoDB connection error:', err));
 
-// Routes
+// API routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/rooms', require('./routes/rooms'));
@@ -129,27 +126,23 @@ app.use('/api/payments', require('./routes/payments'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/chat', require('./routes/chat'));
 
-// Socket.IO connection handling
+// Socket.IO handlers
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  // Join user to their room for private messages
   socket.on('join', (userId) => {
     socket.join(userId);
     console.log(`User ${userId} joined their room`);
   });
 
-  // Handle chat messages
   socket.on('sendMessage', (data) => {
     io.to(data.receiverId).emit('receiveMessage', data);
   });
 
-  // Handle typing indicators
   socket.on('typing', (data) => {
     socket.to(data.receiverId).emit('userTyping', data);
   });
 
-  // Handle service status updates
   socket.on('serviceUpdate', (data) => {
     io.to(data.userId).emit('serviceStatusChanged', data);
   });
@@ -159,13 +152,13 @@ io.on('connection', (socket) => {
   });
 });
 
-// Error handling middleware
+// Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
-// Root route
+// Default route
 app.get('/', (req, res) => {
   res.json({ 
     message: 'RoomNMeal API is running!',
@@ -183,15 +176,14 @@ app.get('/', (req, res) => {
   });
 });
 
-// 404 handler
+// Fallback for unknown routes
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
 const PORT = process.env.PORT || 5000;
-
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-module.exports = { app, io }; 
+module.exports = { app, io };
