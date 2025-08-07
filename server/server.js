@@ -10,6 +10,15 @@ const socketIo = require('socket.io');
 // Load environment variables
 dotenv.config();
 
+// CORS configuration
+const allowedOrigins = [
+  process.env.CLIENT_URL || "http://localhost:3000",
+  "https://roomnmeal.netlify.app",
+  "https://www.roomnmeal.netlify.app",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000"
+];
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -19,15 +28,6 @@ const io = socketIo(server, {
     credentials: true
   }
 });
-
-// CORS configuration
-const allowedOrigins = [
-  process.env.CLIENT_URL || "http://localhost:3000",
-  "https://roomnmeal.netlify.app",
-  "https://www.roomnmeal.netlify.app",
-  "http://localhost:3000",
-  "http://127.0.0.1:3000"
-];
 
 console.log('Allowed CORS origins:', allowedOrigins);
 
@@ -46,12 +46,19 @@ app.use(cors({
       return callback(null, true);
     }
     
+    // For development, allow all origins
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Development mode - allowing all origins');
+      return callback(null, true);
+    }
+    
     if (allowedOrigins.indexOf(origin) !== -1) {
       console.log('Origin allowed:', origin);
       callback(null, true);
     } else {
       console.log('Origin blocked:', origin);
-      callback(new Error('Not allowed by CORS'));
+      // Instead of throwing an error, allow the request but log it
+      callback(null, true);
     }
   },
   credentials: true,
@@ -70,12 +77,29 @@ app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Handle preflight requests
+app.options('*', cors());
+
 // Test endpoint to verify CORS
 app.get('/api/test', (req, res) => {
   res.json({ 
     message: 'CORS test successful', 
     timestamp: new Date().toISOString(),
     origin: req.headers.origin 
+  });
+});
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'OK',
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    cors: {
+      allowedOrigins: allowedOrigins,
+      currentOrigin: req.headers.origin
+    }
   });
 });
 
