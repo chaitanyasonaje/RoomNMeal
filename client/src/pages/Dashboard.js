@@ -31,9 +31,9 @@ const Dashboard = () => {
 
       if (user?.role === 'student') {
         const [bookingsRes, subscriptionsRes, statsRes] = await Promise.all([
-          axios.get('https://roomnmeal-backend.onrender.com/api/bookings/my-bookings', { headers }),
-          axios.get('https://roomnmeal-backend.onrender.com/api/mess/my-subscriptions', { headers }),
-          axios.get('https://roomnmeal-backend.onrender.com/api/bookings/stats/dashboard', { headers })
+                  axios.get('https://roomnmeal.onrender.com/api/bookings/my-bookings', { headers }),
+        axios.get('https://roomnmeal.onrender.com/api/mess/my-subscriptions', { headers }),
+        axios.get('https://roomnmeal.onrender.com/api/bookings/stats/dashboard', { headers })
         ]);
         
         setBookings(bookingsRes.data.bookings);
@@ -45,9 +45,9 @@ const Dashboard = () => {
         });
       } else if (user?.role === 'host') {
         const [bookingsRes, roomsRes, statsRes] = await Promise.all([
-          axios.get('https://roomnmeal-backend.onrender.com/api/bookings/my-bookings', { headers }),
-          axios.get('https://roomnmeal-backend.onrender.com/api/rooms/host/my-rooms', { headers }),
-          axios.get('https://roomnmeal-backend.onrender.com/api/bookings/stats/dashboard', { headers })
+                  axios.get('https://roomnmeal.onrender.com/api/bookings/my-bookings', { headers }),
+        axios.get('https://roomnmeal.onrender.com/api/rooms/host/my-rooms', { headers }),
+        axios.get('https://roomnmeal.onrender.com/api/bookings/stats/dashboard', { headers })
         ]);
         
         setBookings(bookingsRes.data.bookings);
@@ -58,8 +58,8 @@ const Dashboard = () => {
         });
       } else if (user?.role === 'messProvider') {
         const [plansRes, subscriptionsRes] = await Promise.all([
-          axios.get('https://roomnmeal-backend.onrender.com/api/mess/plans', { headers }),
-          axios.get('https://roomnmeal-backend.onrender.com/api/mess/my-subscriptions', { headers })
+                  axios.get('https://roomnmeal.onrender.com/api/mess/plans', { headers }),
+        axios.get('https://roomnmeal.onrender.com/api/mess/my-subscriptions', { headers })
         ]);
         
         setRecentSubscriptions(subscriptionsRes.data.subscriptions.slice(0, 3));

@@ -49,7 +49,7 @@ const BookingCard = ({ booking, userRole, onStatusUpdate }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put(`https://roomnmeal-backend.onrender.com/api/bookings/${booking._id}/status`, {
+      const response = await axios.put(`https://roomnmeal.onrender.com/api/bookings/${booking._id}/status`, {
         status: newStatus,
         reason: newStatus === 'cancelled' ? cancelReason : undefined
       }, {

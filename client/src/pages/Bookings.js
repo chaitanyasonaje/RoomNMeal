@@ -22,7 +22,7 @@ const Bookings = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://roomnmeal-backend.onrender.com/api/bookings/my-bookings', {
+      const response = await axios.get('https://roomnmeal.onrender.com/api/bookings/my-bookings', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBookings(response.data.bookings);

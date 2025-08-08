@@ -31,11 +31,11 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
       const [statsRes, usersRes, roomsRes, bookingsRes, messRes] = await Promise.all([
-        axios.get('https://roomnmeal-backend.onrender.com/api/admin/stats'),
-        axios.get('https://roomnmeal-backend.onrender.com/api/admin/users'),
-        axios.get('https://roomnmeal-backend.onrender.com/api/admin/rooms'),
-        axios.get('https://roomnmeal-backend.onrender.com/api/admin/bookings'),
-        axios.get('https://roomnmeal-backend.onrender.com/api/admin/mess-plans')
+        axios.get('https://roomnmeal.onrender.com/api/admin/stats'),
+        axios.get('https://roomnmeal.onrender.com/api/admin/users'),
+        axios.get('https://roomnmeal.onrender.com/api/admin/rooms'),
+        axios.get('https://roomnmeal.onrender.com/api/admin/bookings'),
+        axios.get('https://roomnmeal.onrender.com/api/admin/mess-plans')
       ]);
 
       setStats(statsRes.data);
@@ -53,7 +53,7 @@ const AdminDashboard = () => {
 
   const handleVerifyUser = async (userId, isVerified) => {
     try {
-      await axios.put(`https://roomnmeal-backend.onrender.com/api/admin/users/${userId}/verify`, { isVerified });
+              await axios.put(`https://roomnmeal.onrender.com/api/admin/users/${userId}/verify`, { isVerified });
       setUsers(prev => prev.map(user => 
         user._id === userId ? { ...user, isVerified } : user
       ));
@@ -65,7 +65,7 @@ const AdminDashboard = () => {
 
   const handleToggleUserStatus = async (userId, isActive) => {
     try {
-      await axios.put(`https://roomnmeal-backend.onrender.com/api/admin/users/${userId}/status`, { isActive });
+              await axios.put(`https://roomnmeal.onrender.com/api/admin/users/${userId}/status`, { isActive });
       setUsers(prev => prev.map(user => 
         user._id === userId ? { ...user, isActive } : user
       ));
@@ -77,7 +77,7 @@ const AdminDashboard = () => {
 
   const handleToggleRoomStatus = async (roomId, isActive) => {
     try {
-      await axios.put(`https://roomnmeal-backend.onrender.com/api/admin/rooms/${roomId}/status`, { isActive });
+              await axios.put(`https://roomnmeal.onrender.com/api/admin/rooms/${roomId}/status`, { isActive });
       setRooms(prev => prev.map(room => 
         room._id === roomId ? { ...room, isActive } : room
       ));
@@ -89,7 +89,7 @@ const AdminDashboard = () => {
 
   const handleToggleMessStatus = async (messId, isActive) => {
     try {
-      await axios.put(`https://roomnmeal-backend.onrender.com/api/admin/mess-plans/${messId}/status`, { isActive });
+              await axios.put(`https://roomnmeal.onrender.com/api/admin/mess-plans/${messId}/status`, { isActive });
       setMessPlans(prev => prev.map(mess => 
         mess._id === messId ? { ...mess, isActive } : mess
       ));

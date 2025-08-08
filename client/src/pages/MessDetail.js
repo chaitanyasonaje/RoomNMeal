@@ -15,7 +15,7 @@ const MessDetail = () => {
   const fetchMessPlanDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`https://roomnmeal-backend.onrender.com/api/mess/plans/${id}`);
+      const response = await axios.get(`https://roomnmeal.onrender.com/api/mess/plans/${id}`);
       setPlan(response.data.plan);
     } catch (error) {
       console.error('Error fetching mess plan details:', error);

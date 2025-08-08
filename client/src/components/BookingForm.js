@@ -82,7 +82,7 @@ const BookingForm = ({ room, onBookingSuccess, onClose }) => {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('https://roomnmeal-backend.onrender.com/api/bookings', {
+      const response = await axios.post('https://roomnmeal.onrender.com/api/bookings', {
         roomId: room._id,
         checkIn: formData.checkIn.toISOString(),
         checkOut: formData.checkOut.toISOString(),

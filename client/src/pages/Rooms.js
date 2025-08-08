@@ -21,7 +21,7 @@ const Rooms = () => {
   const fetchRooms = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://roomnmeal-backend.onrender.com/api/rooms');
+      const response = await axios.get('https://roomnmeal.onrender.com/api/rooms');
       setRooms(response.data.rooms);
     } catch (error) {
       console.error('Error fetching rooms:', error);
