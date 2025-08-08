@@ -9,9 +9,10 @@ const MessSubscription = require('../models/MessSubscription');
 
 const router = express.Router();
 
+// Initialize Razorpay with fallback for development
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
+  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_dummy',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || 'dummy_secret'
 });
 
 // Create payment order
@@ -305,6 +306,73 @@ router.get('/wallet/balance', auth, async (req, res) => {
   } catch (error) {
     console.error('Get wallet balance error:', error);
     res.status(500).json({ message: 'Failed to fetch wallet balance' });
+  }
+});
+
+// Pay from wallet
+router.post('/wallet/pay', auth, async (req, res) => {
+  try {
+    const { amount, type, relatedId, description } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (user.wallet.balance < amount) {
+      return res.status(400).json({ message: 'Insufficient wallet balance' });
+    }
+
+    // Create transaction record
+    const transaction = new Transaction({
+      user: req.user._id,
+      type,
+      amount,
+      currency: 'INR',
+      status: 'completed',
+      paymentMethod: 'wallet',
+      description: description,
+      relatedBooking: type === 'room_booking' ? relatedId : undefined,
+      relatedSubscription: type === 'mess_subscription' ? relatedId : undefined,
+      walletBalance: {
+        before: user.wallet.balance,
+        after: user.wallet.balance - amount
+      }
+    });
+
+    await transaction.save();
+
+    // Update user wallet
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: { 'wallet.balance': -amount },
+      $push: { 'wallet.transactions': transaction._id }
+    });
+
+    // Update related booking or subscription
+    if (type === 'room_booking' && relatedId) {
+      const booking = await Booking.findById(relatedId);
+      if (booking) {
+        booking.paidAmount += amount;
+        booking.paymentStatus = booking.paidAmount >= booking.totalAmount ? 'completed' : 'partial';
+        booking.transactions.push(transaction._id);
+        await booking.save();
+      }
+    }
+
+    if (type === 'mess_subscription' && relatedId) {
+      const subscription = await MessSubscription.findById(relatedId);
+      if (subscription) {
+        subscription.paidAmount += amount;
+        subscription.paymentStatus = subscription.paidAmount >= subscription.totalAmount ? 'completed' : 'partial';
+        subscription.transactions.push(transaction._id);
+        await subscription.save();
+      }
+    }
+
+    res.json({ 
+      message: 'Payment successful',
+      transaction: transaction,
+      newBalance: user.wallet.balance - amount
+    });
+  } catch (error) {
+    console.error('Wallet payment error:', error);
+    res.status(500).json({ message: 'Wallet payment failed' });
   }
 });
 

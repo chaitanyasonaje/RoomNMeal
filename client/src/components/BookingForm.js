@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { FaCalendar, FaUtensils, FaTshirt, FaCoffee, FaInfoCircle } from 'react-icons/fa';
+import { FaCalendar, FaUtensils, FaTshirt, FaCoffee, FaInfoCircle, FaCreditCard } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import PaymentModal from './PaymentModal';
 
 const BookingForm = ({ room, onBookingSuccess, onClose }) => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,8 @@ const BookingForm = ({ room, onBookingSuccess, onClose }) => {
     specialRequests: ''
   });
   const [loading, setLoading] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [bookingData, setBookingData] = useState(null);
 
   const calculateTotal = () => {
     if (!formData.checkIn || !formData.checkOut) return room.rent;
@@ -92,12 +95,14 @@ const BookingForm = ({ room, onBookingSuccess, onClose }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      toast.success('Booking created successfully!');
-      onBookingSuccess(response.data.booking);
-      onClose();
+      // Store booking data and show payment modal
+      setBookingData(response.data.booking);
+      setShowPaymentModal(true);
+      setLoading(false);
     } catch (error) {
       console.error('Booking error:', error);
       toast.error(error.response?.data?.message || 'Failed to create booking');
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -380,6 +385,34 @@ const BookingForm = ({ room, onBookingSuccess, onClose }) => {
           </form>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      {bookingData && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => {
+            setShowPaymentModal(false);
+            setBookingData(null);
+            onClose();
+          }}
+          amount={calculateTotal()}
+          type="room_booking"
+          relatedId={bookingData._id}
+          description={`Room booking for ${room.title}`}
+          onSuccess={(data) => {
+            toast.success('Payment successful! Booking confirmed.');
+            onBookingSuccess(bookingData);
+            setShowPaymentModal(false);
+            setBookingData(null);
+            onClose();
+          }}
+          onFailure={(error) => {
+            toast.error('Payment failed. Please try again.');
+            setShowPaymentModal(false);
+            setBookingData(null);
+          }}
+        />
+      )}
     </div>
   );
 };

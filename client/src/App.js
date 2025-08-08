@@ -15,6 +15,7 @@ import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import Chat from './pages/Chat';
 import Bookings from './pages/Bookings';
+import Wallet from './pages/Wallet';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -57,6 +58,11 @@ function App() {
                       <Route path="/admin" element={
                         <ProtectedRoute allowedRoles={['admin']}>
                           <AdminDashboard />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/wallet" element={
+                        <ProtectedRoute>
+                          <Wallet />
                         </ProtectedRoute>
                       } />
         </Routes>
