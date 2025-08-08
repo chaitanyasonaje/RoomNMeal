@@ -71,21 +71,19 @@ const Bookings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-6">
+      <div className="max-w-5xl mx-auto px-2 sm:px-4 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Bookings</h1>
-          <p className="text-gray-600 mt-2">
-            {user?.role === 'student' 
-              ? 'Manage your room bookings and track their status' 
-              : 'Manage bookings for your properties'
-            }
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">My Bookings</h1>
+          <p className="text-gray-600 text-base mt-1">
+            {user?.role === 'student'
+              ? 'Manage your room bookings and track their status'
+              : 'Manage bookings for your properties'}
           </p>
         </div>
-
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
           {Object.entries(statusCounts).map(([status, count]) => (
             <div key={status} className="bg-white rounded-lg shadow p-4 text-center">
               <div className={`text-2xl font-bold ${
@@ -98,18 +96,14 @@ const Bookings = () => {
               }`}>
                 {count}
               </div>
-              <div className="text-sm text-gray-600 capitalize">
-                {status === 'all' ? 'Total' : status}
-              </div>
+              <div className="text-xs text-gray-600 capitalize mt-1">{status === 'all' ? 'Total' : status}</div>
             </div>
           ))}
         </div>
-
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow mb-8">
-          <div className="p-6">
+        <div className="bg-white rounded-lg shadow mb-6">
+          <div className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
-              {/* Search */}
               <div className="flex-1">
                 <div className="relative">
                   <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -122,8 +116,6 @@ const Bookings = () => {
                   />
                 </div>
               </div>
-
-              {/* Status Filter */}
               <div className="md:w-48">
                 <select
                   value={filters.status}
@@ -141,7 +133,6 @@ const Bookings = () => {
             </div>
           </div>
         </div>
-
         {/* Bookings List */}
         <div className="space-y-6">
           {filteredBookings.length > 0 ? (
@@ -157,18 +148,16 @@ const Bookings = () => {
             <div className="bg-white rounded-lg shadow p-12 text-center">
               <FaCalendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {filters.status !== 'all' || filters.search 
-                  ? 'No bookings match your filters' 
-                  : 'No bookings yet'
-                }
+                {filters.status !== 'all' || filters.search
+                  ? 'No bookings match your filters'
+                  : 'No bookings yet'}
               </h3>
               <p className="text-gray-600 mb-6">
-                {filters.status !== 'all' || filters.search 
+                {filters.status !== 'all' || filters.search
                   ? 'Try adjusting your search or filter criteria'
-                  : user?.role === 'student' 
+                  : user?.role === 'student'
                     ? 'Start by browsing available rooms and making your first booking'
-                    : 'Bookings will appear here once students book your rooms'
-                }
+                    : 'Bookings will appear here once students book your rooms'}
               </p>
               {user?.role === 'student' && (
                 <a
@@ -182,7 +171,6 @@ const Bookings = () => {
             </div>
           )}
         </div>
-
         {/* Quick Actions */}
         {user?.role === 'student' && bookings.length > 0 && (
           <div className="mt-8 bg-white rounded-lg shadow p-6">

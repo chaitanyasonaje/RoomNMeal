@@ -225,35 +225,31 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-6">
+      <div className="max-w-5xl mx-auto px-2 sm:px-4 lg:px-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{getWelcomeMessage()}</h1>
-          <p className="text-gray-600 mt-2">Here's what's happening with your account</p>
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{getWelcomeMessage()}</h1>
+          <p className="text-gray-600 text-base mt-1">Here's what's happening with your account</p>
         </div>
-
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           {getStatsCards().map((stat, index) => (
-            <div key={index} className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                  <stat.icon className={`h-6 w-6 ${stat.textColor}`} />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                </div>
+            <div key={index} className="bg-white rounded-lg shadow p-6 flex items-center">
+              <div className={`p-3 rounded-full ${stat.bgColor}`}>
+                <stat.icon className={`h-6 w-6 ${stat.textColor}`} />
+              </div>
+              <div className="ml-4">
+                <p className="text-xs font-medium text-gray-600">{stat.title}</p>
+                <p className="text-xl font-bold text-gray-900">{stat.value}</p>
               </div>
             </div>
           ))}
         </div>
-
         {/* Quick Actions */}
         <div className="bg-white rounded-lg shadow mb-8">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
+            <h2 className="text-base font-semibold text-gray-900">Quick Actions</h2>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -272,16 +268,13 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-
         {/* Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Recent Bookings */}
           <div className="bg-white rounded-lg shadow">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-gray-900">Recent Bookings</h2>
-              <Link to="/bookings" className="text-primary-600 hover:text-primary-700 text-sm">
-                View all →
-              </Link>
+              <h2 className="text-base font-semibold text-gray-900">Recent Bookings</h2>
+              <Link to="/bookings" className="text-primary-600 hover:text-primary-700 text-xs">View all →</Link>
             </div>
             <div className="p-6">
               {bookings.length > 0 ? (
@@ -300,24 +293,17 @@ const Dashboard = () => {
                   <FaCalendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500">No bookings yet</p>
                   {user?.role === 'student' && (
-                    <Link to="/rooms" className="mt-2 inline-block text-primary-600 hover:text-primary-700">
-                      Find rooms to book →
-                    </Link>
+                    <Link to="/rooms" className="mt-2 inline-block text-primary-600 hover:text-primary-700">Find rooms to book →</Link>
                   )}
                 </div>
               )}
             </div>
           </div>
-
           {/* Recent Subscriptions or Additional Info */}
           <div className="bg-white rounded-lg shadow">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {user?.role === 'student' ? 'Recent Subscriptions' : 'Recent Activity'}
-              </h2>
-              <Link to={user?.role === 'student' ? '/mess' : '/dashboard'} className="text-primary-600 hover:text-primary-700 text-sm">
-                View all →
-              </Link>
+              <h2 className="text-base font-semibold text-gray-900">{user?.role === 'student' ? 'Recent Subscriptions' : 'Recent Activity'}</h2>
+              <Link to={user?.role === 'student' ? '/mess' : '/dashboard'} className="text-primary-600 hover:text-primary-700 text-xs">View all →</Link>
             </div>
             <div className="p-6">
               {user?.role === 'student' ? (
@@ -326,8 +312,8 @@ const Dashboard = () => {
                     {recentSubscriptions.map((subscription) => (
                       <div key={subscription._id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                         <div>
-                          <p className="font-medium text-gray-900">{subscription.messPlan?.planName}</p>
-                          <p className="text-sm text-gray-600">₹{subscription.totalAmount}</p>
+                          <p className="font-medium text-gray-900 text-sm">{subscription.messPlan?.planName}</p>
+                          <p className="text-xs text-gray-600">₹{subscription.totalAmount}</p>
                         </div>
                         <span className={`px-2 py-1 text-xs rounded-full ${
                           subscription.status === 'active' ? 'bg-green-100 text-green-800' :
@@ -342,9 +328,7 @@ const Dashboard = () => {
                   <div className="text-center py-8">
                     <FaUtensils className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500">No subscriptions yet</p>
-                    <Link to="/mess" className="mt-2 inline-block text-primary-600 hover:text-primary-700">
-                      Browse mess plans →
-                    </Link>
+                    <Link to="/mess" className="mt-2 inline-block text-primary-600 hover:text-primary-700">Browse mess plans →</Link>
                   </div>
                 )
               ) : (

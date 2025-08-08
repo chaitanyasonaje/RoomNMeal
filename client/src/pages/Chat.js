@@ -190,12 +190,12 @@ const Chat = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto h-screen flex">
+      <div className="max-w-4xl mx-auto h-[80vh] flex flex-col md:flex-row shadow rounded-lg overflow-hidden mt-6">
         {/* Conversations Sidebar */}
-        <div className="w-1/3 bg-white border-r border-gray-200 flex flex-col">
+        <div className="w-full md:w-1/3 bg-white border-b md:border-b-0 md:border-r border-gray-200 flex flex-col">
           {/* Header */}
           <div className="p-4 border-b border-gray-200">
-            <h1 className="text-xl font-semibold text-gray-900 mb-4">Messages</h1>
+            <h1 className="text-lg font-semibold text-gray-900 mb-2">Messages</h1>
             <div className="relative">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
@@ -207,7 +207,6 @@ const Chat = () => {
               />
             </div>
           </div>
-
           {/* Conversations List */}
           <div className="flex-1 overflow-y-auto">
             {filteredConversations.length === 0 ? (
@@ -225,36 +224,30 @@ const Chat = () => {
                 >
                   <div className="flex items-center space-x-3">
                     <div className="relative">
-                      <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                      <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
                         {conversation.profileImage ? (
                           <img
                             src={conversation.profileImage}
                             alt={conversation.name}
-                            className="w-12 h-12 rounded-full object-cover"
+                            className="w-10 h-10 rounded-full object-cover"
                           />
                         ) : (
-                          <FaUser className="h-6 w-6 text-primary-600" />
+                          <FaUser className="h-5 w-5 text-primary-600" />
                         )}
                       </div>
                       {conversation.isOnline && (
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-medium text-gray-900 truncate">
-                          {conversation.name}
-                        </h3>
+                        <h3 className="text-sm font-medium text-gray-900 truncate">{conversation.name}</h3>
                         {conversation.lastMessageTime && (
-                          <span className="text-xs text-gray-500">
-                            {formatTime(conversation.lastMessageTime)}
-                          </span>
+                          <span className="text-xs text-gray-500">{formatTime(conversation.lastMessageTime)}</span>
                         )}
                       </div>
                       {conversation.lastMessage && (
-                        <p className="text-sm text-gray-600 truncate">
-                          {conversation.lastMessage}
-                        </p>
+                        <p className="text-xs text-gray-600 truncate">{conversation.lastMessage}</p>
                       )}
                     </div>
                   </div>
@@ -263,46 +256,40 @@ const Chat = () => {
             )}
           </div>
         </div>
-
         {/* Chat Area */}
-        <div className="flex-1 flex flex-col bg-white">
+        <div className="flex-1 flex flex-col bg-gray-50">
           {selectedConversation ? (
             <>
               {/* Chat Header */}
               <div className="p-4 border-b border-gray-200 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="relative">
-                    <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
                       {selectedConversation.profileImage ? (
                         <img
                           src={selectedConversation.profileImage}
                           alt={selectedConversation.name}
-                          className="w-10 h-10 rounded-full object-cover"
+                          className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
-                        <FaUser className="h-5 w-5 text-primary-600" />
+                        <FaUser className="h-4 w-4 text-primary-600" />
                       )}
                     </div>
                     {selectedConversation.isOnline && (
-                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                      <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></div>
                     )}
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">
-                      {selectedConversation.name}
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                      {selectedConversation.isOnline ? 'Online' : 'Offline'}
-                    </p>
+                    <h2 className="text-base font-semibold text-gray-900">{selectedConversation.name}</h2>
+                    <p className="text-xs text-gray-500">{selectedConversation.isOnline ? 'Online' : 'Offline'}</p>
                   </div>
                 </div>
                 <button className="p-2 text-gray-400 hover:text-gray-600">
                   <FaEllipsisV />
                 </button>
               </div>
-
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
                 {loading ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
@@ -315,7 +302,7 @@ const Chat = () => {
                         className={`flex ${message.senderId === user._id ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                          className={`max-w-xs md:max-w-md px-4 py-2 rounded-lg ${
                             message.senderId === user._id
                               ? 'bg-primary-600 text-white'
                               : 'bg-gray-100 text-gray-900'
@@ -341,9 +328,8 @@ const Chat = () => {
                   </>
                 )}
               </div>
-
               {/* Message Input */}
-              <div className="p-4 border-t border-gray-200">
+              <div className="p-4 border-t border-gray-200 bg-white">
                 <div className="flex space-x-3">
                   <div className="flex-1">
                     <textarea
@@ -372,9 +358,9 @@ const Chat = () => {
               </div>
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center">
+            <div className="flex-1 flex items-center justify-center bg-white">
               <div className="text-center">
-                <FaUser className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                <FaUser className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Select a conversation</h3>
                 <p className="text-gray-500">Choose a conversation to start messaging</p>
               </div>

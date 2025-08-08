@@ -32,20 +32,19 @@ const MessPlans = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-6">
+      <div className="max-w-5xl mx-auto px-2 sm:px-4 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Mess Services</h1>
-          <p className="text-gray-600">Subscribe to quality meal plans from verified providers</p>
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Mess Services</h1>
+          <p className="text-gray-600 text-base">Subscribe to quality meal plans from verified providers</p>
         </div>
-
         {/* Mess Plans Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {plans.map((plan) => (
-            <div key={plan._id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+            <div key={plan._id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow flex flex-col">
               {/* Plan Image */}
-              <div className="h-48 bg-gray-200 relative">
+              <div className="h-44 bg-gray-200 relative">
                 {plan.images && plan.images.length > 0 ? (
                   <img
                     src={plan.images[0]}
@@ -58,98 +57,45 @@ const MessPlans = () => {
                   </div>
                 )}
                 <div className="absolute top-2 right-2">
-                  <span className="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">
-                    ₹{plan.price}/month
-                  </span>
+                  <span className="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">₹{plan.price}/month</span>
                 </div>
               </div>
-
               {/* Plan Details */}
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {plan.planName}
-                </h3>
-                <p className="text-gray-600 text-sm mb-3">
-                  {plan.description?.substring(0, 100)}...
-                </p>
-
-                {/* Provider Info */}
-                <div className="flex items-center text-gray-500 text-sm mb-3">
+              <div className="p-5 flex-1 flex flex-col justify-between">
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">{plan.planName}</h3>
+                <p className="text-gray-600 text-sm mb-2">{plan.description?.substring(0, 100)}...</p>
+                <div className="flex items-center text-gray-500 text-xs mb-2">
                   <FaMapMarkerAlt className="h-4 w-4 mr-1" />
                   <span>{plan.provider?.messDetails?.messName || 'Mess Provider'}</span>
                 </div>
-
-                {/* Plan Info */}
-                <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-                  <div className="flex items-center">
-                    <FaClock className="h-4 w-4 mr-1" />
-                    <span>{plan.planType}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <FaUsers className="h-4 w-4 mr-1" />
-                    <span>{plan.currentSubscribers}/{plan.capacity}</span>
-                  </div>
+                <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
+                  <div className="flex items-center"><FaClock className="h-4 w-4 mr-1" />{plan.planType}</div>
+                  <div className="flex items-center"><FaUsers className="h-4 w-4 mr-1" />{plan.currentSubscribers}/{plan.capacity}</div>
                 </div>
-
-                {/* Rating */}
-                <div className="flex items-center mb-4">
-                  <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <FaStar
-                        key={i}
-                        className={`h-4 w-4 ${
-                          i < Math.floor(plan.ratings?.average || 0)
-                            ? 'text-yellow-400'
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm text-gray-600 ml-2">
-                    ({plan.ratings?.count || 0} reviews)
-                  </span>
+                <div className="flex items-center mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <FaStar
+                      key={i}
+                      className={`h-4 w-4 ${i < Math.floor(plan.ratings?.average || 0) ? 'text-yellow-400' : 'text-gray-300'}`}
+                    />
+                  ))}
+                  <span className="text-xs text-gray-600 ml-2">({plan.ratings?.count || 0} reviews)</span>
                 </div>
-
-                {/* Meal Types */}
-                <div className="mb-4">
-                  <div className="flex flex-wrap gap-1">
-                    {plan.mealTypes?.map((meal, index) => (
-                      <span
-                        key={index}
-                        className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs"
-                      >
-                        {meal}
-                      </span>
-                    ))}
-                  </div>
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {plan.mealTypes?.map((meal, index) => (
+                    <span key={index} className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">{meal}</span>
+                  ))}
                 </div>
-
-                {/* Cuisine */}
-                <div className="mb-4">
-                  <div className="flex flex-wrap gap-1">
-                    {plan.cuisine?.slice(0, 2).map((cuisine, index) => (
-                      <span
-                        key={index}
-                        className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs"
-                      >
-                        {cuisine}
-                      </span>
-                    ))}
-                  </div>
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {plan.cuisine?.slice(0, 2).map((cuisine, index) => (
+                    <span key={index} className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">{cuisine}</span>
+                  ))}
                 </div>
-
-                {/* Action Button */}
-                <Link
-                  to={`/mess/${plan._id}`}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center"
-                >
-                  View Details
-                </Link>
+                <Link to={`/mess/${plan._id}`} className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center mt-2">View Details</Link>
               </div>
             </div>
           ))}
         </div>
-
         {plans.length === 0 && (
           <div className="text-center py-12">
             <FaUtensils className="h-12 w-12 text-gray-400 mx-auto mb-4" />

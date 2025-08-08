@@ -89,14 +89,14 @@ const RoomDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-6">
+      <div className="max-w-5xl mx-auto px-2 sm:px-4 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Room Images */}
             <div className="bg-white rounded-lg shadow mb-6">
-              <div className="relative h-96 bg-gray-200 rounded-t-lg">
+              <div className="relative h-64 sm:h-80 bg-gray-200 rounded-t-lg">
                 {room.images && room.images.length > 0 ? (
                   <img
                     src={room.images[0]}
@@ -120,75 +120,60 @@ const RoomDetail = () => {
             </div>
 
             {/* Room Details */}
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <div className="flex justify-between items-start mb-4">
-                <h1 className="text-3xl font-bold text-gray-900">{room.title}</h1>
+            <div className="bg-white rounded-lg shadow p-5 mb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start mb-4 gap-4">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{room.title}</h1>
                 <div className="text-right">
                   <div className="text-2xl font-bold text-primary-600">₹{room.rent}</div>
                   <div className="text-sm text-gray-600">per month</div>
                 </div>
               </div>
-              
-              <p className="text-gray-600 mb-6">{room.description}</p>
-
-              {/* Location */}
+              <p className="text-gray-600 mb-4">{room.description}</p>
               <div className="flex items-center text-gray-500 mb-4">
                 <FaMapMarkerAlt className="h-5 w-5 mr-2" />
                 <span>{room.address?.street}, {room.address?.city}, {room.address?.state}</span>
               </div>
-
-              {/* Room Info */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="text-center">
                   <FaBed className="h-6 w-6 text-primary-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600">Room Type</p>
-                  <p className="font-semibold">{room.roomType}</p>
+                  <p className="text-xs text-gray-600">Room Type</p>
+                  <p className="font-semibold text-sm">{room.roomType}</p>
                 </div>
                 <div className="text-center">
                   <FaBath className="h-6 w-6 text-primary-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600">Property Type</p>
-                  <p className="font-semibold">{room.propertyType}</p>
+                  <p className="text-xs text-gray-600">Property Type</p>
+                  <p className="font-semibold text-sm">{room.propertyType}</p>
                 </div>
                 <div className="text-center">
                   <FaWifi className="h-6 w-6 text-primary-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600">Available</p>
-                  <p className="font-semibold">{room.availability?.availableRooms || 0}</p>
+                  <p className="text-xs text-gray-600">Available</p>
+                  <p className="font-semibold text-sm">{room.availability?.availableRooms || 0}</p>
                 </div>
                 <div className="text-center">
                   <FaParking className="h-6 w-6 text-primary-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600">Security</p>
-                  <p className="font-semibold">₹{room.securityDeposit}</p>
+                  <p className="text-xs text-gray-600">Security</p>
+                  <p className="font-semibold text-sm">₹{room.securityDeposit}</p>
                 </div>
               </div>
-
-              {/* Rating */}
-              <div className="flex items-center mb-6">
-                <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <FaStar
-                      key={i}
-                      className={`h-5 w-5 ${
-                        i < Math.floor(room.ratings?.average || 0)
-                          ? 'text-yellow-400'
-                          : 'text-gray-300'
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className="text-gray-600 ml-2">
-                  {room.ratings?.average?.toFixed(1) || 0} ({room.ratings?.count || 0} reviews)
-                </span>
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <FaStar
+                    key={i}
+                    className={`h-5 w-5 ${i < Math.floor(room.ratings?.average || 0) ? 'text-yellow-400' : 'text-gray-300'}`}
+                  />
+                ))}
+                <span className="text-gray-600 ml-2 text-sm">{room.ratings?.average?.toFixed(1) || 0} ({room.ratings?.count || 0} reviews)</span>
               </div>
             </div>
 
             {/* Amenities */}
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Amenities</h2>
+            <div className="bg-white rounded-lg shadow p-5 mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-3">Amenities</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {room.amenities?.map((amenity, index) => (
                   <div key={index} className="flex items-center">
                     <div className="w-2 h-2 bg-primary-600 rounded-full mr-3"></div>
-                    <span className="text-gray-700">{amenity}</span>
+                    <span className="text-gray-700 text-sm">{amenity}</span>
                   </div>
                 ))}
               </div>
@@ -196,40 +181,36 @@ const RoomDetail = () => {
 
             {/* Additional Services */}
             {(room.mealOptions?.hasMeals || room.additionalServices?.laundry?.available || room.additionalServices?.tea?.available) && (
-              <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Additional Services</h2>
+              <div className="bg-white rounded-lg shadow p-5 mb-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">Additional Services</h2>
                 <div className="space-y-4">
                   {room.mealOptions?.hasMeals && (
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
                       <div>
                         <h3 className="font-medium">Meals Available</h3>
-                        <p className="text-sm text-gray-600">
-                          {room.mealOptions.mealTypes?.join(', ')}
-                        </p>
+                        <p className="text-xs text-gray-600">{room.mealOptions.mealTypes?.join(', ')}</p>
                       </div>
                       <div className="text-right">
                         <p className="font-medium">₹{room.mealOptions.mealPrice?.breakfast || 0}/day</p>
                       </div>
                     </div>
                   )}
-                  
                   {room.additionalServices?.laundry?.available && (
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
                       <div>
                         <h3 className="font-medium">Laundry Service</h3>
-                        <p className="text-sm text-gray-600">Weekly laundry service</p>
+                        <p className="text-xs text-gray-600">Weekly laundry service</p>
                       </div>
                       <div className="text-right">
                         <p className="font-medium">₹{room.additionalServices.laundry.price}/week</p>
                       </div>
                     </div>
                   )}
-                  
                   {room.additionalServices?.tea?.available && (
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
                       <div>
                         <h3 className="font-medium">Tea Service</h3>
-                        <p className="text-sm text-gray-600">Morning and evening tea</p>
+                        <p className="text-xs text-gray-600">Morning and evening tea</p>
                       </div>
                       <div className="text-right">
                         <p className="font-medium">₹{room.additionalServices.tea.price}/day</p>
@@ -241,8 +222,8 @@ const RoomDetail = () => {
             )}
 
             {/* Reviews */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Reviews</h2>
+            <div className="bg-white rounded-lg shadow p-5">
+              <h2 className="text-lg font-semibold text-gray-900 mb-3">Reviews</h2>
               {room.reviews && room.reviews.length > 0 ? (
                 <div className="space-y-4">
                   {room.reviews.slice(0, 3).map((review, index) => (
@@ -252,17 +233,13 @@ const RoomDetail = () => {
                           {[...Array(5)].map((_, i) => (
                             <FaStar
                               key={i}
-                              className={`h-4 w-4 ${
-                                i < review.rating ? 'text-yellow-400' : 'text-gray-300'
-                              }`}
+                              className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
                             />
                           ))}
                         </div>
-                        <span className="text-sm text-gray-500 ml-2">
-                          {new Date(review.date).toLocaleDateString()}
-                        </span>
+                        <span className="text-xs text-gray-500 ml-2">{new Date(review.date).toLocaleDateString()}</span>
                       </div>
-                      <p className="text-gray-700">{review.comment}</p>
+                      <p className="text-gray-700 text-sm">{review.comment}</p>
                     </div>
                   ))}
                 </div>
@@ -274,59 +251,46 @@ const RoomDetail = () => {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            {/* Booking Card */}
-            <div className="bg-white rounded-lg shadow p-6 sticky top-8">
+            <div className="bg-white rounded-lg shadow p-5 sticky top-8">
               <div className="text-center mb-6">
-                <div className="text-3xl font-bold text-gray-900">₹{room.rent}</div>
+                <div className="text-2xl font-bold text-gray-900">₹{room.rent}</div>
                 <div className="text-gray-600">per month</div>
               </div>
-
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Security Deposit</span>
-                  <span className="font-semibold">₹{room.securityDeposit}</span>
+                  <span className="text-gray-600 text-sm">Security Deposit</span>
+                  <span className="font-semibold text-sm">₹{room.securityDeposit}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Available Rooms</span>
-                  <span className={`font-semibold ${room.availability?.availableRooms > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {room.availability?.availableRooms || 0}
-                  </span>
+                  <span className="text-gray-600 text-sm">Available Rooms</span>
+                  <span className={`font-semibold text-sm ${room.availability?.availableRooms > 0 ? 'text-green-600' : 'text-red-600'}`}>{room.availability?.availableRooms || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Property Type</span>
-                  <span className="font-semibold">{room.propertyType}</span>
+                  <span className="text-gray-600 text-sm">Property Type</span>
+                  <span className="font-semibold text-sm">{room.propertyType}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Room Type</span>
-                  <span className="font-semibold">{room.roomType}</span>
+                  <span className="text-gray-600 text-sm">Room Type</span>
+                  <span className="font-semibold text-sm">{room.roomType}</span>
                 </div>
               </div>
-
-              {/* Action Buttons */}
               <div className="space-y-3">
-                <button 
+                <button
                   onClick={handleBookNow}
                   disabled={room.availability?.availableRooms <= 0}
-                  className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                    room.availability?.availableRooms > 0
-                      ? 'bg-primary-600 hover:bg-primary-700 text-white'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
+                  className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${room.availability?.availableRooms > 0 ? 'bg-primary-600 hover:bg-primary-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
                 >
                   {room.availability?.availableRooms > 0 ? 'Book Now' : 'No Rooms Available'}
                 </button>
-
-                <button 
+                <button
                   onClick={handleContactHost}
                   className="w-full btn-outline"
                 >
                   Contact Host
                 </button>
               </div>
-
-              {/* Host Info */}
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <h3 className="font-semibold text-gray-900 mb-2">Host Information</h3>
+                <h3 className="font-semibold text-gray-900 mb-2 text-sm">Host Information</h3>
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
                     <span className="text-primary-600 font-semibold">
@@ -334,38 +298,33 @@ const RoomDetail = () => {
                     </span>
                   </div>
                   <div className="ml-3">
-                    <p className="font-medium text-gray-900">{room.host?.name}</p>
-                    <p className="text-sm text-gray-600">{room.host?.phone}</p>
-                    <p className="text-sm text-gray-600">{room.host?.email}</p>
+                    <p className="font-medium text-gray-900 text-sm">{room.host?.name}</p>
+                    <p className="text-xs text-gray-600">{room.host?.phone}</p>
+                    <p className="text-xs text-gray-600">{room.host?.email}</p>
                   </div>
                 </div>
               </div>
-
-              {/* Verification Badge */}
               {room.isVerified && (
                 <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded">
                   <div className="flex items-center">
                     <FaStar className="h-4 w-4 text-green-600 mr-2" />
-                    <span className="text-sm font-medium text-green-800">Verified Property</span>
+                    <span className="text-xs font-medium text-green-800">Verified Property</span>
                   </div>
-                  <p className="text-xs text-green-700 mt-1">
-                    This property has been verified by our team
-                  </p>
+                  <p className="text-xs text-green-700 mt-1">This property has been verified by our team</p>
                 </div>
               )}
             </div>
           </div>
         </div>
+        {/* Booking Form Modal */}
+        {showBookingForm && (
+          <BookingForm
+            room={room}
+            onBookingSuccess={handleBookingSuccess}
+            onClose={() => setShowBookingForm(false)}
+          />
+        )}
       </div>
-
-      {/* Booking Form Modal */}
-      {showBookingForm && (
-        <BookingForm
-          room={room}
-          onBookingSuccess={handleBookingSuccess}
-          onClose={() => setShowBookingForm(false)}
-        />
-      )}
     </div>
   );
 };

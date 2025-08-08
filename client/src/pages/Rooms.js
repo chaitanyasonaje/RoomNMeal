@@ -65,18 +65,18 @@ const Rooms = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-6">
+      <div className="max-w-5xl mx-auto px-2 sm:px-4 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Find Your Perfect Room</h1>
-          <p className="text-gray-600">Discover verified accommodations near your college</p>
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Find Your Perfect Room</h1>
+          <p className="text-gray-600 text-base">Discover verified accommodations near your college</p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow mb-8">
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="bg-white rounded-lg shadow mb-6">
+          <div className="p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <label className="form-label">City</label>
                 <input
@@ -145,18 +145,16 @@ const Rooms = () => {
         </div>
 
         {/* Results */}
-        <div className="mb-4">
-          <p className="text-gray-600">
-            Showing {filteredRooms.length} of {rooms.length} rooms
-          </p>
+        <div className="mb-2 text-sm text-gray-600 text-center">
+          Showing {filteredRooms.length} of {rooms.length} rooms
         </div>
 
         {/* Rooms Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredRooms.map((room) => (
-            <div key={room._id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+            <div key={room._id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow flex flex-col">
               {/* Room Image */}
-              <div className="h-48 bg-gray-200 relative">
+              <div className="h-44 bg-gray-200 relative">
                 {room.images && room.images.length > 0 ? (
                   <img
                     src={room.images[0]}
@@ -176,77 +174,35 @@ const Rooms = () => {
               </div>
 
               {/* Room Details */}
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {room.title}
-                </h3>
-                <p className="text-gray-600 text-sm mb-3">
-                  {room.description?.substring(0, 100)}...
-                </p>
-
-                {/* Location */}
-                <div className="flex items-center text-gray-500 text-sm mb-3">
+              <div className="p-5 flex-1 flex flex-col justify-between">
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">{room.title}</h3>
+                <p className="text-gray-600 text-sm mb-2">{room.description?.substring(0, 100)}...</p>
+                <div className="flex items-center text-gray-500 text-xs mb-2">
                   <FaMapMarkerAlt className="h-4 w-4 mr-1" />
                   <span>{room.address?.city}, {room.address?.state}</span>
                 </div>
-
-                {/* Room Info */}
-                <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-                  <div className="flex items-center">
-                    <FaBed className="h-4 w-4 mr-1" />
-                    <span>{room.roomType}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <FaBath className="h-4 w-4 mr-1" />
-                    <span>{room.propertyType}</span>
-                  </div>
+                <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
+                  <div className="flex items-center"><FaBed className="h-4 w-4 mr-1" />{room.roomType}</div>
+                  <div className="flex items-center"><FaBath className="h-4 w-4 mr-1" />{room.propertyType}</div>
                 </div>
-
-                {/* Rating */}
-                <div className="flex items-center mb-4">
-                  <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <FaStar
-                        key={i}
-                        className={`h-4 w-4 ${
-                          i < Math.floor(room.ratings?.average || 0)
-                            ? 'text-yellow-400'
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm text-gray-600 ml-2">
-                    ({room.ratings?.count || 0} reviews)
-                  </span>
+                <div className="flex items-center mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <FaStar
+                      key={i}
+                      className={`h-4 w-4 ${i < Math.floor(room.ratings?.average || 0) ? 'text-yellow-400' : 'text-gray-300'}`}
+                    />
+                  ))}
+                  <span className="text-xs text-gray-600 ml-2">({room.ratings?.count || 0} reviews)</span>
                 </div>
-
-                {/* Amenities */}
-                <div className="mb-4">
-                  <div className="flex flex-wrap gap-1">
-                    {room.amenities?.slice(0, 3).map((amenity, index) => (
-                      <span
-                        key={index}
-                        className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs"
-                      >
-                        {amenity}
-                      </span>
-                    ))}
-                    {room.amenities?.length > 3 && (
-                      <span className="text-gray-500 text-xs">
-                        +{room.amenities.length - 3} more
-                      </span>
-                    )}
-                  </div>
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {room.amenities?.slice(0, 3).map((amenity, index) => (
+                    <span key={index} className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">{amenity}</span>
+                  ))}
+                  {room.amenities?.length > 3 && (
+                    <span className="text-gray-500 text-xs">+{room.amenities.length - 3} more</span>
+                  )}
                 </div>
-
-                {/* Action Button */}
-                <Link
-                  to={`/rooms/${room._id}`}
-                  className="w-full btn-primary text-center"
-                >
-                  View Details
-                </Link>
+                <Link to={`/rooms/${room._id}`} className="w-full btn-primary text-center mt-2">View Details</Link>
               </div>
             </div>
           ))}
