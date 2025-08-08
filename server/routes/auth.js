@@ -14,6 +14,14 @@ router.post('/register', async (req, res) => {
   try {
     const { name, email, password, phone, role } = req.body;
 
+    // Check if JWT_SECRET is configured
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET is not configured');
+      return res.status(500).json({ 
+        message: 'Server configuration error - JWT_SECRET missing' 
+      });
+    }
+
     const existingUser = await User.findOne({ 
       $or: [{ email }, { phone }] 
     });
@@ -42,7 +50,11 @@ router.post('/register', async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Registration error:', error);
+    res.status(500).json({ 
+      message: 'Server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
@@ -50,6 +62,14 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Check if JWT_SECRET is configured
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET is not configured');
+      return res.status(500).json({ 
+        message: 'Server configuration error - JWT_SECRET missing' 
+      });
+    }
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -70,7 +90,11 @@ router.post('/login', async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Login error:', error);
+    res.status(500).json({ 
+      message: 'Server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
