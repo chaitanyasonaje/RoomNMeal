@@ -1,6 +1,6 @@
 // API Configuration
 // Change this URL when deploying to different environments
-export const API_BASE_URL = 'https://roomnmeal-backend.onrender.com';
+export const API_BASE_URL = 'https://roomnmeal.onrender.com';
 
 // Helper function to build API URLs
 export const buildApiUrl = (endpoint) => {
