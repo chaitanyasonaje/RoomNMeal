@@ -230,6 +230,32 @@ RoomNMeal/
 - `PUT /api/admin/users/:id/verify` - Verify user
 - `PUT /api/admin/users/:id/status` - Update user status
 
+### Reviews
+- `GET /api/reviews/:targetModel/:targetId` - Get reviews for a target
+- `POST /api/reviews` - Create a new review
+- `PUT /api/reviews/:id` - Update a review
+- `DELETE /api/reviews/:id` - Delete a review
+- `POST /api/reviews/:id/helpful` - Mark review as helpful
+- `POST /api/reviews/:id/reply` - Reply to a review
+
+### Services
+- `GET /api/services` - Get all services with filters
+- `GET /api/services/:id` - Get service details
+- `POST /api/services` - Create new service (providers only)
+- `PUT /api/services/:id` - Update service
+- `DELETE /api/services/:id` - Delete service
+- `POST /api/services/:id/book` - Book a service
+- `GET /api/services/orders/my-orders` - Get user's service orders
+- `GET /api/services/orders/provider-orders` - Get provider's service orders
+
+### Notifications
+- `GET /api/notifications` - Get user notifications
+- `GET /api/notifications/unread-count` - Get unread count
+- `PUT /api/notifications/:id/read` - Mark notification as read
+- `PUT /api/notifications/mark-all-read` - Mark all as read
+- `PUT /api/notifications/:id/archive` - Archive notification
+- `DELETE /api/notifications/:id` - Delete notification
+
 ## 🚀 Deployment
 
 ### Frontend Deployment
@@ -286,6 +312,11 @@ For support and questions:
 - Wallet system
 - File upload with Cloudinary
 - Responsive design with Tailwind CSS
+- **NEW: Comprehensive Review & Rating System**
+- **NEW: Enhanced Services Module (Laundry, Cleaning, Food, Transport)**
+- **NEW: Advanced Notification System**
+- **NEW: Service Order Management**
+- **NEW: Enhanced Search & Filtering**
 
 🔄 **Ready for Production:**
 - All core features implemented

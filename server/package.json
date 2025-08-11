@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "generate-data": "node scripts/generate-sample-data.js",
     "seed": "node utils/seedData.js",
     "migrate-atlas": "node scripts/migrate-to-atlas.js",
     "test-db": "node test-database-setup.js"

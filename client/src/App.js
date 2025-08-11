@@ -11,6 +11,7 @@ import Rooms from './pages/Rooms';
 import RoomDetail from './pages/RoomDetail';
 import MessPlans from './pages/MessPlans';
 import MessDetail from './pages/MessDetail';
+import Services from './pages/Services';
 import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import Chat from './pages/Chat';
@@ -33,6 +34,7 @@ function App() {
           <Route path="/rooms/:id" element={<RoomDetail />} />
           <Route path="/mess" element={<MessPlans />} />
           <Route path="/mess/:id" element={<MessDetail />} />
+          <Route path="/services" element={<Services />} />
           
           {/* Protected Routes */}
           <Route path="/dashboard" element={

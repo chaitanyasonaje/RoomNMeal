@@ -125,6 +125,8 @@ app.use('/api/services', require('./routes/services'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/chat', require('./routes/chat'));
+app.use('/api/reviews', require('./routes/reviews'));
+app.use('/api/notifications', require('./routes/notifications'));
 
 // Socket.IO handlers
 io.on('connection', (socket) => {

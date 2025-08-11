@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FaHome, FaUser, FaSignOutAlt, FaBars, FaTimes, FaWallet, FaComments, FaBed, FaUtensils } from 'react-icons/fa';
+import { FaHome, FaUser, FaSignOutAlt, FaBars, FaTimes, FaWallet, FaComments, FaBed, FaUtensils, FaPlus } from 'react-icons/fa';
+import NotificationBell from './NotificationBell';
 
 const navLinks = [
   { to: '/', label: 'Home', icon: <FaHome /> },
   { to: '/rooms', label: 'Rooms', icon: <FaBed /> },
   { to: '/mess', label: 'Mess', icon: <FaUtensils /> },
+  { to: '/services', label: 'Services', icon: <FaPlus /> },
   { to: '/chat', label: 'Chat', icon: <FaComments /> },
 ];
 
@@ -27,55 +29,71 @@ const Navbar = () => {
   return (
     <>
       {/* Top Navbar for desktop */}
-      <nav className="bg-white shadow-lg sticky top-0 z-50 hidden md:block">
+      <nav className="bg-white/95 backdrop-blur-md shadow-soft sticky top-0 z-50 hidden md:block border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
+          <div className="flex justify-between h-20 items-center">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
-              <FaHome className="h-8 w-8 text-primary-600" />
-              <span className="text-xl font-bold text-gray-900">RoomNMeal</span>
+            <Link to="/" className="flex items-center space-x-3 group">
+              <div className="bg-gradient-to-r from-primary-600 to-primary-700 p-3 rounded-2xl group-hover:shadow-glow transition-all duration-300">
+                <FaHome className="h-8 w-8 text-white" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+                RoomNMeal
+              </span>
             </Link>
+            
             {/* Desktop Navigation */}
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="flex items-center gap-2 text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-base font-medium transition-colors"
+                  className="nav-link"
                 >
-                  {link.icon}
+                  <span className="text-lg">{link.icon}</span>
                   <span>{link.label}</span>
                 </Link>
               ))}
+              
               {isAuthenticated && (
-                <Link to="/wallet" className="flex items-center gap-2 text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-base font-medium">
-                  <FaWallet />
+                <Link to="/wallet" className="nav-link">
+                  <FaWallet className="text-lg" />
                   <span>Wallet</span>
                 </Link>
               )}
+              
+              {isAuthenticated && <NotificationBell />}
+              
               {isAuthenticated ? (
-                <div className="relative group">
-                  <button className="flex items-center space-x-1 text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-base font-medium">
-                    <FaUser className="h-5 w-5" />
-                    <span>{user?.name}</span>
+                <div className="relative group ml-2">
+                  <button className="flex items-center space-x-2 text-gray-700 hover:text-primary-600 px-4 py-2 rounded-xl text-base font-medium transition-all duration-200 hover:bg-primary-50">
+                    <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                      {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                    </div>
+                    <span className="hidden lg:block">{user?.name}</span>
                   </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                    <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</Link>
+                  <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-large py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 border border-gray-100">
+                    <Link to="/profile" className="block px-4 py-3 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors duration-200 rounded-lg mx-2">
+                      Profile Settings
+                    </Link>
                     {user?.role === 'admin' && (
-                      <Link to="/admin" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Admin Panel</Link>
+                      <Link to="/admin" className="block px-4 py-3 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors duration-200 rounded-lg mx-2">
+                        Admin Panel
+                      </Link>
                     )}
+                    <div className="border-t border-gray-100 my-2"></div>
                     <button
                       onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200 rounded-lg mx-2"
                     >
-                      Logout
+                      Sign Out
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center space-x-4">
-                  <Link to="/login" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-base font-medium">Login</Link>
-                  <Link to="/register" className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-base font-medium">Register</Link>
+                <div className="flex items-center space-x-3 ml-4">
+                  <Link to="/login" className="nav-link">Sign In</Link>
+                  <Link to="/register" className="btn-primary">Get Started</Link>
                 </div>
               )}
             </div>
@@ -84,31 +102,62 @@ const Navbar = () => {
       </nav>
 
       {/* Bottom Navbar for mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white shadow-t md:hidden border-t border-gray-200">
-        <div className="flex justify-between items-center px-2 py-1">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-t border-t border-gray-200 md:hidden">
+        <div className="flex justify-between items-center px-2 py-2">
           {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className="flex flex-col items-center justify-center flex-1 py-2 text-xs text-gray-700 hover:text-primary-600 transition-colors"
+              className="flex flex-col items-center justify-center flex-1 py-3 text-xs text-gray-600 hover:text-primary-600 transition-all duration-200 rounded-xl hover:bg-primary-50 mx-1"
             >
-              <span className="text-lg mb-1">{link.icon}</span>
-              {link.label}
+              <span className="text-xl mb-1">{link.icon}</span>
+              <span className="font-medium">{link.label}</span>
             </Link>
           ))}
+          
           {isAuthenticated ? (
-            <Link to="/profile" className="flex flex-col items-center justify-center flex-1 py-2 text-xs text-gray-700 hover:text-primary-600 transition-colors">
-              <span className="text-lg mb-1"><FaUser /></span>
-              Profile
+            <Link to="/profile" className="flex flex-col items-center justify-center flex-1 py-3 text-xs text-gray-600 hover:text-primary-600 transition-all duration-200 rounded-xl hover:bg-primary-50 mx-1">
+              <span className="text-xl mb-1"><FaUser /></span>
+              <span className="font-medium">Profile</span>
             </Link>
           ) : (
-            <Link to="/login" className="flex flex-col items-center justify-center flex-1 py-2 text-xs text-gray-700 hover:text-primary-600 transition-colors">
-              <span className="text-lg mb-1"><FaUser /></span>
-              Login
+            <Link to="/login" className="flex flex-col items-center justify-center flex-1 py-3 text-xs text-gray-600 hover:text-primary-600 transition-all duration-200 rounded-xl hover:bg-primary-50 mx-1">
+              <span className="text-xl mb-1"><FaUser /></span>
+              <span className="font-medium">Sign In</span>
             </Link>
           )}
         </div>
       </nav>
+
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 md:hidden">
+          <div className="absolute bottom-20 left-4 right-4 bg-white rounded-2xl shadow-large p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Menu</h3>
+              <button
+                onClick={toggleMenu}
+                className="p-2 hover:bg-gray-100 rounded-xl transition-colors duration-200"
+              >
+                <FaTimes className="h-5 w-5 text-gray-600" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  onClick={toggleMenu}
+                  className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors duration-200"
+                >
+                  <span className="text-lg">{link.icon}</span>
+                  <span className="font-medium">{link.label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

@@ -1,93 +1,232 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaSearch, FaHome, FaUtensils, FaComments, FaShieldAlt, FaStar } from 'react-icons/fa';
+import { FaSearch, FaHome, FaUtensils, FaComments, FaShieldAlt, FaStar, FaArrowRight, FaCheck, FaMapMarkerAlt, FaUsers, FaClock, FaHeart } from 'react-icons/fa';
 
 const Home = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white flex-1 flex items-center">
-        <div className="w-full max-w-2xl mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Find Your Perfect Student Home</h1>
-          <p className="text-lg md:text-xl mb-8 text-primary-100">Discover rooms, subscribe to mess services, and enjoy a comfortable student life in Shirpur</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/rooms" className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-md">Find Rooms</Link>
-            <Link to="/mess" className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-colors shadow-md">Mess Services</Link>
+      <section className="relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+        </div>
+        
+        <div className="relative section-padding">
+          <div className="max-w-6xl mx-auto text-center">
+            <div className={`animate-fade-in-up ${isVisible ? 'animate' : ''}`}>
+              <h1 className="heading-1 text-white mb-6">
+                Find Your Perfect
+                <span className="block bg-gradient-to-r from-accent-400 to-accent-500 bg-clip-text text-transparent">
+                  Student Home
+                </span>
+              </h1>
+              <p className="text-body text-primary-100 mb-8 max-w-3xl mx-auto">
+                Discover premium rooms, subscribe to quality mess services, and enjoy a comfortable student life in Shirpur. 
+                Everything you need for your academic journey in one place.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <Link to="/rooms" className="btn-primary text-lg px-8 py-4 group">
+                  <span>Find Rooms</span>
+                  <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+                </Link>
+                <Link to="/mess" className="btn-outline text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-primary-600">
+                  <span>Mess Services</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Stats Section */}
+            <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto animate-fade-in-up ${isVisible ? 'animate' : ''}`} style={{animationDelay: '0.2s'}}>
+              <div className="card-glass text-center">
+                <div className="text-3xl font-bold text-white mb-2">500+</div>
+                <div className="text-primary-100">Happy Students</div>
+              </div>
+              <div className="card-glass text-center">
+                <div className="text-3xl font-bold text-white mb-2">100+</div>
+                <div className="text-primary-100">Verified Rooms</div>
+              </div>
+              <div className="card-glass text-center">
+                <div className="text-3xl font-bold text-white mb-2">50+</div>
+                <div className="text-primary-100">Mess Providers</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-12 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Why Choose RoomNMeal?</h2>
-            <p className="text-base md:text-lg text-gray-600">Everything you need for a comfortable student life in one place</p>
+      <section className="section-padding bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="heading-2 mb-4">Why Choose RoomNMeal?</h2>
+            <p className="text-body max-w-3xl mx-auto">
+              Everything you need for a comfortable and successful student life, all in one comprehensive platform
+            </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="text-center bg-white rounded-lg shadow p-6 flex flex-col items-center">
-              <div className="bg-primary-100 w-14 h-14 rounded-full flex items-center justify-center mb-3">
-                <FaHome className="h-7 w-7 text-primary-600" />
+          
+          <div className="grid-feature">
+            <div className={`card-hover text-center group animate-fade-in-up ${isVisible ? 'animate' : ''}`} style={{animationDelay: '0.1s'}}>
+              <div className="bg-gradient-to-br from-primary-100 to-primary-200 w-20 h-20 rounded-3xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
+                <FaHome className="h-10 w-10 text-primary-600" />
               </div>
-              <h3 className="text-lg font-semibold mb-1">Quality Accommodation</h3>
-              <p className="text-gray-600 text-sm">Find verified rooms and PGs near your college with all essential amenities</p>
+              <h3 className="heading-3 mb-4">Premium Accommodation</h3>
+              <p className="text-body mb-6">
+                Find verified rooms and PGs near your college with all essential amenities, 
+                modern facilities, and secure environments.
+              </p>
+              <div className="space-y-2 text-left">
+                <div className="flex items-center text-sm text-gray-600">
+                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
+                  Verified properties
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
+                  Detailed photos & amenities
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
+                  Secure online booking
+                </div>
+              </div>
             </div>
-            <div className="text-center bg-white rounded-lg shadow p-6 flex flex-col items-center">
-              <div className="bg-primary-100 w-14 h-14 rounded-full flex items-center justify-center mb-3">
-                <FaUtensils className="h-7 w-7 text-primary-600" />
+
+            <div className={`card-hover text-center group animate-fade-in-up ${isVisible ? 'animate' : ''}`} style={{animationDelay: '0.2s'}}>
+              <div className="bg-gradient-to-br from-success-100 to-success-200 w-20 h-20 rounded-3xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
+                <FaUtensils className="h-10 w-10 text-success-600" />
               </div>
-              <h3 className="text-lg font-semibold mb-1">Mess Services</h3>
-              <p className="text-gray-600 text-sm">Subscribe to quality meal plans from verified mess providers</p>
+              <h3 className="heading-3 mb-4">Quality Mess Services</h3>
+              <p className="text-body mb-6">
+                Subscribe to hygienic meal plans from trusted mess providers with 
+                flexible options and nutritional balance.
+              </p>
+              <div className="space-y-2 text-left">
+                <div className="flex items-center text-sm text-gray-600">
+                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
+                  Hygienic food preparation
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
+                  Flexible meal plans
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
+                  Online payment options
+                </div>
+              </div>
             </div>
-            <div className="text-center bg-white rounded-lg shadow p-6 flex flex-col items-center">
-              <div className="bg-primary-100 w-14 h-14 rounded-full flex items-center justify-center mb-3">
-                <FaComments className="h-7 w-7 text-primary-600" />
+
+            <div className={`card-hover text-center group animate-fade-in-up ${isVisible ? 'animate' : ''}`} style={{animationDelay: '0.3s'}}>
+              <div className="bg-gradient-to-br from-accent-100 to-accent-200 w-20 h-20 rounded-3xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
+                <FaComments className="h-10 w-10 text-accent-600" />
               </div>
-              <h3 className="text-lg font-semibold mb-1">Easy Communication</h3>
-              <p className="text-gray-600 text-sm">Chat directly with hosts and service providers for any queries</p>
+              <h3 className="heading-3 mb-4">Seamless Communication</h3>
+              <p className="text-body mb-6">
+                Chat directly with hosts and service providers for any queries, 
+                instant support, and real-time updates.
+              </p>
+              <div className="space-y-2 text-left">
+                <div className="flex items-center text-sm text-gray-600">
+                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
+                  Real-time chat support
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
+                  Instant notifications
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
+                  Direct provider contact
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Services Section */}
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Our Services</h2>
-            <p className="text-base md:text-lg text-gray-600">Comprehensive solutions for all your student accommodation needs</p>
+      <section className="section-padding bg-gradient-to-br from-gray-50 to-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="heading-2 mb-4">Our Comprehensive Services</h2>
+            <p className="text-body max-w-3xl mx-auto">
+              From accommodation to daily meals, we provide end-to-end solutions for all your student needs
+            </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Room Booking */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
-              <div className="bg-primary-600 p-6 flex flex-col items-center">
-                <FaHome className="h-10 w-10 text-white mb-2" />
-                <h3 className="text-xl font-bold text-white mb-1">Room Booking</h3>
-                <p className="text-primary-100 text-sm mb-2">Find and book verified rooms, PGs, and hostels near your college</p>
+            <div className={`card-hover overflow-hidden group animate-fade-in-left ${isVisible ? 'animate' : ''}`} style={{animationDelay: '0.1s'}}>
+              <div className="bg-gradient-to-br from-primary-600 to-primary-700 p-8 text-white">
+                <div className="flex items-center justify-between mb-4">
+                  <FaHome className="h-12 w-12 text-white" />
+                  <FaHeart className="h-6 w-6 text-primary-200 group-hover:scale-110 transition-transform duration-300" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2">Room Booking</h3>
+                <p className="text-primary-100 text-lg">
+                  Find and book verified rooms, PGs, and hostels near your college
+                </p>
               </div>
-              <div className="p-6 flex-1 flex flex-col justify-between">
-                <ul className="space-y-2 text-gray-600 text-sm mb-4">
-                  <li className="flex items-center"><FaStar className="h-4 w-4 text-primary-600 mr-2" />Verified accommodations</li>
-                  <li className="flex items-center"><FaStar className="h-4 w-4 text-primary-600 mr-2" />Detailed photos and amenities</li>
-                  <li className="flex items-center"><FaStar className="h-4 w-4 text-primary-600 mr-2" />Secure online booking</li>
-                </ul>
-                <Link to="/rooms" className="mt-2 inline-block bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors text-center">Browse Rooms</Link>
+              <div className="p-8">
+                <div className="space-y-4 mb-6">
+                  <div className="flex items-center text-gray-700">
+                    <FaStar className="h-5 w-5 text-primary-500 mr-3" />
+                    <span>Verified accommodations with detailed photos</span>
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <FaMapMarkerAlt className="h-5 w-5 text-primary-500 mr-3" />
+                    <span>Prime locations near educational institutions</span>
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <FaShieldAlt className="h-5 w-5 text-primary-500 mr-3" />
+                    <span>Secure online booking and payment</span>
+                  </div>
+                </div>
+                <Link to="/rooms" className="btn-primary w-full text-center group">
+                  <span>Browse Rooms</span>
+                  <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+                </Link>
               </div>
             </div>
+
             {/* Mess Services */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
-              <div className="bg-green-600 p-6 flex flex-col items-center">
-                <FaUtensils className="h-10 w-10 text-white mb-2" />
-                <h3 className="text-xl font-bold text-white mb-1">Mess Services</h3>
-                <p className="text-green-100 text-sm mb-2">Subscribe to quality meal plans from trusted mess providers</p>
+            <div className={`card-hover overflow-hidden group animate-fade-in-right ${isVisible ? 'animate' : ''}`} style={{animationDelay: '0.2s'}}>
+              <div className="bg-gradient-to-br from-success-600 to-success-700 p-8 text-white">
+                <div className="flex items-center justify-between mb-4">
+                  <FaUtensils className="h-12 w-12 text-white" />
+                  <FaClock className="h-6 w-6 text-success-200 group-hover:scale-110 transition-transform duration-300" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2">Mess Services</h3>
+                <p className="text-success-100 text-lg">
+                  Subscribe to quality meal plans from trusted mess providers
+                </p>
               </div>
-              <div className="p-6 flex-1 flex flex-col justify-between">
-                <ul className="space-y-2 text-gray-600 text-sm mb-4">
-                  <li className="flex items-center"><FaStar className="h-4 w-4 text-green-600 mr-2" />Hygienic food preparation</li>
-                  <li className="flex items-center"><FaStar className="h-4 w-4 text-green-600 mr-2" />Flexible meal plans</li>
-                  <li className="flex items-center"><FaStar className="h-4 w-4 text-green-600 mr-2" />Online payment options</li>
-                </ul>
-                <Link to="/mess" className="mt-2 inline-block bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors text-center">View Mess Plans</Link>
+              <div className="p-8">
+                <div className="space-y-4 mb-6">
+                  <div className="flex items-center text-gray-700">
+                    <FaStar className="h-5 w-5 text-success-500 mr-3" />
+                    <span>Hygienic food preparation standards</span>
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <FaUsers className="h-5 w-5 text-success-500 mr-3" />
+                    <span>Flexible meal plans and schedules</span>
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <FaShieldAlt className="h-5 w-5 text-success-500 mr-3" />
+                    <span>Online payment and subscription management</span>
+                  </div>
+                </div>
+                <Link to="/mess" className="btn-success w-full text-center group">
+                  <span>View Mess Plans</span>
+                  <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+                </Link>
               </div>
             </div>
           </div>
@@ -95,13 +234,41 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gray-900 text-white py-12">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-2">Ready to Find Your Perfect Student Home?</h2>
-          <p className="text-lg text-gray-300 mb-6">Join thousands of students who trust RoomNMeal for their accommodation needs</p>
+      <section className="section-padding bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+        
+        <div className="relative max-w-4xl mx-auto text-center">
+          <h2 className="heading-2 text-white mb-6">
+            Ready to Find Your Perfect Student Home?
+          </h2>
+          <p className="text-body text-gray-300 mb-8 max-w-2xl mx-auto">
+            Join thousands of students who trust RoomNMeal for their accommodation needs. 
+            Start your journey today and experience the difference.
+          </p>
+          
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/register" className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">Get Started</Link>
-            <Link to="/rooms" className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-gray-900 transition-colors">Browse Now</Link>
+            <Link to="/register" className="btn-primary text-lg px-8 py-4 group">
+              <span>Get Started Today</span>
+              <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+            </Link>
+            <Link to="/rooms" className="btn-outline text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-gray-900">
+              <span>Browse Now</span>
+            </Link>
+          </div>
+          
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-white mb-2">24/7</div>
+              <div className="text-gray-400">Support Available</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-white mb-2">100%</div>
+              <div className="text-gray-400">Secure Payments</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-white mb-2">Instant</div>
+              <div className="text-gray-400">Booking Confirmation</div>
+            </div>
           </div>
         </div>
       </section>
