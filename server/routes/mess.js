@@ -90,4 +90,28 @@ router.get('/my-subscriptions', auth, async (req, res) => {
   }
 });
 
+// Get plans for the logged-in mess provider
+router.get('/provider/my-plans', auth, requireRole(['messProvider']), async (req, res) => {
+  try {
+    const plans = await MessPlan.find({ provider: req.user._id, isActive: true })
+      .sort({ createdAt: -1 });
+    res.json({ plans });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete mess plan (Provider only)
+router.delete('/plans/:id', auth, requireRole(['messProvider']), async (req, res) => {
+  try {
+    const plan = await MessPlan.findOneAndDelete({ _id: req.params.id, provider: req.user._id });
+    if (!plan) {
+      return res.status(404).json({ message: 'Mess plan not found or not authorized' });
+    }
+    res.json({ message: 'Mess plan deleted' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router; 

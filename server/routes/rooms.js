@@ -90,4 +90,28 @@ router.post('/:id/reviews', auth, async (req, res) => {
   }
 });
 
+// Get rooms for the logged-in host
+router.get('/host/my-rooms', auth, requireRole(['host']), async (req, res) => {
+  try {
+    const rooms = await Room.find({ host: req.user._id, isActive: true })
+      .sort({ createdAt: -1 });
+    res.json({ rooms });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete room (Host only)
+router.delete('/:id', auth, requireRole(['host']), async (req, res) => {
+  try {
+    const room = await Room.findOneAndDelete({ _id: req.params.id, host: req.user._id });
+    if (!room) {
+      return res.status(404).json({ message: 'Room not found or not authorized' });
+    }
+    res.json({ message: 'Room deleted' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router; 

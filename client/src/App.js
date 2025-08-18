@@ -18,6 +18,12 @@ import Chat from './pages/Chat';
 import Bookings from './pages/Bookings';
 import Wallet from './pages/Wallet';
 import ProtectedRoute from './components/ProtectedRoute';
+import AddRoom from './pages/AddRoom';
+import EditRoom from './pages/EditRoom';
+import HostRooms from './pages/HostRooms';
+import AddMessPlan from './pages/AddMessPlan';
+import EditMessPlan from './pages/EditMessPlan';
+import ProviderPlans from './pages/ProviderPlans';
 
 function App() {
   const { user } = useAuth();
@@ -67,6 +73,36 @@ function App() {
                           <Wallet />
                         </ProtectedRoute>
                       } />
+          <Route path="/rooms/add" element={
+            <ProtectedRoute allowedRoles={['host']}>
+              <AddRoom />
+            </ProtectedRoute>
+          } />
+          <Route path="/rooms/edit/:id" element={
+            <ProtectedRoute allowedRoles={['host']}>
+              <EditRoom />
+            </ProtectedRoute>
+          } />
+          <Route path="/rooms/host" element={
+            <ProtectedRoute allowedRoles={['host']}>
+              <HostRooms />
+            </ProtectedRoute>
+          } />
+          <Route path="/mess/add" element={
+            <ProtectedRoute allowedRoles={['messProvider']}>
+              <AddMessPlan />
+            </ProtectedRoute>
+          } />
+          <Route path="/mess/edit/:id" element={
+            <ProtectedRoute allowedRoles={['messProvider']}>
+              <EditMessPlan />
+            </ProtectedRoute>
+          } />
+          <Route path="/mess/provider" element={
+            <ProtectedRoute allowedRoles={['messProvider']}>
+              <ProviderPlans />
+            </ProtectedRoute>
+          } />
         </Routes>
       </main>
       <Footer />
