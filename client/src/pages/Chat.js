@@ -11,6 +11,7 @@ const Chat = () => {
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [deliveredMap, setDeliveredMap] = useState({}); // message _id -> delivered boolean
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -49,33 +50,54 @@ const Chat = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('receiveMessage', (data) => {
-      if (selectedConversation && 
-          (data.senderId === selectedConversation._id || data.receiverId === selectedConversation._id)) {
-        setMessages(prev => [...prev, data]);
+    const handleReceive = (msg) => {
+      // Normalize server shape to what UI expects
+      const normalized = {
+        _id: msg._id,
+        senderId: msg.sender?._id || msg.sender || msg.senderId,
+        receiverId: msg.receiver?._id || msg.receiver || msg.receiverId,
+        message: msg.message,
+        messageType: msg.messageType || 'text',
+        createdAt: msg.createdAt || new Date(),
+      };
+
+      if (selectedConversation &&
+          (normalized.senderId === selectedConversation._id || normalized.receiverId === selectedConversation._id)) {
+        setMessages(prev => [...prev, normalized]);
       }
-      // Update conversation list
+
       setConversations(prev => {
         const updated = prev.map(conv => {
-          if (conv._id === data.senderId || conv._id === data.receiverId) {
-            return { ...conv, lastMessage: data.message, lastMessageTime: new Date() };
+          if (conv._id === normalized.senderId || conv._id === normalized.receiverId) {
+            return { ...conv, lastMessage: normalized.message, lastMessageTime: new Date(normalized.createdAt) };
           }
           return conv;
         });
-        return updated.sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime));
+        return updated.sort((a, b) => new Date(b.lastMessageTime || 0) - new Date(a.lastMessageTime || 0));
       });
-    });
+    };
 
-    socket.on('userTyping', (data) => {
+    const handleDelivered = (msg) => {
+      const id = msg?._id;
+      if (!id) return;
+      setDeliveredMap(prev => ({ ...prev, [id]: true }));
+    };
+
+    const handleTypingEvent = (data) => {
       if (selectedConversation && data.userId === selectedConversation._id) {
         setOtherUserTyping(true);
         setTimeout(() => setOtherUserTyping(false), 3000);
       }
-    });
+    };
+
+    socket.on('receiveMessage', handleReceive);
+    socket.on('messageDelivered', handleDelivered);
+    socket.on('userTyping', handleTypingEvent);
 
     return () => {
-      socket.off('receiveMessage');
-      socket.off('userTyping');
+      socket.off('receiveMessage', handleReceive);
+      socket.off('messageDelivered', handleDelivered);
+      socket.off('userTyping', handleTypingEvent);
     };
   }, [socket, selectedConversation]);
 
@@ -309,10 +331,13 @@ const Chat = () => {
                           }`}
                         >
                           <p className="text-sm">{message.message}</p>
-                          <p className={`text-xs mt-1 ${
+                          <p className={`text-[10px] mt-1 flex items-center gap-2 ${
                             message.senderId === user._id ? 'text-primary-100' : 'text-gray-500'
                           }`}>
                             {formatTime(message.createdAt)}
+                            {message.senderId === user._id && deliveredMap[message._id] && (
+                              <span className="inline-block w-2 h-2 rounded-full bg-green-300" title="Delivered"></span>
+                            )}
                           </p>
                         </div>
                       </div>

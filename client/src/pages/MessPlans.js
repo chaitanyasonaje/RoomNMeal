@@ -1,20 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaUtensils, FaStar, FaMapMarkerAlt, FaClock, FaUsers } from 'react-icons/fa';
+import { useCity } from '../context/CityContext';
+import { FaUtensils, FaStar, FaMapMarkerAlt, FaClock, FaUsers, FaFilter, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 
 const MessPlans = () => {
+  const { selectedCity } = useCity();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    minPrice: '',
+    maxPrice: '',
+    planType: '',
+    cuisine: '',
+    dietaryOptions: ''
+  });
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     fetchMessPlans();
-  }, []);
+  }, [selectedCity, filters]);
 
   const fetchMessPlans = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://roomnmeal.onrender.com/api/mess/plans');
+      const params = new URLSearchParams();
+      
+      // Add city filter if selected
+      if (selectedCity) {
+        params.append('city', selectedCity.id);
+      }
+      
+      // Add other filters
+      Object.keys(filters).forEach(key => {
+        if (filters[key]) {
+          params.append(key, filters[key]);
+        }
+      });
+      
+      const response = await axios.get(`/api/mess/plans?${params.toString()}`);
       setPlans(response.data.plans);
     } catch (error) {
       console.error('Error fetching mess plans:', error);
@@ -36,8 +60,33 @@ const MessPlans = () => {
       <div className="max-w-5xl mx-auto px-2 sm:px-4 lg:px-8">
         {/* Header */}
         <div className="mb-6 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Mess Services</h1>
-          <p className="text-gray-600 text-base">Subscribe to quality meal plans from verified providers</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
+            Mess Services
+            {selectedCity && (
+              <span className="block text-primary-600 text-lg mt-1">
+                in {selectedCity.name}
+              </span>
+            )}
+          </h1>
+          <p className="text-gray-600 text-base">
+            Subscribe to quality meal plans from verified providers
+            {selectedCity && (
+              <span className="block mt-1 text-sm text-primary-600">
+                {selectedCity.collegesCount}+ colleges • {selectedCity.techCompaniesCount}+ companies
+              </span>
+            )}
+          </p>
+        </div>
+
+        {/* Mobile Filter Toggle */}
+        <div className="md:hidden mb-6">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="w-full btn-secondary flex items-center justify-center gap-2"
+          >
+            <FaFilter />
+            <span>{showFilters ? 'Hide' : 'Show'} Filters</span>
+          </button>
         </div>
         {/* Mess Plans Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

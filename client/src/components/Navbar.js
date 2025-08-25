@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FaHome, FaUser, FaSignOutAlt, FaBars, FaTimes, FaWallet, FaComments, FaBed, FaUtensils, FaPlus } from 'react-icons/fa';
+import { useCity } from '../context/CityContext';
+import { FaHome, FaUser, FaSignOutAlt, FaBars, FaTimes, FaWallet, FaComments, FaBed, FaUtensils, FaPlus, FaMapMarkerAlt, FaChevronDown } from 'react-icons/fa';
 import NotificationBell from './NotificationBell';
+import CitySelector from './CitySelector';
 
 const navLinks = [
   { to: '/', label: 'Home', icon: <FaHome /> },
@@ -14,8 +16,10 @@ const navLinks = [
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
+  const { selectedCity, selectCity } = useCity();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCitySelectorOpen, setIsCitySelectorOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -24,6 +28,10 @@ const Navbar = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleCitySelect = (city) => {
+    selectCity(city);
   };
 
   return (
@@ -41,6 +49,16 @@ const Navbar = () => {
                 RoomNMeal
               </span>
             </Link>
+
+            {/* City Selector */}
+            <button
+              onClick={() => setIsCitySelectorOpen(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200 text-sm font-medium text-gray-700"
+            >
+              <FaMapMarkerAlt className="h-4 w-4 text-primary-600" />
+              <span>{selectedCity ? selectedCity.name : 'Select City'}</span>
+              <FaChevronDown className="h-3 w-3 text-gray-500" />
+            </button>
             
             {/* Desktop Navigation */}
             <div className="flex items-center space-x-2">
@@ -158,6 +176,13 @@ const Navbar = () => {
           </div>
         </div>
       )}
+
+      {/* City Selector Modal */}
+      <CitySelector
+        isOpen={isCitySelectorOpen}
+        onClose={() => setIsCitySelectorOpen(false)}
+        onCitySelect={handleCitySelect}
+      />
     </>
   );
 };

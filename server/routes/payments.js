@@ -15,6 +15,15 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET || 'dummy_secret'
 });
 
+// Public config for client (open for all authenticated users)
+router.get('/public-key', auth, async (req, res) => {
+  try {
+    res.json({ key: process.env.RAZORPAY_KEY_ID || 'rzp_test_dummy' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch key' });
+  }
+});
+
 // Create payment order
 router.post('/create-order', auth, async (req, res) => {
   try {

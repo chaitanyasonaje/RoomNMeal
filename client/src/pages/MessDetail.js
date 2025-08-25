@@ -12,6 +12,17 @@ const MessDetail = () => {
     fetchMessPlanDetails();
   }, [id]);
 
+  // Auto-refresh rating on review submit without full reload
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.detail?.targetModel === 'MessPlan' && e.detail?.targetId === id) {
+        fetchMessPlanDetails();
+      }
+    };
+    window.addEventListener('ratings:updated', handler);
+    return () => window.removeEventListener('ratings:updated', handler);
+  }, [id]);
+
   const fetchMessPlanDetails = async () => {
     try {
       setLoading(true);

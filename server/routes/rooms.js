@@ -7,12 +7,50 @@ const router = express.Router();
 // Get all rooms
 router.get('/', async (req, res) => {
   try {
-    const rooms = await Room.find({ isActive: true })
+    const { city, state, minRent, maxRent, propertyType, roomType, amenities } = req.query;
+    
+    let query = { isActive: true };
+
+    // Filter by city
+    if (city) {
+      query['address.city.id'] = city;
+    }
+
+    // Filter by state
+    if (state) {
+      query['address.city.state'] = state;
+    }
+
+    // Filter by rent range
+    if (minRent || maxRent) {
+      query.rent = {};
+      if (minRent) query.rent.$gte = parseInt(minRent);
+      if (maxRent) query.rent.$lte = parseInt(maxRent);
+    }
+
+    // Filter by property type
+    if (propertyType) {
+      query.propertyType = propertyType;
+    }
+
+    // Filter by room type
+    if (roomType) {
+      query.roomType = roomType;
+    }
+
+    // Filter by amenities
+    if (amenities) {
+      const amenitiesArray = amenities.split(',');
+      query.amenities = { $all: amenitiesArray };
+    }
+
+    const rooms = await Room.find(query)
       .populate('host', 'name phone')
       .sort({ createdAt: -1 });
 
     res.json({ rooms });
   } catch (error) {
+    console.error('Error fetching rooms:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

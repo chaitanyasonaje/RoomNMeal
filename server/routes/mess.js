@@ -8,12 +8,51 @@ const router = express.Router();
 // Get all mess plans
 router.get('/plans', async (req, res) => {
   try {
-    const plans = await MessPlan.find({ isActive: true })
+    const { city, state, minPrice, maxPrice, planType, cuisine, dietaryOptions } = req.query;
+    
+    let query = { isActive: true };
+
+    // Filter by city
+    if (city) {
+      query['city.id'] = city;
+    }
+
+    // Filter by state
+    if (state) {
+      query['city.state'] = state;
+    }
+
+    // Filter by price range
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = parseInt(minPrice);
+      if (maxPrice) query.price.$lte = parseInt(maxPrice);
+    }
+
+    // Filter by plan type
+    if (planType) {
+      query.planType = planType;
+    }
+
+    // Filter by cuisine
+    if (cuisine) {
+      const cuisineArray = cuisine.split(',');
+      query.cuisine = { $in: cuisineArray };
+    }
+
+    // Filter by dietary options
+    if (dietaryOptions) {
+      const dietaryArray = dietaryOptions.split(',');
+      query.dietaryOptions = { $in: dietaryArray };
+    }
+
+    const plans = await MessPlan.find(query)
       .populate('provider', 'name phone messDetails')
       .sort({ createdAt: -1 });
 
     res.json({ plans });
   } catch (error) {
+    console.error('Error fetching mess plans:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

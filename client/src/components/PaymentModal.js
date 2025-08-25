@@ -35,6 +35,12 @@ const PaymentModal = ({
     setError('');
 
     try {
+      // Fetch public key
+      const keyResp = await axios.get(`${API_BASE_URL}/api/payments/public-key`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      const publicKey = keyResp.data.key;
+
       // Create payment order
       const orderResponse = await axios.post(
         `${API_BASE_URL}/api/payments/create-order`,
@@ -56,7 +62,7 @@ const PaymentModal = ({
 
       // Initialize Razorpay
       const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_dummy',
+        key: publicKey || process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_dummy',
         amount: order.amount,
         currency: order.currency,
         name: 'RoomNMeal',

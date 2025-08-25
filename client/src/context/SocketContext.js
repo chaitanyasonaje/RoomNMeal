@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
+import { API_BASE_URL } from '../config/api';
 import { useAuth } from './AuthContext';
 
 const SocketContext = createContext();
@@ -19,7 +20,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      const newSocket = io('http://localhost:5000', {
+      const newSocket = io(API_BASE_URL, {
         auth: {
           token: localStorage.getItem('token')
         }
@@ -37,6 +38,14 @@ export const SocketProvider = ({ children }) => {
       newSocket.on('connect_error', (error) => {
         console.error('Socket connection error:', error);
         setIsConnected(false);
+      });
+
+      // Generic listeners that higher-level components can also hook into
+      newSocket.on('receiveMessage', (message) => {
+        // No-op here; Chat page subscribes directly. Kept for future global badges.
+      });
+      newSocket.on('messageDelivered', () => {
+        // No-op placeholder for delivery receipts.
       });
 
       setSocket(newSocket);

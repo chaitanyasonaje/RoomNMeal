@@ -4,6 +4,7 @@ const User = require('../models/User');
 const { auth } = require('../middlewares/auth');
 
 const router = express.Router();
+const { io } = require('../server');
 
 // Get user conversations
 router.get('/conversations', auth, async (req, res) => {
@@ -109,6 +110,14 @@ router.post('/send', auth, async (req, res) => {
     const populatedMessage = await ChatMessage.findById(chatMessage._id)
       .populate('sender', 'name profileImage')
       .populate('receiver', 'name profileImage');
+
+    // Emit real-time events to both sender and receiver rooms
+    try {
+      io.to(String(receiverId)).emit('receiveMessage', populatedMessage);
+      io.to(String(req.user._id)).emit('messageDelivered', populatedMessage);
+    } catch (e) {
+      console.error('Socket emit error:', e.message);
+    }
 
     res.status(201).json({ message: 'Message sent', chatMessage: populatedMessage });
   } catch (error) {

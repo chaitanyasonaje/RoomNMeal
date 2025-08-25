@@ -118,6 +118,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/roomnmeal
 // API routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/cities', require('./routes/cities'));
 app.use('/api/rooms', require('./routes/rooms'));
 app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/mess', require('./routes/mess'));

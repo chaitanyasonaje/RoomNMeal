@@ -18,6 +18,17 @@ const RoomDetail = () => {
     fetchRoomDetails();
   }, [id]);
 
+  // Auto-refresh rating on review submit without full reload
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.detail?.targetModel === 'Room' && e.detail?.targetId === id) {
+        fetchRoomDetails();
+      }
+    };
+    window.addEventListener('ratings:updated', handler);
+    return () => window.removeEventListener('ratings:updated', handler);
+  }, [id]);
+
   const fetchRoomDetails = async () => {
     try {
       setLoading(true);

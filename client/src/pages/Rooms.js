@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaSearch, FaFilter, FaStar, FaMapMarkerAlt, FaBed, FaBath, FaWifi, FaParking, FaSnowflake, FaShower, FaHeart, FaShare, FaEye, FaUtensils, FaCheck } from 'react-icons/fa';
+import { useCity } from '../context/CityContext';
+import { FaSearch, FaFilter, FaStar, FaMapMarkerAlt, FaBed, FaBath, FaWifi, FaParking, FaSnowflake, FaShower, FaHeart, FaShare, FaEye, FaUtensils, FaCheck, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import { PageLoading } from '../components/LoadingSpinner';
 
 const Rooms = () => {
+  const { selectedCity } = useCity();
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -18,12 +20,26 @@ const Rooms = () => {
 
   useEffect(() => {
     fetchRooms();
-  }, []);
+  }, [selectedCity, filters]);
 
   const fetchRooms = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://roomnmeal.onrender.com/api/rooms');
+      const params = new URLSearchParams();
+      
+      // Add city filter if selected
+      if (selectedCity) {
+        params.append('city', selectedCity.id);
+      }
+      
+      // Add other filters
+      Object.keys(filters).forEach(key => {
+        if (filters[key]) {
+          params.append(key, filters[key]);
+        }
+      });
+      
+      const response = await axios.get(`/api/rooms?${params.toString()}`);
       setRooms(response.data.rooms);
     } catch (error) {
       console.error('Error fetching rooms:', error);
@@ -78,9 +94,21 @@ const Rooms = () => {
       <div className="max-w-7xl mx-auto container-padding">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="heading-2 mb-3">Find Your Perfect Room</h1>
+          <h1 className="heading-2 mb-3">
+            Find Your Perfect Room
+            {selectedCity && (
+              <span className="block text-primary-600 text-xl mt-2">
+                in {selectedCity.name}
+              </span>
+            )}
+          </h1>
           <p className="text-body text-gray-600 max-w-2xl mx-auto">
             Discover verified accommodations near your college with modern amenities and comfortable living spaces
+            {selectedCity && (
+              <span className="block mt-2 text-sm text-primary-600">
+                {selectedCity.collegesCount}+ colleges • {selectedCity.techCompaniesCount}+ companies
+              </span>
+            )}
           </p>
         </div>
 

@@ -6,6 +6,7 @@ const MessPlan = require('../models/MessPlan');
 const User = require('../models/User');
 
 const router = express.Router();
+const { updateTargetRatings } = require('../utils/ratings');
 
 // Get reviews for a specific target (room, mess plan, or user)
 router.get('/:targetModel/:targetId', async (req, res) => {
@@ -132,6 +133,9 @@ router.post('/', auth, async (req, res) => {
     // Populate user info for response
     await review.populate('userId', 'name profileImage');
 
+    // Update aggregate ratings on target
+    await updateTargetRatings(targetModel, targetId);
+
     res.status(201).json({
       message: 'Review created successfully',
       review
@@ -168,6 +172,9 @@ router.put('/:id', auth, async (req, res) => {
     await review.save();
     await review.populate('userId', 'name profileImage');
 
+    // Update aggregate ratings on target
+    await updateTargetRatings(review.targetModel, review.targetId);
+
     res.json({
       message: 'Review updated successfully',
       review
@@ -197,6 +204,9 @@ router.delete('/:id', auth, async (req, res) => {
     // Soft delete
     review.isActive = false;
     await review.save();
+
+    // Update aggregate ratings on target
+    await updateTargetRatings(review.targetModel, review.targetId);
 
     res.json({ message: 'Review deleted successfully' });
   } catch (error) {

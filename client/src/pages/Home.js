@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaSearch, FaHome, FaUtensils, FaComments, FaShieldAlt, FaStar, FaArrowRight, FaCheck, FaMapMarkerAlt, FaUsers, FaClock, FaHeart } from 'react-icons/fa';
+import { useCity } from '../context/CityContext';
+import { FaSearch, FaHome, FaUtensils, FaComments, FaShieldAlt, FaStar, FaArrowRight, FaCheck, FaMapMarkerAlt, FaUsers, FaClock, FaHeart, FaMapPin, FaBuilding, FaGraduationCap } from 'react-icons/fa';
 
 const Home = () => {
+  const { selectedCity } = useCity();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ const Home = () => {
                 </span>
               </h1>
               <p className="text-body text-primary-100 mb-8 max-w-3xl mx-auto">
-                Discover premium rooms, subscribe to quality mess services, and enjoy a comfortable student life in Shirpur. 
+                Discover premium rooms, subscribe to quality mess services, and enjoy a comfortable student life {selectedCity ? `in ${selectedCity.name}` : 'across India'}. 
                 Everything you need for your academic journey in one place.
               </p>
               
@@ -61,6 +63,46 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* City Information Section */}
+      {selectedCity && (
+        <section className="section-padding bg-white border-b border-gray-100">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-8">
+              <h2 className="heading-2 mb-4">Welcome to {selectedCity.name}</h2>
+              <p className="text-body max-w-3xl mx-auto text-gray-600">
+                {selectedCity.description}
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="card-hover text-center group">
+                <div className="bg-gradient-to-br from-primary-100 to-primary-200 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
+                  <FaGraduationCap className="h-8 w-8 text-primary-600" />
+                </div>
+                <h3 className="heading-3 mb-2">{selectedCity.collegesCount}+</h3>
+                <p className="text-body text-gray-600">Colleges & Universities</p>
+              </div>
+              
+              <div className="card-hover text-center group">
+                <div className="bg-gradient-to-br from-success-100 to-success-200 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
+                  <FaBuilding className="h-8 w-8 text-success-600" />
+                </div>
+                <h3 className="heading-3 mb-2">{selectedCity.techCompaniesCount}+</h3>
+                <p className="text-body text-gray-600">Tech Companies</p>
+              </div>
+              
+              <div className="card-hover text-center group">
+                <div className="bg-gradient-to-br from-accent-100 to-accent-200 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
+                  <FaMapPin className="h-8 w-8 text-accent-600" />
+                </div>
+                <h3 className="heading-3 mb-2">Tier {selectedCity.tier}</h3>
+                <p className="text-body text-gray-600">City Category</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Features Section */}
       <section className="section-padding bg-white">

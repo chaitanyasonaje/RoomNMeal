@@ -6,6 +6,11 @@ const messPlanSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  city: {
+    id: String,
+    name: String,
+    state: String
+  },
   planName: {
     type: String,
     required: true,

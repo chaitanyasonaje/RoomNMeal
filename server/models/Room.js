@@ -32,8 +32,11 @@ const roomSchema = new mongoose.Schema({
   },
   address: {
     street: String,
-    city: String,
-    state: String,
+    city: {
+      id: String,
+      name: String,
+      state: String
+    },
     pincode: String,
     coordinates: {
       latitude: Number,

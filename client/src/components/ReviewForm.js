@@ -117,6 +117,11 @@ const ReviewForm = ({ targetId, targetModel, onSubmit, onCancel, existingReview 
         toast.success('Review submitted successfully');
         if (onSubmit) onSubmit(response.data.review);
       }
+      // After submit/update, fetch latest aggregate rating and emit event
+      try {
+        const event = new CustomEvent('ratings:updated', { detail: { targetId, targetModel } });
+        window.dispatchEvent(event);
+      } catch {}
     } catch (error) {
       console.error('Error submitting review:', error);
       if (error.response?.data?.message) {
