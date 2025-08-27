@@ -37,15 +37,16 @@ const Navbar = () => {
   return (
     <>
       {/* Top Navbar for desktop */}
-      <nav className="bg-white/95 backdrop-blur-md shadow-soft sticky top-0 z-50 hidden md:block border-b border-gray-100">
+      <nav className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-soft sticky top-0 z-50 hidden md:block border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3 group">
-              <div className="bg-gradient-to-r from-primary-600 to-primary-700 p-3 rounded-2xl group-hover:shadow-glow transition-all duration-300">
-                <FaHome className="h-8 w-8 text-white" />
+              <div className="bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900 p-3 rounded-2xl group-hover:shadow-glow transition-all duration-300">
+                {/* Optionally add a logo image here */}
+                <FaHome className="h-8 w-8 text-white dark:text-primary-200" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 dark:from-primary-300 dark:to-primary-700 bg-clip-text text-transparent">
                 RoomNMeal
               </span>
             </Link>
@@ -120,26 +121,25 @@ const Navbar = () => {
       </nav>
 
       {/* Bottom Navbar for mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-t border-t border-gray-200 md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-t border-t border-gray-200 dark:border-gray-800 md:hidden">
         <div className="flex justify-between items-center px-2 py-2">
           {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className="flex flex-col items-center justify-center flex-1 py-3 text-xs text-gray-600 hover:text-primary-600 transition-all duration-200 rounded-xl hover:bg-primary-50 mx-1"
+              className="flex flex-col items-center justify-center flex-1 py-3 text-xs text-gray-600 dark:text-primary-200 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/30 mx-1"
             >
               <span className="text-xl mb-1">{link.icon}</span>
               <span className="font-medium">{link.label}</span>
             </Link>
           ))}
-          
           {isAuthenticated ? (
-            <Link to="/profile" className="flex flex-col items-center justify-center flex-1 py-3 text-xs text-gray-600 hover:text-primary-600 transition-all duration-200 rounded-xl hover:bg-primary-50 mx-1">
+            <Link to="/profile" className="flex flex-col items-center justify-center flex-1 py-3 text-xs text-gray-600 dark:text-primary-200 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/30 mx-1">
               <span className="text-xl mb-1"><FaUser /></span>
               <span className="font-medium">Profile</span>
             </Link>
           ) : (
-            <Link to="/login" className="flex flex-col items-center justify-center flex-1 py-3 text-xs text-gray-600 hover:text-primary-600 transition-all duration-200 rounded-xl hover:bg-primary-50 mx-1">
+            <Link to="/login" className="flex flex-col items-center justify-center flex-1 py-3 text-xs text-gray-600 dark:text-primary-200 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/30 mx-1">
               <span className="text-xl mb-1"><FaUser /></span>
               <span className="font-medium">Sign In</span>
             </Link>

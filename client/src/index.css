@@ -22,36 +22,43 @@
 @layer components {
   /* Modern Button Styles */
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3 px-4 sm:px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   }
   
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-6 rounded-xl border-2 border-gray-200 hover:border-gray-300 transition-all duration-300 transform hover:scale-105 hover:shadow-soft focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+    @apply bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-4 sm:px-6 rounded-xl border-2 border-gray-200 hover:border-gray-300 transition-all duration-300 transform hover:scale-105 hover:shadow-soft focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
   }
   
   .btn-outline {
-    @apply border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white font-semibold py-3 px-4 sm:px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   }
 
   .btn-accent {
-    @apply bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2;
+    @apply bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white font-semibold py-3 px-4 sm:px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2;
   }
 
   .btn-success {
-    @apply bg-gradient-to-r from-success-500 to-success-600 hover:from-success-600 hover:to-success-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-success-500 focus:ring-offset-2;
+    @apply bg-gradient-to-r from-success-500 to-success-600 hover:from-success-600 hover:to-success-700 text-white font-semibold py-3 px-4 sm:px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-success-500 focus:ring-offset-2;
   }
 
   .btn-warning {
-    @apply bg-gradient-to-r from-warning-500 to-warning-600 hover:from-warning-600 hover:to-warning-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-warning-500 focus:ring-offset-2;
+    @apply bg-gradient-to-r from-warning-500 to-warning-600 hover:from-warning-600 hover:to-warning-700 text-white font-semibold py-3 px-4 sm:px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-warning-500 focus:ring-offset-2;
   }
 
   /* Modern Card Styles */
   .card {
-    @apply bg-white rounded-2xl shadow-soft border border-gray-100 p-6 transition-all duration-300 hover:shadow-medium hover:scale-[1.02] hover:border-gray-200;
+    @apply bg-white rounded-2xl shadow-soft border border-gray-100 p-6 transition-all duration-300 hover:shadow-medium hover:border-gray-200;
   }
 
   .card-hover {
-    @apply bg-white rounded-2xl shadow-soft border border-gray-100 p-6 transition-all duration-300 hover:shadow-large hover:scale-[1.03] hover:border-primary-200 hover:shadow-glow cursor-pointer;
+    @apply bg-white rounded-2xl shadow-soft border border-gray-100 p-6 transition-all duration-300 hover:shadow-large hover:border-primary-200 hover:shadow-glow cursor-pointer;
+  }
+
+  /* Prevent hover scaling on touch devices */
+  @media (hover: hover) {
+    .card:hover, .card-hover:hover {
+      transform: scale(1.03);
+    }
   }
 
   .card-glass {
@@ -119,11 +126,11 @@
 
   /* Modern Navigation Styles */
   .nav-link {
-    @apply flex items-center gap-2 text-gray-700 hover:text-primary-600 px-4 py-2 rounded-xl text-base font-medium transition-all duration-200 hover:bg-primary-50;
+    @apply flex items-center gap-2 text-gray-700 hover:text-primary-600 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:bg-primary-50;
   }
 
   .nav-link-active {
-    @apply flex items-center gap-2 text-primary-600 bg-primary-50 px-4 py-2 rounded-xl text-base font-medium;
+    @apply flex items-center gap-2 text-primary-600 bg-primary-50 px-4 py-3 rounded-xl text-base font-medium;
   }
 
   /* Modern Grid Layouts */
@@ -183,12 +190,20 @@
     @apply min-h-[44px] min-w-[44px];
   }
 
-  /* Modern Glassmorphism */
+  /* Modern Glassmorphism + Fallback */
   .glass {
     @apply bg-white/10 backdrop-blur-md border border-white/20;
   }
-
   .glass-dark {
     @apply bg-gray-900/80 backdrop-blur-md border border-gray-700/50;
   }
-} 
+
+  @supports not (backdrop-filter: blur(4px)) {
+    .glass {
+      background: rgba(255,255,255,0.85);
+    }
+    .glass-dark {
+      background: rgba(17,24,39,0.9); /* gray-900 fallback */
+    }
+  }
+}
