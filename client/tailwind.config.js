@@ -69,11 +69,22 @@ module.exports = {
         "bounce-in": "cubic-bezier(0.68, -0.55, 0.27, 1.55)",
         smooth: "cubic-bezier(0.4, 0, 0.2, 1)",
       },
+      animationDelay: {
+        '75': '75ms',
+        '100': '100ms',
+        '150': '150ms',
+        '200': '200ms',
+        '300': '300ms',
+        '500': '500ms',
+        '700': '700ms',
+        '1000': '1000ms',
+      },
     },
   },
   plugins: [
-    require("@tailwindcss/forms"),
-    require("@tailwindcss/typography"),
-    require("@tailwindcss/aspect-ratio"),
+    // Note: Install these plugins if needed: npm install @tailwindcss/forms @tailwindcss/typography @tailwindcss/aspect-ratio
+    // require("@tailwindcss/forms"),
+    // require("@tailwindcss/typography"),
+    // require("@tailwindcss/aspect-ratio"),
   ],
 };

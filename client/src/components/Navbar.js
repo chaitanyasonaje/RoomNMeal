@@ -39,7 +39,7 @@ const Navbar = () => {
       {/* Top Navbar for desktop */}
       <nav className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-soft sticky top-0 z-50 hidden md:block border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20 items-center">
+          <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3 group">
               <div className="bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900 p-3 rounded-2xl group-hover:shadow-glow transition-all duration-300">
@@ -62,7 +62,7 @@ const Navbar = () => {
             </button>
             
             {/* Desktop Navigation */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
@@ -121,8 +121,8 @@ const Navbar = () => {
       </nav>
 
       {/* Bottom Navbar for mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-t border-t border-gray-200 dark:border-gray-800 md:hidden">
-        <div className="flex justify-between items-center px-2 py-2">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-t border-t border-gray-200 dark:border-gray-800 md:hidden pb-safe">
+        <div className="flex justify-between items-center px-1 py-2">
           {navLinks.map((link) => (
             <Link
               key={link.to}

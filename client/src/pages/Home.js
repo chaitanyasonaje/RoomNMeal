@@ -12,7 +12,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50 pb-20 md:pb-0">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background Elements */}
@@ -20,7 +20,7 @@ const Home = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-primary-700/10 to-primary-800/10 opacity-20"></div>
         </div>
         
-        <div className="relative section-padding">
+        <div className="relative section-padding pt-20 md:pt-16">
           <div className="max-w-6xl mx-auto text-center">
             <div className={`animate-fade-in-up ${isVisible ? 'animate' : ''}`}>
               <h1 className="heading-1 text-white mb-6">
@@ -46,7 +46,7 @@ const Home = () => {
             </div>
 
             {/* Stats Section */}
-            <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto animate-fade-in-up ${isVisible ? 'animate' : ''}`} style={{animationDelay: '0.2s'}}>
+            <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto animate-fade-in-up ${isVisible ? 'animate' : ''} [animation-delay:0.2s]`}>
               <div className="card-glass text-center">
                 <div className="text-3xl font-bold text-white mb-2">500+</div>
                 <div className="text-primary-100">Happy Students</div>
@@ -115,7 +115,7 @@ const Home = () => {
           </div>
           
           <div className="grid-feature">
-            <div className={`card-hover text-center group animate-fade-in-up ${isVisible ? 'animate' : ''}`} style={{animationDelay: '0.1s'}}>
+            <div className={`card-hover text-center group animate-fade-in-up ${isVisible ? 'animate' : ''} [animation-delay:0.1s]`}>
               <div className="bg-gradient-to-br from-primary-100 to-primary-200 w-20 h-20 rounded-3xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
                 <FaHome className="h-10 w-10 text-primary-600" />
               </div>
@@ -140,7 +140,7 @@ const Home = () => {
               </div>
             </div>
 
-            <div className={`card-hover text-center group animate-fade-in-up ${isVisible ? 'animate' : ''}`} style={{animationDelay: '0.2s'}}>
+            <div className={`card-hover text-center group animate-fade-in-up ${isVisible ? 'animate' : ''} [animation-delay:0.2s]`}>
               <div className="bg-gradient-to-br from-success-100 to-success-200 w-20 h-20 rounded-3xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
                 <FaUtensils className="h-10 w-10 text-success-600" />
               </div>
@@ -165,7 +165,7 @@ const Home = () => {
               </div>
             </div>
 
-            <div className={`card-hover text-center group animate-fade-in-up ${isVisible ? 'animate' : ''}`} style={{animationDelay: '0.3s'}}>
+            <div className={`card-hover text-center group animate-fade-in-up ${isVisible ? 'animate' : ''} [animation-delay:0.3s]`}>
               <div className="bg-gradient-to-br from-accent-100 to-accent-200 w-20 h-20 rounded-3xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
                 <FaComments className="h-10 w-10 text-accent-600" />
               </div>
@@ -203,9 +203,9 @@ const Home = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {/* Room Booking */}
-            <div className={`card-hover overflow-hidden group animate-fade-in-left ${isVisible ? 'animate' : ''}`} style={{animationDelay: '0.1s'}}>
+            <div className={`card-hover overflow-hidden group animate-fade-in-left ${isVisible ? 'animate' : ''} [animation-delay:0.1s]`}>
               <div className="bg-gradient-to-br from-primary-600 to-primary-700 p-8 text-white">
                 <div className="flex items-center justify-between mb-4">
                   <FaHome className="h-12 w-12 text-white" />
@@ -239,7 +239,7 @@ const Home = () => {
             </div>
 
             {/* Mess Services */}
-            <div className={`card-hover overflow-hidden group animate-fade-in-right ${isVisible ? 'animate' : ''}`} style={{animationDelay: '0.2s'}}>
+            <div className={`card-hover overflow-hidden group animate-fade-in-right ${isVisible ? 'animate' : ''} [animation-delay:0.2s]`}>
               <div className="bg-gradient-to-br from-success-600 to-success-700 p-8 text-white">
                 <div className="flex items-center justify-between mb-4">
                   <FaUtensils className="h-12 w-12 text-white" />

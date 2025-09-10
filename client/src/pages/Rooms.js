@@ -219,7 +219,7 @@ const Rooms = () => {
               <div 
                 key={room._id} 
                 className="card-hover overflow-hidden group animate-fade-in-up"
-                style={{animationDelay: `${index * 0.1}s`}}
+                style={{'--animation-delay': `${index * 0.1}s`}}
               >
                 {/* Room Image */}
                 <div className="relative h-56 bg-gray-200 overflow-hidden">

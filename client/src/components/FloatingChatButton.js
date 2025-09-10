@@ -25,8 +25,7 @@ const FloatingChatButton = () => {
     <button
       onClick={handleClick}
       aria-label="Open chat"
-      className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-50 rounded-full shadow-glow-lg focus:outline-none focus:ring-2 focus:ring-primary-500 pointer-events-auto transition-all duration-300 group"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 rounded-full shadow-glow-lg focus:outline-none focus:ring-2 focus:ring-primary-500 pointer-events-auto transition-all duration-300 group pb-safe"
     >
       <div className="relative flex items-center">
         <div className="p-3 md:p-4 rounded-full bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 dark:from-gray-800 dark:to-gray-900 dark:text-primary-300 dark:hover:from-gray-900 dark:hover:to-gray-800 shadow-lg transition-transform duration-200 hover:scale-105 motion-reduce:transition-none motion-reduce:hover:transform-none">

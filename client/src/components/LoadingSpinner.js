@@ -55,9 +55,9 @@ export const PageLoading = ({ text = 'Loading amazing content...' }) => (
       <LoadingSpinner size="xl" text={text} variant="primary" />
       <div className="mt-6">
         <div className="flex space-x-1 justify-center">
-          <div className="w-2 h-2 bg-primary-600 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-          <div className="w-2 h-2 bg-primary-600 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-          <div className="w-2 h-2 bg-primary-600 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+          <div className="w-2 h-2 bg-primary-600 rounded-full animate-bounce [animation-delay:0ms]"></div>
+          <div className="w-2 h-2 bg-primary-600 rounded-full animate-bounce [animation-delay:150ms]"></div>
+          <div className="w-2 h-2 bg-primary-600 rounded-full animate-bounce [animation-delay:300ms]"></div>
         </div>
       </div>
     </div>
