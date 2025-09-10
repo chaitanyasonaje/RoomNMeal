@@ -11,7 +11,7 @@ const navLinks = [
   { to: '/rooms', label: 'Rooms', icon: <FaBed /> },
   { to: '/mess', label: 'Mess', icon: <FaUtensils /> },
   { to: '/services', label: 'Services', icon: <FaPlus /> },
-  { to: '/chat', label: 'Chat', icon: <FaComments /> },
+  { to: '/faq', label: 'FAQ', icon: <FaComments /> },
 ];
 
 const Navbar = () => {

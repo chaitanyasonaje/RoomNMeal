@@ -75,9 +75,9 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/chat" className="text-gray-300 hover:text-primary-400 transition-colors duration-200 flex items-center group">
+                  <Link to="/faq" className="text-gray-300 hover:text-primary-400 transition-colors duration-200 flex items-center group">
                     <span className="w-2 h-2 bg-primary-500 rounded-full mr-3 group-hover:scale-150 transition-transform duration-200"></span>
-                    Support Chat
+                    FAQ & Help
                   </Link>
                 </li>
               </ul>

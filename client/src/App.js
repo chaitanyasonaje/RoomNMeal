@@ -4,7 +4,7 @@ import { useAuth } from './context/AuthContext';
 import { CityProvider } from './context/CityContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import FloatingChatButton from './components/FloatingChatButton';
+import AdvancedChatBot from './components/AdvancedChatBot';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -26,6 +26,7 @@ import HostRooms from './pages/HostRooms';
 import AddMessPlan from './pages/AddMessPlan';
 import EditMessPlan from './pages/EditMessPlan';
 import ProviderPlans from './pages/ProviderPlans';
+import FAQ from './pages/FAQ';
 
 function App() {
   const { user } = useAuth();
@@ -44,6 +45,7 @@ function App() {
           <Route path="/mess" element={<MessPlans />} />
           <Route path="/mess/:id" element={<MessDetail />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/faq" element={<FAQ />} />
           
           {/* Protected Routes */}
           <Route path="/dashboard" element={
@@ -108,7 +110,7 @@ function App() {
           } />
         </Routes>
       </main>
-      <FloatingChatButton />
+      <AdvancedChatBot />
       <Footer />
     </div>
     </CityProvider>
