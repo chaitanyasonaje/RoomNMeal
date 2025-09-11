@@ -7,6 +7,18 @@
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",
@@ -17,24 +29,58 @@
   "scope": "/",
   "lang": "en",
   "categories": ["education", "lifestyle", "food", "travel"],
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Home page showing city selection and featured rooms"
+    },
+    {
+      "src": "screenshot2.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile view of room listings with filters"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Find Rooms",
       "short_name": "Rooms",
       "description": "Search for available rooms and PGs",
-      "url": "/rooms"
+      "url": "/rooms",
+      "icons": [
+        {
+          "src": "icon-room.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
       "name": "Mess Services",
       "short_name": "Mess",
       "description": "Browse and subscribe to mess plans",
-      "url": "/mess"
+      "url": "/mess",
+      "icons": [
+        {
+          "src": "icon-mess.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
       "name": "My Bookings",
       "short_name": "Bookings",
       "description": "View your room and mess bookings",
-      "url": "/bookings"
+      "url": "/bookings",
+      "icons": [
+        {
+          "src": "icon-booking.png",
+          "sizes": "96x96"
+        }
+      ]
     }
   ]
 } 
