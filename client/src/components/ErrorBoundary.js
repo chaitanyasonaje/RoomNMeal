@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaExclamationTriangle, FaHome, FaRedo, FaBug } from 'react-icons/fa';
+import { FaExclamationTriangle, FaRefresh } from 'react-icons/fa';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -8,100 +8,84 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
+    // Update state so the next render will show the fallback UI
     return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
+    // Log error details
+    console.error('Error caught by boundary:', error, errorInfo);
     this.setState({
       error: error,
       errorInfo: errorInfo
     });
-
-    // Log error to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error caught by boundary:', error, errorInfo);
-    }
-
-    // You can also log the error to an error reporting service here
-    // logErrorToService(error, errorInfo);
   }
 
-  handleReload = () => {
+  handleRefresh = () => {
+    // Reset error state and refresh
+    this.setState({ hasError: false, error: null, errorInfo: null });
     window.location.reload();
   };
 
-  handleGoHome = () => {
-    window.location.href = '/';
+  handleReset = () => {
+    // Reset error state without refresh
+    this.setState({ hasError: false, error: null, errorInfo: null });
   };
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-100 flex items-center justify-center p-4">
-          <div className="max-w-2xl mx-auto text-center">
-            {/* Error Icon */}
-            <div className="mb-8">
-              <div className="bg-red-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FaExclamationTriangle className="h-12 w-12 text-red-600" />
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
+            <div className="mb-4">
+              <FaExclamationTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
                 Oops! Something went wrong
-              </h1>
-              <p className="text-lg text-gray-600">
-                We're sorry, but something unexpected happened. Our team has been notified.
+              </h2>
+              <p className="text-gray-600 mb-4">
+                We encountered an unexpected error. Don't worry, this has been logged and we'll fix it soon.
               </p>
             </div>
 
-            {/* Error Details (Development Only) */}
+            {/* Error Details (only in development) */}
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <div className="bg-white rounded-2xl shadow-soft p-6 mb-8 text-left">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                  <FaBug className="h-5 w-5 text-red-500 mr-2" />
-                  Error Details (Development)
-                </h3>
-                <div className="bg-gray-50 rounded-lg p-4 font-mono text-sm overflow-auto">
-                  <div className="text-red-600 mb-2">
-                    <strong>Error:</strong> {this.state.error.toString()}
-                  </div>
-                  {this.state.errorInfo && (
-                    <div className="text-gray-700">
-                      <strong>Stack Trace:</strong>
-                      <pre className="mt-2 text-xs overflow-auto">
-                        {this.state.errorInfo.componentStack}
-                      </pre>
-                    </div>
-                  )}
-                </div>
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-left">
+                <p className="text-sm font-medium text-red-800 mb-2">Error Details:</p>
+                <p className="text-xs text-red-700 font-mono">
+                  {this.state.error.toString()}
+                </p>
+                {this.state.errorInfo && (
+                  <details className="mt-2">
+                    <summary className="text-xs text-red-600 cursor-pointer">
+                      Stack Trace
+                    </summary>
+                    <pre className="text-xs text-red-700 mt-1 whitespace-pre-wrap">
+                      {this.state.errorInfo.componentStack}
+                    </pre>
+                  </details>
+                )}
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={this.handleReload}
-                className="btn-primary flex items-center justify-center gap-2"
+                onClick={this.handleReset}
+                className="flex-1 bg-primary-600 text-white py-2 px-4 rounded-lg hover:bg-primary-700 transition-colors"
               >
-                <FaRedo className="h-4 w-4" />
-                <span>Try Again</span>
+                Try Again
               </button>
               <button
-                onClick={this.handleGoHome}
-                className="btn-secondary flex items-center justify-center gap-2"
+                onClick={this.handleRefresh}
+                className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
               >
-                <FaHome className="h-4 w-4" />
-                <span>Go Home</span>
+                <FaRefresh className="h-4 w-4" />
+                Refresh Page
               </button>
             </div>
 
-            {/* Help Text */}
-            <div className="mt-8 text-sm text-gray-500">
-              <p className="mb-2">
-                If this problem persists, please contact our support team.
-              </p>
-              <p>
-                Error ID: {this.state.error?.message?.substring(0, 8) || 'UNKNOWN'}
-              </p>
-            </div>
+            <p className="text-xs text-gray-500 mt-4">
+              If the problem persists, please contact support.
+            </p>
           </div>
         </div>
       );
@@ -110,69 +94,5 @@ class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
-
-// Functional Error Component for use in components
-export const ErrorFallback = ({ error, resetErrorBoundary }) => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-100 flex items-center justify-center p-4">
-      <div className="max-w-2xl mx-auto text-center">
-        <div className="mb-8">
-          <div className="bg-red-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FaExclamationTriangle className="h-12 w-12 text-red-600" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Something went wrong
-          </h1>
-          <p className="text-lg text-gray-600">
-            An error occurred while loading this content.
-          </p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
-            onClick={resetErrorBoundary}
-            className="btn-primary flex items-center justify-center gap-2"
-          >
-            <FaRedo className="h-4 w-4" />
-            <span>Try Again</span>
-          </button>
-          <button
-            onClick={() => window.location.href = '/'}
-            className="btn-secondary flex items-center justify-center gap-2"
-          >
-            <FaHome className="h-4 w-4" />
-            <span>Go Home</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Simple Error Message Component
-export const ErrorMessage = ({ 
-  title = 'Error', 
-  message = 'Something went wrong', 
-  onRetry, 
-  className = '' 
-}) => {
-  return (
-    <div className={`bg-red-50 border border-red-200 rounded-2xl p-6 text-center ${className}`}>
-      <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-        <FaExclamationTriangle className="h-8 w-8 text-red-600" />
-      </div>
-      <h3 className="text-lg font-semibold text-red-900 mb-2">{title}</h3>
-      <p className="text-red-700 mb-4">{message}</p>
-      {onRetry && (
-        <button
-          onClick={onRetry}
-          className="btn-primary"
-        >
-          Try Again
-        </button>
-      )}
-    </div>
-  );
-};
 
 export default ErrorBoundary;
