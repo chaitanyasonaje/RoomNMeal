@@ -16,6 +16,7 @@ const allowedOrigins = [
   process.env.CLIENT_URL || "http://localhost:3000",
   "https://roomnmeal.netlify.app",
   "https://www.roomnmeal.netlify.app",
+  "https://roomnmeal.netlify.app/",
   "http://localhost:3000",
   "http://127.0.0.1:3000"
 ];
@@ -58,7 +59,10 @@ app.use(cors({
       callback(null, true);
     } else {
       console.log('Origin blocked:', origin);
-      // Instead of throwing an error, allow the request but log it
+      // Explicitly block disallowed origins in production
+      if (process.env.NODE_ENV === 'production') {
+        return callback(new Error('Not allowed by CORS'));
+      }
       callback(null, true);
     }
   },

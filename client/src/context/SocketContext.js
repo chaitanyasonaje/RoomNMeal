@@ -23,7 +23,9 @@ export const SocketProvider = ({ children }) => {
       const newSocket = io(API_BASE_URL, {
         auth: {
           token: localStorage.getItem('token')
-        }
+        },
+        transports: ['websocket'],
+        withCredentials: true
       });
 
       newSocket.on('connect', () => {
