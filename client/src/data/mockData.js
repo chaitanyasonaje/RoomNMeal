@@ -154,7 +154,7 @@ export const mockRooms = [
     gender: 'Female',
     availableFrom: '2024-02-01',
     images: [
-      'https://images.unsplash.com/photo-1555854877-bab0ef8c7b9b?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop',
       'https://images.unsplash.com/photo-1560448204-61dc36dc98c8?w=800&h=600&fit=crop',
       'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop'
     ],

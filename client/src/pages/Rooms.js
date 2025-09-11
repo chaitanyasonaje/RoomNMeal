@@ -315,12 +315,15 @@ const Rooms = () => {
                   
                   {/* Amenities */}
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {room.amenities?.slice(0, 4).map((amenity, index) => (
-                      <span key={index} className="flex items-center gap-1 bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs">
-                        {getAmenityIcon(amenity)}
-                        {amenity}
-                      </span>
-                    ))}
+                    {room.amenities?.slice(0, 4).map((amenity, index) => {
+                      const amenityName = typeof amenity === 'string' ? amenity : amenity.name || 'Unknown';
+                      return (
+                        <span key={index} className="flex items-center gap-1 bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs">
+                          {getAmenityIcon(amenityName)}
+                          {amenityName}
+                        </span>
+                      );
+                    })}
                     {room.amenities?.length > 4 && (
                       <span className="text-gray-500 text-xs flex items-center">
                         +{room.amenities.length - 4} more

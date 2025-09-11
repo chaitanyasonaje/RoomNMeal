@@ -184,7 +184,9 @@ const RoomDetail = () => {
                 {room.amenities?.map((amenity, index) => (
                   <div key={index} className="flex items-center">
                     <div className="w-2 h-2 bg-primary-600 rounded-full mr-3"></div>
-                    <span className="text-gray-700 text-sm">{amenity}</span>
+                    <span className="text-gray-700 text-sm">
+                      {typeof amenity === 'string' ? amenity : amenity.name || 'Unknown Amenity'}
+                    </span>
                   </div>
                 ))}
               </div>
