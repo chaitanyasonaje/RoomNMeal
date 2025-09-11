@@ -183,12 +183,19 @@ const RoomDetail = () => {
             <div className="bg-white rounded-lg shadow p-5 mb-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-3">Amenities</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {room.amenities?.map((amenity, index) => (
-                  <div key={index} className="flex items-center">
-                    <div className="w-2 h-2 bg-primary-600 rounded-full mr-3"></div>
-                    <span className="text-gray-700 text-sm">{amenity}</span>
-                  </div>
-                ))}
+                {room.amenities?.map((amenity, index) => {
+                  const amenityName = typeof amenity === 'string' ? amenity : amenity?.name;
+                  const amenityPrice = typeof amenity === 'object' ? amenity?.price : undefined;
+                  return (
+                    <div key={index} className="flex items-center">
+                      <div className="w-2 h-2 bg-primary-600 rounded-full mr-3"></div>
+                      <span className="text-gray-700 text-sm">
+                        {amenityName}
+                        {amenityPrice ? ` (₹${amenityPrice})` : ''}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

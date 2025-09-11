@@ -85,6 +85,7 @@ const Rooms = () => {
   });
 
   const getAmenityIcon = (amenity) => {
+    const name = typeof amenity === 'string' ? amenity : amenity?.name;
     const iconMap = {
       'WiFi': <FaWifi className="h-4 w-4" />,
       'Parking': <FaParking className="h-4 w-4" />,
@@ -92,7 +93,7 @@ const Rooms = () => {
       'Attached Bathroom': <FaShower className="h-4 w-4" />,
       'Food': <FaUtensils className="h-4 w-4" />,
     };
-    return iconMap[amenity] || <FaCheck className="h-4 w-4" />;
+    return iconMap[name] || <FaCheck className="h-4 w-4" />;
   };
 
   if (loading) {
@@ -315,12 +316,16 @@ const Rooms = () => {
                   
                   {/* Amenities */}
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {room.amenities?.slice(0, 4).map((amenity, index) => (
-                      <span key={index} className="flex items-center gap-1 bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs">
-                        {getAmenityIcon(amenity)}
-                        {amenity}
-                      </span>
-                    ))}
+                    {room.amenities?.slice(0, 4).map((amenity, index) => {
+                      const name = typeof amenity === 'string' ? amenity : amenity?.name;
+                      const price = typeof amenity === 'object' ? amenity?.price : undefined;
+                      return (
+                        <span key={index} className="flex items-center gap-1 bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs">
+                          {getAmenityIcon(amenity)}
+                          {name}{price ? ` (₹${price})` : ''}
+                        </span>
+                      );
+                    })}
                     {room.amenities?.length > 4 && (
                       <span className="text-gray-500 text-xs flex items-center">
                         +{room.amenities.length - 4} more
