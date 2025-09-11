@@ -650,30 +650,124 @@ export const mockCities = [
 
 // Helper functions
 export const getMockData = {
-  rooms: () => mockRooms,
-  messPlans: () => mockMessPlans,
-  services: () => mockServices,
-  users: () => mockUsers,
-  reviews: () => mockReviews,
-  bookings: () => mockBookings,
-  messSubscriptions: () => mockMessSubscriptions,
-  notifications: () => mockNotifications,
-  cities: () => mockCities,
+  rooms: () => Array.isArray(mockRooms) ? mockRooms : [],
+  messPlans: () => Array.isArray(mockMessPlans) ? mockMessPlans : [],
+  services: () => Array.isArray(mockServices) ? mockServices : [],
+  users: () => Array.isArray(mockUsers) ? mockUsers : [],
+  reviews: () => Array.isArray(mockReviews) ? mockReviews : [],
+  bookings: () => Array.isArray(mockBookings) ? mockBookings : [],
+  messSubscriptions: () => Array.isArray(mockMessSubscriptions) ? mockMessSubscriptions : [],
+  notifications: () => Array.isArray(mockNotifications) ? mockNotifications : [],
+  cities: () => Array.isArray(mockCities) ? mockCities : [],
   
   // Get specific items
-  getRoomById: (id) => mockRooms.find(room => room._id === id),
-  getMessById: (id) => mockMessPlans.find(mess => mess._id === id),
-  getServiceById: (id) => mockServices.find(service => service._id === id),
-  getUserById: (id) => mockUsers.find(user => user._id === id),
+  getRoomById: (id) => {
+    try {
+      if (!id) return null;
+      return Array.isArray(mockRooms) ? mockRooms.find(room => room && room._id === id) || null : null;
+    } catch (error) {
+      console.error('Error finding room by ID:', error);
+      return null;
+    }
+  },
+  getMessById: (id) => {
+    try {
+      if (!id) return null;
+      return Array.isArray(mockMessPlans) ? mockMessPlans.find(mess => mess && mess._id === id) || null : null;
+    } catch (error) {
+      console.error('Error finding mess by ID:', error);
+      return null;
+    }
+  },
+  getServiceById: (id) => {
+    try {
+      if (!id) return null;
+      return Array.isArray(mockServices) ? mockServices.find(service => service && service._id === id) || null : null;
+    } catch (error) {
+      console.error('Error finding service by ID:', error);
+      return null;
+    }
+  },
+  getUserById: (id) => {
+    try {
+      if (!id) return null;
+      return Array.isArray(mockUsers) ? mockUsers.find(user => user && user._id === id) || null : null;
+    } catch (error) {
+      console.error('Error finding user by ID:', error);
+      return null;
+    }
+  },
   
   // Get filtered data
-  getRoomsByCity: (city) => mockRooms.filter(room => room.address.city.toLowerCase() === city.toLowerCase()),
-  getMessByCity: (city) => mockMessPlans.filter(mess => mess.address.city.toLowerCase() === city.toLowerCase()),
-  getReviewsByEntity: (entityId, entityType) => mockReviews.filter(review => review.entityId === entityId && review.entityType === entityType),
+  getRoomsByCity: (city) => {
+    try {
+      if (!city || typeof city !== 'string') return [];
+      return Array.isArray(mockRooms) ? mockRooms.filter(room => 
+        room && room.address && room.address.city && 
+        room.address.city.toLowerCase() === city.toLowerCase()
+      ) : [];
+    } catch (error) {
+      console.error('Error filtering rooms by city:', error);
+      return [];
+    }
+  },
+  getMessByCity: (city) => {
+    try {
+      if (!city || typeof city !== 'string') return [];
+      return Array.isArray(mockMessPlans) ? mockMessPlans.filter(mess => 
+        mess && mess.address && mess.address.city && 
+        mess.address.city.toLowerCase() === city.toLowerCase()
+      ) : [];
+    } catch (error) {
+      console.error('Error filtering mess plans by city:', error);
+      return [];
+    }
+  },
+  getReviewsByEntity: (entityId, entityType) => {
+    try {
+      if (!entityId || !entityType) return [];
+      return Array.isArray(mockReviews) ? mockReviews.filter(review => 
+        review && review.entityId === entityId && review.entityType === entityType
+      ) : [];
+    } catch (error) {
+      console.error('Error filtering reviews:', error);
+      return [];
+    }
+  },
   
   // Get user-specific data
-  getUserBookings: (userId) => mockBookings.filter(booking => booking.userId === userId),
-  getUserSubscriptions: (userId) => mockMessSubscriptions.filter(sub => sub.userId === userId),
-  getUserNotifications: (userId) => mockNotifications.filter(notif => notif.userId === userId)
+  getUserBookings: (userId) => {
+    try {
+      if (!userId) return [];
+      return Array.isArray(mockBookings) ? mockBookings.filter(booking => 
+        booking && booking.userId === userId
+      ) : [];
+    } catch (error) {
+      console.error('Error getting user bookings:', error);
+      return [];
+    }
+  },
+  getUserSubscriptions: (userId) => {
+    try {
+      if (!userId) return [];
+      return Array.isArray(mockMessSubscriptions) ? mockMessSubscriptions.filter(sub => 
+        sub && sub.userId === userId
+      ) : [];
+    } catch (error) {
+      console.error('Error getting user subscriptions:', error);
+      return [];
+    }
+  },
+  getUserNotifications: (userId) => {
+    try {
+      if (!userId) return [];
+      return Array.isArray(mockNotifications) ? mockNotifications.filter(notif => 
+        notif && notif.userId === userId
+      ) : [];
+    } catch (error) {
+      console.error('Error getting user notifications:', error);
+      return [];
+    }
+  }
 };
 

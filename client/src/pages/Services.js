@@ -294,7 +294,9 @@ const Services = () => {
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {services.map((service) => (
+          {Array.isArray(services) && services.map((service) => {
+            if (!service || !service._id) return null;
+            return (
             <div key={service._id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
               {/* Service Image */}
               <div className="relative h-48 bg-gray-200">
@@ -394,7 +396,8 @@ const Services = () => {
                 </Link>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Pagination */}

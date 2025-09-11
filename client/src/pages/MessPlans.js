@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useCity } from '../context/CityContext';
 import { FaUtensils, FaStar, FaMapMarkerAlt, FaClock, FaUsers, FaFilter, FaTimes } from 'react-icons/fa';
@@ -19,43 +19,92 @@ const MessPlans = () => {
 
   useEffect(() => {
     fetchMessPlans();
-  }, [selectedCity, filters]);
+  }, [fetchMessPlans]);
 
-  const fetchMessPlans = async () => {
+  const fetchMessPlans = useCallback(async () => {
     try {
       setLoading(true);
+      // Ensure plans is always an array during loading
+      setPlans([]);
+      
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      let filteredPlans = getMockData.messPlans() || [];
-      // Apply city filter
-      if (selectedCity) {
-        const cityPlans = getMockData.getMessByCity(selectedCity.name);
-        filteredPlans = Array.isArray(cityPlans) ? cityPlans : [];
+      
+      // Get initial data with proper null checks
+      let filteredPlans = [];
+      try {
+        const allPlans = getMockData.messPlans();
+        filteredPlans = Array.isArray(allPlans) ? allPlans : [];
+      } catch (dataError) {
+        console.error('Error getting mock data:', dataError);
+        filteredPlans = [];
       }
-      // Apply other filters
+      
+      // Apply city filter with enhanced error handling
+      if (selectedCity && selectedCity.name) {
+        try {
+          const cityPlans = getMockData.getMessByCity(selectedCity.name);
+          filteredPlans = Array.isArray(cityPlans) ? cityPlans : [];
+        } catch (cityError) {
+          console.error('Error filtering by city:', cityError);
+          filteredPlans = [];
+        }
+      }
+      
+      // Apply other filters with enhanced safety checks
       if (filters.minPrice && Array.isArray(filteredPlans)) {
-        filteredPlans = filteredPlans.filter(plan => 
-          plan.mealPlans && Array.isArray(plan.mealPlans) && plan.mealPlans.some(meal => meal.price >= parseInt(filters.minPrice))
-        );
+        const minPrice = parseInt(filters.minPrice);
+        if (!isNaN(minPrice)) {
+          filteredPlans = filteredPlans.filter(plan => {
+            try {
+              return plan && plan.mealPlans && Array.isArray(plan.mealPlans) && 
+                     plan.mealPlans.some(meal => meal && typeof meal.price === 'number' && meal.price >= minPrice);
+            } catch (filterError) {
+              console.error('Error in minPrice filter:', filterError);
+              return false;
+            }
+          });
+        }
       }
+      
       if (filters.maxPrice && Array.isArray(filteredPlans)) {
-        filteredPlans = filteredPlans.filter(plan => 
-          plan.mealPlans && Array.isArray(plan.mealPlans) && plan.mealPlans.some(meal => meal.price <= parseInt(filters.maxPrice))
-        );
+        const maxPrice = parseInt(filters.maxPrice);
+        if (!isNaN(maxPrice)) {
+          filteredPlans = filteredPlans.filter(plan => {
+            try {
+              return plan && plan.mealPlans && Array.isArray(plan.mealPlans) && 
+                     plan.mealPlans.some(meal => meal && typeof meal.price === 'number' && meal.price <= maxPrice);
+            } catch (filterError) {
+              console.error('Error in maxPrice filter:', filterError);
+              return false;
+            }
+          });
+        }
       }
+      
       if (filters.cuisine && Array.isArray(filteredPlans)) {
-        filteredPlans = filteredPlans.filter(plan => 
-          plan.cuisine && Array.isArray(plan.cuisine) && plan.cuisine.includes(filters.cuisine)
-        );
+        filteredPlans = filteredPlans.filter(plan => {
+          try {
+            return plan && plan.cuisine && Array.isArray(plan.cuisine) && plan.cuisine.includes(filters.cuisine);
+          } catch (filterError) {
+            console.error('Error in cuisine filter:', filterError);
+            return false;
+          }
+        });
       }
-      setPlans(Array.isArray(filteredPlans) ? filteredPlans : []);
+      
+      // Ensure we always set an array
+      const finalPlans = Array.isArray(filteredPlans) ? filteredPlans : [];
+      setPlans(finalPlans);
+      
     } catch (error) {
       console.error('Error fetching mess plans:', error);
+      // Always ensure plans is an array, even in error state
       setPlans([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCity, filters]);
 
   if (loading) {
     return (
@@ -100,7 +149,14 @@ const MessPlans = () => {
         </div>
         {/* Mess Plans Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {plans && plans.length > 0 && plans.map((plan) => (
+          {Array.isArray(plans) && plans.length > 0 && plans.map((plan) => {
+            // Safety check for each plan object
+            if (!plan || !plan._id) {
+              console.warn('Invalid plan object:', plan);
+              return null;
+            }
+            
+            return (
             <div key={plan._id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow flex flex-col">
               {/* Plan Image */}
               <div className="h-44 bg-gray-200 relative">
@@ -132,30 +188,37 @@ const MessPlans = () => {
                   <div className="flex items-center"><FaUsers className="h-4 w-4 mr-1" />{plan.currentSubscribers || 0}/{plan.capacity || 'N/A'}</div>
                 </div>
                 <div className="flex items-center mb-2">
-                  {[...Array(5)].map((_, i) => (
+                  {Array.from({ length: 5 }, (_, i) => (
                     <FaStar
                       key={i}
-                      className={`h-4 w-4 ${i < Math.floor(plan.ratings?.average || 0) ? 'text-yellow-400' : 'text-gray-300'}`}
+                      className={`h-4 w-4 ${i < Math.floor((plan.ratings?.average || 0)) ? 'text-yellow-400' : 'text-gray-300'}`}
                     />
                   ))}
                   <span className="text-xs text-gray-600 ml-2">({plan.ratings?.count || 0} reviews)</span>
                 </div>
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {plan.mealTypes && Array.isArray(plan.mealTypes) && plan.mealTypes.map((meal, index) => (
-                    <span key={index} className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">{meal}</span>
-                  ))}
+                  {plan.mealTypes && Array.isArray(plan.mealTypes) && plan.mealTypes.map((meal, index) => {
+                    if (!meal || typeof meal !== 'string') return null;
+                    return (
+                      <span key={index} className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">{meal}</span>
+                    );
+                  })}
                 </div>
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {plan.cuisine && Array.isArray(plan.cuisine) && plan.cuisine.slice(0, 2).map((cuisine, index) => (
-                    <span key={index} className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">{cuisine}</span>
-                  ))}
+                  {plan.cuisine && Array.isArray(plan.cuisine) && plan.cuisine.slice(0, 2).map((cuisine, index) => {
+                    if (!cuisine || typeof cuisine !== 'string') return null;
+                    return (
+                      <span key={index} className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">{cuisine}</span>
+                    );
+                  })}
                 </div>
                 <Link to={`/mess/${plan._id}`} className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center mt-2">View Details</Link>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
-        {(!plans || plans.length === 0) && !loading && (
+        {(!Array.isArray(plans) || plans.length === 0) && !loading && (
           <div className="text-center py-12">
             <FaUtensils className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No mess plans available</h3>

@@ -5,6 +5,7 @@ import { CityProvider } from './context/CityContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AdvancedChatBot from './components/AdvancedChatBot';
+import ErrorBoundary from './components/ErrorBoundary';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -32,10 +33,11 @@ function App() {
   const { user } = useAuth();
 
   return (
-    <CityProvider>
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-grow">
+    <ErrorBoundary>
+      <CityProvider>
+        <div className="min-h-screen flex flex-col">
+          <Navbar />
+          <main className="flex-grow">
           <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -114,6 +116,7 @@ function App() {
       <Footer />
     </div>
     </CityProvider>
+    </ErrorBoundary>
   );
 }
 
