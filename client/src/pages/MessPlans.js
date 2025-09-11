@@ -29,25 +29,26 @@ const MessPlans = () => {
       let filteredPlans = getMockData.messPlans() || [];
       // Apply city filter
       if (selectedCity) {
-        filteredPlans = getMockData.getMessByCity(selectedCity.name) || [];
+        const cityPlans = getMockData.getMessByCity(selectedCity.name);
+        filteredPlans = Array.isArray(cityPlans) ? cityPlans : [];
       }
       // Apply other filters
-      if (filters.minPrice) {
+      if (filters.minPrice && Array.isArray(filteredPlans)) {
         filteredPlans = filteredPlans.filter(plan => 
-          plan.mealPlans.some(meal => meal.price >= parseInt(filters.minPrice))
+          plan.mealPlans && Array.isArray(plan.mealPlans) && plan.mealPlans.some(meal => meal.price >= parseInt(filters.minPrice))
         );
       }
-      if (filters.maxPrice) {
+      if (filters.maxPrice && Array.isArray(filteredPlans)) {
         filteredPlans = filteredPlans.filter(plan => 
-          plan.mealPlans.some(meal => meal.price <= parseInt(filters.maxPrice))
+          plan.mealPlans && Array.isArray(plan.mealPlans) && plan.mealPlans.some(meal => meal.price <= parseInt(filters.maxPrice))
         );
       }
-      if (filters.cuisine) {
+      if (filters.cuisine && Array.isArray(filteredPlans)) {
         filteredPlans = filteredPlans.filter(plan => 
-          plan.cuisine.includes(filters.cuisine)
+          plan.cuisine && Array.isArray(plan.cuisine) && plan.cuisine.includes(filters.cuisine)
         );
       }
-      setPlans(filteredPlans);
+      setPlans(Array.isArray(filteredPlans) ? filteredPlans : []);
     } catch (error) {
       console.error('Error fetching mess plans:', error);
       setPlans([]);
@@ -99,7 +100,7 @@ const MessPlans = () => {
         </div>
         {/* Mess Plans Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {plans.map((plan) => (
+          {plans && plans.length > 0 && plans.map((plan) => (
             <div key={plan._id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow flex flex-col">
               {/* Plan Image */}
               <div className="h-44 bg-gray-200 relative">
@@ -115,20 +116,20 @@ const MessPlans = () => {
                   </div>
                 )}
                 <div className="absolute top-2 right-2">
-                  <span className="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">₹{plan.price}/month</span>
+                  <span className="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">₹{plan.price || 'N/A'}/month</span>
                 </div>
               </div>
               {/* Plan Details */}
               <div className="p-5 flex-1 flex flex-col justify-between">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">{plan.planName}</h3>
-                <p className="text-gray-600 text-sm mb-2">{plan.description?.substring(0, 100)}...</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">{plan.planName || plan.name || 'Unnamed Plan'}</h3>
+                <p className="text-gray-600 text-sm mb-2">{plan.description ? plan.description.substring(0, 100) + '...' : 'No description available'}</p>
                 <div className="flex items-center text-gray-500 text-xs mb-2">
                   <FaMapMarkerAlt className="h-4 w-4 mr-1" />
-                  <span>{plan.provider?.messDetails?.messName || 'Mess Provider'}</span>
+                  <span>{plan.provider?.messDetails?.messName || plan.provider?.name || 'Mess Provider'}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
-                  <div className="flex items-center"><FaClock className="h-4 w-4 mr-1" />{plan.planType}</div>
-                  <div className="flex items-center"><FaUsers className="h-4 w-4 mr-1" />{plan.currentSubscribers}/{plan.capacity}</div>
+                  <div className="flex items-center"><FaClock className="h-4 w-4 mr-1" />{plan.planType || 'N/A'}</div>
+                  <div className="flex items-center"><FaUsers className="h-4 w-4 mr-1" />{plan.currentSubscribers || 0}/{plan.capacity || 'N/A'}</div>
                 </div>
                 <div className="flex items-center mb-2">
                   {[...Array(5)].map((_, i) => (
@@ -140,12 +141,12 @@ const MessPlans = () => {
                   <span className="text-xs text-gray-600 ml-2">({plan.ratings?.count || 0} reviews)</span>
                 </div>
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {plan.mealTypes?.map((meal, index) => (
+                  {plan.mealTypes && Array.isArray(plan.mealTypes) && plan.mealTypes.map((meal, index) => (
                     <span key={index} className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">{meal}</span>
                   ))}
                 </div>
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {plan.cuisine?.slice(0, 2).map((cuisine, index) => (
+                  {plan.cuisine && Array.isArray(plan.cuisine) && plan.cuisine.slice(0, 2).map((cuisine, index) => (
                     <span key={index} className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">{cuisine}</span>
                   ))}
                 </div>
@@ -154,7 +155,7 @@ const MessPlans = () => {
             </div>
           ))}
         </div>
-        {plans.length === 0 && (
+        {(!plans || plans.length === 0) && !loading && (
           <div className="text-center py-12">
             <FaUtensils className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No mess plans available</h3>
