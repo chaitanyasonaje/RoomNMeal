@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCity } from '../context/CityContext';
 import { FaSearch, FaFilter, FaStar, FaMapMarkerAlt, FaBed, FaBath, FaWifi, FaParking, FaSnowflake, FaShower, FaHeart, FaShare, FaEye, FaUtensils, FaCheck, FaTimes } from 'react-icons/fa';
-import axios from 'axios';
+import { getMockData } from '../data/mockData';
 import { PageLoading } from '../components/LoadingSpinner';
 
 const Rooms = () => {
@@ -25,22 +25,32 @@ const Rooms = () => {
   const fetchRooms = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams();
       
-      // Add city filter if selected
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      let filteredRooms = getMockData.rooms() || [];
+      
+      // Apply city filter
       if (selectedCity) {
-        params.append('city', selectedCity.id);
+        filteredRooms = getMockData.getRoomsByCity(selectedCity.name) || [];
       }
       
-      // Add other filters
-      Object.keys(filters).forEach(key => {
-        if (filters[key]) {
-          params.append(key, filters[key]);
-        }
-      });
+      // Apply other filters
+      if (filters.minRent) {
+        filteredRooms = filteredRooms.filter(room => room.rent >= parseInt(filters.minRent));
+      }
+      if (filters.maxRent) {
+        filteredRooms = filteredRooms.filter(room => room.rent <= parseInt(filters.maxRent));
+      }
+      if (filters.propertyType) {
+        filteredRooms = filteredRooms.filter(room => room.propertyType === filters.propertyType);
+      }
+      if (filters.roomType) {
+        filteredRooms = filteredRooms.filter(room => room.roomType === filters.roomType);
+      }
       
-      const response = await axios.get(`/api/rooms?${params.toString()}`);
-      setRooms(response.data.rooms);
+      setRooms(filteredRooms);
     } catch (error) {
       console.error('Error fetching rooms:', error);
     } finally {

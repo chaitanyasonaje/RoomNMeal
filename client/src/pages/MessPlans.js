@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCity } from '../context/CityContext';
 import { FaUtensils, FaStar, FaMapMarkerAlt, FaClock, FaUsers, FaFilter, FaTimes } from 'react-icons/fa';
-import axios from 'axios';
+import { getMockData } from '../data/mockData';
 
 const MessPlans = () => {
   const { selectedCity } = useCity();
@@ -24,24 +24,33 @@ const MessPlans = () => {
   const fetchMessPlans = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams();
-      
-      // Add city filter if selected
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      let filteredPlans = getMockData.messPlans() || [];
+      // Apply city filter
       if (selectedCity) {
-        params.append('city', selectedCity.id);
+        filteredPlans = getMockData.getMessByCity(selectedCity.name) || [];
       }
-      
-      // Add other filters
-      Object.keys(filters).forEach(key => {
-        if (filters[key]) {
-          params.append(key, filters[key]);
-        }
-      });
-      
-      const response = await axios.get(`/api/mess/plans?${params.toString()}`);
-      setPlans(response.data.plans);
+      // Apply other filters
+      if (filters.minPrice) {
+        filteredPlans = filteredPlans.filter(plan => 
+          plan.mealPlans.some(meal => meal.price >= parseInt(filters.minPrice))
+        );
+      }
+      if (filters.maxPrice) {
+        filteredPlans = filteredPlans.filter(plan => 
+          plan.mealPlans.some(meal => meal.price <= parseInt(filters.maxPrice))
+        );
+      }
+      if (filters.cuisine) {
+        filteredPlans = filteredPlans.filter(plan => 
+          plan.cuisine.includes(filters.cuisine)
+        );
+      }
+      setPlans(filteredPlans);
     } catch (error) {
       console.error('Error fetching mess plans:', error);
+      setPlans([]);
     } finally {
       setLoading(false);
     }
