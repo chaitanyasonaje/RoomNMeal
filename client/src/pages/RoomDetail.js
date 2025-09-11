@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import BookingForm from '../components/BookingForm';
+import { getMockData, mockReviews } from '../data/mockData';
 
 const RoomDetail = () => {
   const { id } = useParams();
@@ -30,16 +31,17 @@ const RoomDetail = () => {
   }, [id]);
 
   const fetchRoomDetails = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`https://roomnmeal.onrender.com/api/rooms/${id}`);
-      setRoom(response.data.room);
-    } catch (error) {
-      console.error('Error fetching room details:', error);
-      toast.error('Failed to load room details');
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    // Use mock data instead of API
+    const mockRoom = getMockData.getRoomById(id);
+    if (mockRoom) {
+      // Attach reviews from mockReviews
+      mockRoom.reviews = mockReviews.filter(r => r.entityId === id && r.entityType === 'room');
+      setRoom(mockRoom);
+    } else {
+      setRoom(null);
     }
+    setLoading(false);
   };
 
   const handleBookNow = () => {

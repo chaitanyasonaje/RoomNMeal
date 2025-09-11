@@ -4,6 +4,7 @@ import { FaFilter, FaSearch, FaCalendar, FaHome, FaUser } from 'react-icons/fa';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import BookingCard from '../components/BookingCard';
+import { getMockData } from '../data/mockData';
 
 const Bookings = () => {
   const { user } = useAuth();
@@ -19,19 +20,14 @@ const Bookings = () => {
   }, []);
 
   const fetchBookings = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get('https://roomnmeal.onrender.com/api/bookings/my-bookings', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setBookings(response.data.bookings);
-    } catch (error) {
-      console.error('Error fetching bookings:', error);
-      toast.error('Failed to load bookings');
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    // Use mock data instead of API
+    if (user && user._id) {
+      setBookings(getMockData.getUserBookings(user._id));
+    } else {
+      setBookings([]);
     }
+    setLoading(false);
   };
 
   const handleBookingUpdate = (updatedBooking) => {

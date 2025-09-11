@@ -3,6 +3,7 @@ import { FaBell, FaTimes, FaCheck, FaArchive, FaTrash, FaExclamationTriangle, Fa
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { getMockData } from '../data/mockData';
 
 const NotificationBell = () => {
   const { user } = useAuth();
@@ -33,38 +34,27 @@ const NotificationBell = () => {
   }, []);
 
   const fetchUnreadCount = async () => {
-    try {
-      const response = await axios.get('https://roomnmeal.onrender.com/api/notifications/unread-count', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-      setUnreadCount(response.data.unreadCount);
-    } catch (error) {
-      console.error('Error fetching unread count:', error);
+    if (user && user._id) {
+      const notifs = getMockData.getUserNotifications(user._id) || [];
+      setUnreadCount(notifs.filter(n => !n.isRead).length);
+    } else {
+      setUnreadCount(0);
     }
   };
 
   const fetchNotifications = async (pageNum = 1, append = false) => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`https://roomnmeal.onrender.com/api/notifications?page=${pageNum}&limit=10`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-
-      const newNotifications = response.data.notifications;
-      if (append) {
-        setNotifications(prev => [...prev, ...newNotifications]);
-      } else {
-        setNotifications(newNotifications);
-      }
-
-      setHasMore(response.data.pagination.hasNext);
-      setPage(pageNum);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-      toast.error('Failed to load notifications');
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    if (user && user._id) {
+      const notifs = getMockData.getUserNotifications(user._id) || [];
+      setNotifications(notifs);
+      setHasMore(false);
+      setPage(1);
+    } else {
+      setNotifications([]);
+      setHasMore(false);
+      setPage(1);
     }
+    setLoading(false);
   };
 
   const markAsRead = async (notificationId) => {
