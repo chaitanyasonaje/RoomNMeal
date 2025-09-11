@@ -5,6 +5,7 @@ import { FaHome, FaUtensils, FaComments, FaPlus, FaEye, FaEdit, FaCalendar, FaUs
 import axios from 'axios';
 import BookingCard from '../components/BookingCard';
 import toast from 'react-hot-toast';
+import { getMockData } from '../data/mockData';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -24,57 +25,37 @@ const Dashboard = () => {
   }, [user]);
 
   const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-
-      if (user?.role === 'student') {
-        const [bookingsRes, subscriptionsRes, statsRes] = await Promise.all([
-                  axios.get('https://roomnmeal.onrender.com/api/bookings/my-bookings', { headers }),
-        axios.get('https://roomnmeal.onrender.com/api/mess/my-subscriptions', { headers }),
-        axios.get('https://roomnmeal.onrender.com/api/bookings/stats/dashboard', { headers })
-        ]);
-        
-        setBookings(bookingsRes.data.bookings);
-        setRecentSubscriptions(subscriptionsRes.data.subscriptions.slice(0, 3));
-        setStats({
-          ...stats,
-          bookings: statsRes.data.stats,
-          subscriptions: { total: subscriptionsRes.data.subscriptions.length }
-        });
-      } else if (user?.role === 'host') {
-        const [bookingsRes, roomsRes, statsRes] = await Promise.all([
-                  axios.get('https://roomnmeal.onrender.com/api/bookings/my-bookings', { headers }),
-        axios.get('https://roomnmeal.onrender.com/api/rooms/host/my-rooms', { headers }),
-        axios.get('https://roomnmeal.onrender.com/api/bookings/stats/dashboard', { headers })
-        ]);
-        
-        setBookings(bookingsRes.data.bookings);
-        setStats({
-          ...stats,
-          bookings: statsRes.data.stats,
-          rooms: roomsRes.data.rooms.length
-        });
-      } else if (user?.role === 'messProvider') {
-        const [plansRes, subscriptionsRes] = await Promise.all([
-                  axios.get('https://roomnmeal.onrender.com/api/mess/plans', { headers }),
-        axios.get('https://roomnmeal.onrender.com/api/mess/my-subscriptions', { headers })
-        ]);
-        
-        setRecentSubscriptions(subscriptionsRes.data.subscriptions.slice(0, 3));
-        setStats({
-          ...stats,
-          messPlans: plansRes.data.plans.length,
-          subscriptions: { total: subscriptionsRes.data.subscriptions.length }
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      toast.error('Failed to load dashboard data');
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    if (user && user._id) {
+      const bookingsData = getMockData.getUserBookings(user._id) || [];
+      const subscriptionsData = getMockData.getUserSubscriptions(user._id) || [];
+      setBookings(bookingsData);
+      setRecentSubscriptions(subscriptionsData.slice(0, 3));
+      setStats({
+        bookings: {
+          total: bookingsData.length,
+          pending: bookingsData.filter(b => b.status === 'pending').length,
+          confirmed: bookingsData.filter(b => b.status === 'confirmed').length,
+          active: bookingsData.filter(b => b.status === 'active').length,
+          completed: bookingsData.filter(b => b.status === 'completed').length
+        },
+        subscriptions: { total: subscriptionsData.length },
+        rooms: 0,
+        messPlans: 0,
+        earnings: 0
+      });
+    } else {
+      setBookings([]);
+      setRecentSubscriptions([]);
+      setStats({
+        bookings: { total: 0, pending: 0, confirmed: 0, active: 0, completed: 0 },
+        subscriptions: { total: 0, active: 0, paused: 0 },
+        rooms: 0,
+        messPlans: 0,
+        earnings: 0
+      });
     }
+    setLoading(false);
   };
 
   const handleBookingUpdate = (updatedBooking) => {
