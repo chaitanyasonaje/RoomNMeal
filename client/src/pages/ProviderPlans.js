@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { buildApiUrl } from '../config/api';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
@@ -15,7 +16,7 @@ const ProviderPlans = () => {
   const fetchPlans = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://roomnmeal.onrender.com/api/mess/provider/my-plans');
+      const response = await axios.get(buildApiUrl('/api/mess/provider/my-plans'));
       setPlans(response.data.plans);
     } catch (error) {
       toast.error('Failed to fetch plans');
@@ -27,7 +28,7 @@ const ProviderPlans = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this plan?')) return;
     try {
-      await axios.delete(`https://roomnmeal.onrender.com/api/mess/plans/${id}`);
+      await axios.delete(buildApiUrl(`/api/mess/plans/${id}`));
       toast.success('Plan deleted');
       setPlans(plans.filter(plan => plan._id !== id));
     } catch (error) {

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaSearch, FaFilter, FaStar, FaMapMarkerAlt, FaClock, FaUser, FaPlus } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { buildApiUrl } from '../config/api';
 import toast from 'react-hot-toast';
 
 const Services = () => {
@@ -45,7 +46,7 @@ const Services = () => {
         ...filters
       });
 
-      const response = await axios.get(`https://roomnmeal.onrender.com/api/services?${params}`);
+      const response = await axios.get(buildApiUrl(`/api/services?${params}`));
       
       setServices(response.data.services);
       setPagination(response.data.pagination);
@@ -59,7 +60,7 @@ const Services = () => {
 
   const fetchAvailableFilters = async () => {
     try {
-      const response = await axios.get('https://roomnmeal.onrender.com/api/services');
+      const response = await axios.get(buildApiUrl('/api/services'));
       setAvailableFilters(response.data.filters);
     } catch (error) {
       console.error('Error fetching filters:', error);

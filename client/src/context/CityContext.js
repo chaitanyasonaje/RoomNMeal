@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { buildApiUrl } from '../config/api';
 
 const CityContext = createContext();
 
@@ -46,7 +47,7 @@ export const CityProvider = ({ children }) => {
   const loadCities = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/cities');
+      const response = await axios.get(buildApiUrl('/api/cities'));
       setCities(response.data.cities);
     } catch (error) {
       console.error('Error loading cities:', error);
@@ -58,7 +59,7 @@ export const CityProvider = ({ children }) => {
 
   const loadPopularCities = async () => {
     try {
-      const response = await axios.get('/api/cities?popular=true');
+      const response = await axios.get(buildApiUrl('/api/cities?popular=true'));
       setPopularCities(response.data.cities);
     } catch (error) {
       console.error('Error loading popular cities:', error);
@@ -67,7 +68,7 @@ export const CityProvider = ({ children }) => {
 
   const loadStates = async () => {
     try {
-      const response = await axios.get('/api/cities/states/list');
+      const response = await axios.get(buildApiUrl('/api/cities/states/list'));
       setStates(response.data.states);
     } catch (error) {
       console.error('Error loading states:', error);
@@ -77,7 +78,7 @@ export const CityProvider = ({ children }) => {
   const searchCities = async (query) => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/cities?search=${encodeURIComponent(query)}`);
+      const response = await axios.get(buildApiUrl(`/api/cities?search=${encodeURIComponent(query)}`));
       return response.data.cities;
     } catch (error) {
       console.error('Error searching cities:', error);
@@ -90,7 +91,7 @@ export const CityProvider = ({ children }) => {
 
   const getCitiesByState = async (state) => {
     try {
-      const response = await axios.get(`/api/cities/state/${encodeURIComponent(state)}`);
+      const response = await axios.get(buildApiUrl(`/api/cities/state/${encodeURIComponent(state)}`));
       return response.data.cities;
     } catch (error) {
       console.error('Error getting cities by state:', error);
@@ -100,7 +101,7 @@ export const CityProvider = ({ children }) => {
 
   const getCityDetails = async (cityId) => {
     try {
-      const response = await axios.get(`/api/cities/${cityId}`);
+      const response = await axios.get(buildApiUrl(`/api/cities/${cityId}`));
       return response.data.city;
     } catch (error) {
       console.error('Error getting city details:', error);
@@ -119,7 +120,7 @@ export const CityProvider = ({ children }) => {
 
   const getNearbyCities = async (latitude, longitude, radius = 100) => {
     try {
-      const response = await axios.get(`/api/cities?nearby=true&lat=${latitude}&lng=${longitude}&radius=${radius}`);
+      const response = await axios.get(buildApiUrl(`/api/cities?nearby=true&lat=${latitude}&lng=${longitude}&radius=${radius}`));
       return response.data.cities;
     } catch (error) {
       console.error('Error getting nearby cities:', error);

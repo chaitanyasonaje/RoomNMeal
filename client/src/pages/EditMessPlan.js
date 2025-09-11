@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { buildApiUrl } from '../config/api';
 import toast from 'react-hot-toast';
 
 const initialState = {
@@ -27,7 +28,7 @@ const EditMessPlan = () => {
   const fetchPlan = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`https://roomnmeal.onrender.com/api/mess/plans/${id}`);
+      const res = await axios.get(buildApiUrl(`/api/mess/plans/${id}`));
       const plan = res.data.plan;
       setForm({
         ...plan,

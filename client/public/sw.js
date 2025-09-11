@@ -22,16 +22,20 @@ self.addEventListener('install', (event) => {
 
 // Fetch event
 self.addEventListener('fetch', (event) => {
+  const { request } = event;
+
+  // Bypass caching for cross-origin API calls (e.g., Render backend)
+  const isCrossOrigin = new URL(request.url).origin !== self.location.origin;
+  const isApiCall = request.url.includes('/api/');
+  if (isCrossOrigin && isApiCall) {
+    return; // let the network handle it; avoids SW errors on failed fetch
+  }
+
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
+      return fetch(request);
+    })
   );
 });
 

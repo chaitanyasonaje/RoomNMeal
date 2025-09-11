@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaStar, FaMapMarkerAlt, FaClock, FaUsers, FaUtensils } from 'react-icons/fa';
 import axios from 'axios';
+import { buildApiUrl } from '../config/api';
 
 const MessDetail = () => {
   const { id } = useParams();
@@ -26,7 +27,7 @@ const MessDetail = () => {
   const fetchMessPlanDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`https://roomnmeal.onrender.com/api/mess/plans/${id}`);
+      const response = await axios.get(buildApiUrl(`/api/mess/plans/${id}`));
       setPlan(response.data.plan);
     } catch (error) {
       console.error('Error fetching mess plan details:', error);
