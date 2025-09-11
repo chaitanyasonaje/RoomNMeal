@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { FaUser, FaEdit, FaSave, FaTimes, FaCamera, FaShieldAlt, FaBell, FaWallet } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import { getMockData } from '../data/mockData';
 
 const Profile = () => {
   const { user, updateProfile } = useAuth();
@@ -36,29 +37,31 @@ const Profile = () => {
 
   useEffect(() => {
     if (user) {
+      // Use mock data if available
+      const mockUser = getMockData.getUserById(user._id) || user;
       setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        collegeName: user.collegeName || '',
-        collegeId: user.collegeId || '',
+        name: mockUser.name || '',
+        email: mockUser.email || '',
+        phone: mockUser.phone || '',
+        collegeName: mockUser.collegeName || '',
+        collegeId: mockUser.collegeId || '',
         address: {
-          street: user.address?.street || '',
-          city: user.address?.city || '',
-          state: user.address?.state || '',
-          pincode: user.address?.pincode || ''
+          street: mockUser.address?.street || '',
+          city: mockUser.address?.city || '',
+          state: mockUser.address?.state || '',
+          pincode: mockUser.address?.pincode || ''
         },
         preferences: {
           notifications: {
-            email: user.preferences?.notifications?.email ?? true,
-            sms: user.preferences?.notifications?.sms ?? true,
-            push: user.preferences?.notifications?.push ?? true
+            email: mockUser.preferences?.notifications?.email ?? true,
+            sms: mockUser.preferences?.notifications?.sms ?? true,
+            push: mockUser.preferences?.notifications?.push ?? true
           },
-          dietaryRestrictions: user.preferences?.dietaryRestrictions || [],
+          dietaryRestrictions: mockUser.preferences?.dietaryRestrictions || [],
           mealTimings: {
-            breakfast: user.preferences?.mealTimings?.breakfast || '',
-            lunch: user.preferences?.mealTimings?.lunch || '',
-            dinner: user.preferences?.mealTimings?.dinner || ''
+            breakfast: mockUser.preferences?.mealTimings?.breakfast || '',
+            lunch: mockUser.preferences?.mealTimings?.lunch || '',
+            dinner: mockUser.preferences?.mealTimings?.dinner || ''
           }
         }
       });
