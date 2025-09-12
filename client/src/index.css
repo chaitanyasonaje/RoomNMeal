@@ -277,6 +277,191 @@
     @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl;
   }
 
+  /* Mobile-First Responsive Grid */
+  .grid-responsive {
+    @apply grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6;
+  }
+
+  .grid-responsive-2 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6;
+  }
+
+  .grid-responsive-3 {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6;
+  }
+
+  /* Mobile-First Spacing */
+  .section-padding-mobile {
+    @apply py-8 px-4 sm:py-12 sm:px-6 md:py-16 md:px-8 lg:py-20 lg:px-12;
+  }
+
+  .container-padding-mobile {
+    @apply px-4 sm:px-6 md:px-8 lg:px-12;
+  }
+
+  /* Mobile-First Typography */
+  .heading-mobile {
+    @apply text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl;
+  }
+
+  .subheading-mobile {
+    @apply text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  .body-mobile {
+    @apply text-sm xs:text-base sm:text-lg md:text-xl;
+  }
+
+  .caption-mobile {
+    @apply text-xs xs:text-sm sm:text-base;
+  }
+
+  /* Mobile-First Button Sizes */
+  .btn-mobile {
+    @apply text-sm xs:text-base px-3 py-2 xs:px-4 xs:py-3 sm:px-6 sm:py-3 md:px-8 md:py-4;
+  }
+
+  .btn-lg-mobile {
+    @apply text-base xs:text-lg px-4 py-3 xs:px-6 xs:py-4 sm:px-8 sm:py-4 md:px-10 md:py-5;
+  }
+
+  /* Mobile-First Card Layouts */
+  .card-mobile {
+    @apply p-4 xs:p-5 sm:p-6 md:p-8;
+  }
+
+  .card-grid-mobile {
+    @apply grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6;
+  }
+
+  /* Mobile-First Navigation */
+  .nav-mobile {
+    @apply flex flex-col xs:flex-row items-center space-y-2 xs:space-y-0 xs:space-x-4;
+  }
+
+  .nav-item-mobile {
+    @apply text-sm xs:text-base px-3 py-2 xs:px-4 xs:py-2 rounded-lg;
+  }
+
+  /* Mobile-First Form Elements */
+  .form-mobile {
+    @apply space-y-4 xs:space-y-6;
+  }
+
+  .input-mobile {
+    @apply text-sm xs:text-base px-3 py-2 xs:px-4 xs:py-3 sm:px-5 sm:py-4;
+  }
+
+  .label-mobile {
+    @apply text-sm xs:text-base font-medium;
+  }
+
+  /* Mobile-First Modal/Drawer */
+  .modal-mobile {
+    @apply fixed inset-0 z-50 flex items-end sm:items-center justify-center;
+  }
+
+  .modal-content-mobile {
+    @apply w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl;
+  }
+
+  /* Mobile-First Image Responsiveness */
+  .img-responsive {
+    @apply w-full h-auto object-cover;
+  }
+
+  .img-square-mobile {
+    @apply w-full aspect-square object-cover;
+  }
+
+  .img-16-9-mobile {
+    @apply w-full aspect-video object-cover;
+  }
+
+  /* Mobile-First Flexbox Utilities */
+  .flex-mobile {
+    @apply flex flex-col xs:flex-row items-start xs:items-center;
+  }
+
+  .flex-center-mobile {
+    @apply flex flex-col xs:flex-row items-center justify-center;
+  }
+
+  .flex-between-mobile {
+    @apply flex flex-col xs:flex-row items-start xs:items-center justify-between;
+  }
+
+  /* Mobile-First Text Alignment */
+  .text-center-mobile {
+    @apply text-center xs:text-left sm:text-center;
+  }
+
+  .text-left-mobile {
+    @apply text-left;
+  }
+
+  /* Mobile-First Visibility */
+  .mobile-only {
+    @apply block sm:hidden;
+  }
+
+  .desktop-only {
+    @apply hidden sm:block;
+  }
+
+  .tablet-only {
+    @apply hidden md:block lg:hidden;
+  }
+
+  /* Mobile-First Overflow Handling */
+  .overflow-mobile {
+    @apply overflow-x-auto overflow-y-visible;
+  }
+
+  .scroll-mobile {
+    @apply -mx-4 px-4 sm:mx-0 sm:px-0;
+  }
+
+  /* Mobile-First Touch Targets */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+  }
+
+  .touch-target-lg {
+    @apply min-h-[48px] min-w-[48px] flex items-center justify-center;
+  }
+
+  /* Mobile-First Safe Areas */
+  .safe-area-top {
+    @apply pt-safe;
+  }
+
+  .safe-area-bottom {
+    @apply pb-safe;
+  }
+
+  .safe-area-left {
+    @apply pl-safe;
+  }
+
+  .safe-area-right {
+    @apply pr-safe;
+  }
+
+  /* Mobile-First Animation Delays */
+  .animate-delay-mobile {
+    @apply animate-delay-75 sm:animate-delay-100 md:animate-delay-150 lg:animate-delay-200;
+  }
+
+  /* Mobile-First Shadow Responsiveness */
+  .shadow-mobile {
+    @apply shadow-sm sm:shadow-md md:shadow-lg;
+  }
+
+  .shadow-card-mobile {
+    @apply shadow-soft sm:shadow-medium md:shadow-large;
+  }
+
   /* Form Improvements */
   .form-group {
     @apply space-y-2;

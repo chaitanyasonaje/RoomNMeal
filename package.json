@@ -14,7 +14,9 @@
     "create-env": "node create-env.js",
     "start": "cd server && npm start",
     "heroku-postbuild": "cd client && npm install && npm run build",
-    "deploy": "node deploy.js"
+    "deploy": "node deploy.js",
+    "fix-deployment": "node quick-deploy-fix.js",
+    "seed-production": "cd server && npm run seed-production"
   },
   "keywords": ["mern", "student", "accommodation", "mess", "booking"],
   "author": "RoomNMeal Team",

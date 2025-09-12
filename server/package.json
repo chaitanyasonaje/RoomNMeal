@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "generate-data": "node scripts/generate-sample-data.js",
     "seed": "node utils/seedData.js",
+    "seed-production": "node scripts/seed-production.js",
     "migrate-atlas": "node scripts/migrate-to-atlas.js",
     "test-db": "node test-database-setup.js"
   },

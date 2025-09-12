@@ -117,6 +117,22 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/roomnmeal
   const { setupDatabase, optimizeDatabase } = require('./utils/databaseSetup');
   await setupDatabase();
   await optimizeDatabase();
+  
+  // Seed production data if in production and database is empty
+  if (process.env.NODE_ENV === 'production') {
+    const User = require('./models/User');
+    const userCount = await User.countDocuments();
+    if (userCount === 0) {
+      console.log('🌱 Seeding production data...');
+      const { seedProductionData } = require('./scripts/seed-production');
+      try {
+        await seedProductionData();
+        console.log('✅ Production data seeded successfully');
+      } catch (error) {
+        console.error('❌ Failed to seed production data:', error);
+      }
+    }
+  }
 }).catch(err => console.error('MongoDB connection error:', err));
 
 // API routes
@@ -183,10 +199,21 @@ app.get('/', (req, res) => {
   });
 });
 
-// Fallback for unknown routes
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
+// Serve static files from React build in production
+if (process.env.NODE_ENV === 'production') {
+  const path = require('path');
+  app.use(express.static(path.join(__dirname, '../client/build')));
+  
+  // Handle React routing, return all requests to React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+  });
+} else {
+  // Fallback for unknown routes in development
+  app.use('*', (req, res) => {
+    res.status(404).json({ message: 'Route not found' });
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

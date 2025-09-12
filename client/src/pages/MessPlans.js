@@ -3,6 +3,29 @@ import { Link } from 'react-router-dom';
 import { useCity } from '../context/CityContext';
 import { FaUtensils, FaStar, FaMapMarkerAlt, FaClock, FaUsers, FaFilter, FaTimes } from 'react-icons/fa';
 import { getMockData } from '../data/mockData';
+import { safeArray, safeAccess, logError } from '../utils/errorHandler';
+
+// Safety check for getMockData
+const safeGetMockData = {
+  messPlans: () => {
+    try {
+      const result = getMockData?.messPlans?.();
+      return safeArray(result);
+    } catch (error) {
+      logError(error, 'messPlans access');
+      return [];
+    }
+  },
+  getMessByCity: (city) => {
+    try {
+      const result = getMockData?.getMessByCity?.(city);
+      return safeArray(result);
+    } catch (error) {
+      logError(error, 'getMessByCity access');
+      return [];
+    }
+  }
+};
 
 const MessPlans = () => {
   const { selectedCity } = useCity();
@@ -17,10 +40,6 @@ const MessPlans = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  useEffect(() => {
-    fetchMessPlans();
-  }, [fetchMessPlans]);
-
   const fetchMessPlans = useCallback(async () => {
     try {
       setLoading(true);
@@ -31,24 +50,12 @@ const MessPlans = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Get initial data with proper null checks
-      let filteredPlans = [];
-      try {
-        const allPlans = getMockData.messPlans();
-        filteredPlans = Array.isArray(allPlans) ? allPlans : [];
-      } catch (dataError) {
-        console.error('Error getting mock data:', dataError);
-        filteredPlans = [];
-      }
+      let filteredPlans = safeGetMockData.messPlans();
       
       // Apply city filter with enhanced error handling
       if (selectedCity && selectedCity.name) {
-        try {
-          const cityPlans = getMockData.getMessByCity(selectedCity.name);
-          filteredPlans = Array.isArray(cityPlans) ? cityPlans : [];
-        } catch (cityError) {
-          console.error('Error filtering by city:', cityError);
-          filteredPlans = [];
-        }
+        const cityPlans = safeGetMockData.getMessByCity(selectedCity.name);
+        filteredPlans = Array.isArray(cityPlans) && cityPlans.length > 0 ? cityPlans : filteredPlans;
       }
       
       // Apply other filters with enhanced safety checks
@@ -106,6 +113,10 @@ const MessPlans = () => {
     }
   }, [selectedCity, filters]);
 
+  useEffect(() => {
+    fetchMessPlans();
+  }, [fetchMessPlans]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -149,9 +160,9 @@ const MessPlans = () => {
         </div>
         {/* Mess Plans Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {Array.isArray(plans) && plans.length > 0 && plans.map((plan) => {
+          {safeArray(plans).map((plan) => {
             // Safety check for each plan object
-            if (!plan || !plan._id) {
+            if (!plan || !safeAccess(plan, '_id')) {
               console.warn('Invalid plan object:', plan);
               return null;
             }
@@ -218,7 +229,7 @@ const MessPlans = () => {
             );
           })}
         </div>
-        {(!Array.isArray(plans) || plans.length === 0) && !loading && (
+        {safeArray(plans).length === 0 && !loading && (
           <div className="text-center py-12">
             <FaUtensils className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No mess plans available</h3>

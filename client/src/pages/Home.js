@@ -20,44 +20,44 @@ const Home = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-primary-700/10 to-primary-800/10 opacity-20"></div>
         </div>
         
-        <div className="relative section-padding pt-20 md:pt-16">
-          <div className="max-w-6xl mx-auto text-center">
+        <div className="relative section-padding-mobile pt-16 xs:pt-18 sm:pt-20 md:pt-16">
+          <div className="max-w-6xl mx-auto text-center container-padding-mobile">
             <div className={`animate-fade-in-up ${isVisible ? 'animate' : ''}`}>
-              <h1 className="heading-1 text-white mb-6">
+              <h1 className="heading-mobile text-white mb-4 xs:mb-6 font-bold leading-tight">
                 Find Your Perfect
                 <span className="block bg-gradient-to-r from-accent-400 to-accent-500 bg-clip-text text-transparent">
                   Student Home
                 </span>
               </h1>
-              <p className="text-body text-primary-100 mb-8 max-w-3xl mx-auto">
+              <p className="body-mobile text-primary-100 mb-6 xs:mb-8 max-w-3xl mx-auto leading-relaxed">
                 Discover premium rooms, subscribe to quality mess services, and enjoy a comfortable student life {selectedCity ? `in ${selectedCity.name}` : 'across India'}. 
                 Everything you need for your academic journey in one place.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <Link to="/rooms" className="btn-primary text-lg px-8 py-4 group">
+              <div className="flex-mobile gap-3 xs:gap-4 justify-center mb-8 xs:mb-12">
+                <Link to="/rooms" className="btn-primary btn-lg-mobile group touch-target">
                   <span>Find Rooms</span>
                   <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-200" />
                 </Link>
-                <Link to="/mess" className="btn-outline text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-primary-600">
+                <Link to="/mess" className="btn-outline btn-lg-mobile border-white text-white hover:bg-white hover:text-primary-600 touch-target">
                   <span>Mess Services</span>
                 </Link>
               </div>
             </div>
 
             {/* Stats Section */}
-            <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto animate-fade-in-up ${isVisible ? 'animate' : ''} [animation-delay:0.2s]`}>
-              <div className="card-glass text-center">
-                <div className="text-3xl font-bold text-white mb-2">500+</div>
-                <div className="text-primary-100">Happy Students</div>
+            <div className={`grid-responsive-3 max-w-4xl mx-auto animate-fade-in-up ${isVisible ? 'animate' : ''} [animation-delay:0.2s]`}>
+              <div className="card-glass text-center card-mobile">
+                <div className="heading-mobile text-white mb-2 font-bold">500+</div>
+                <div className="caption-mobile text-primary-100">Happy Students</div>
               </div>
-              <div className="card-glass text-center">
-                <div className="text-3xl font-bold text-white mb-2">100+</div>
-                <div className="text-primary-100">Verified Rooms</div>
+              <div className="card-glass text-center card-mobile">
+                <div className="heading-mobile text-white mb-2 font-bold">100+</div>
+                <div className="caption-mobile text-primary-100">Verified Rooms</div>
               </div>
-              <div className="card-glass text-center">
-                <div className="text-3xl font-bold text-white mb-2">50+</div>
-                <div className="text-primary-100">Mess Providers</div>
+              <div className="card-glass text-center card-mobile">
+                <div className="heading-mobile text-white mb-2 font-bold">50+</div>
+                <div className="caption-mobile text-primary-100">Mess Providers</div>
               </div>
             </div>
           </div>
@@ -66,38 +66,38 @@ const Home = () => {
 
       {/* City Information Section */}
       {selectedCity && (
-        <section className="section-padding bg-white border-b border-gray-100">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="heading-2 mb-4">Welcome to {selectedCity.name}</h2>
-              <p className="text-body max-w-3xl mx-auto text-gray-600">
+        <section className="section-padding-mobile bg-white border-b border-gray-100">
+          <div className="max-w-6xl mx-auto container-padding-mobile">
+            <div className="text-center mb-6 xs:mb-8">
+              <h2 className="subheading-mobile mb-3 xs:mb-4 font-bold">Welcome to {selectedCity.name}</h2>
+              <p className="body-mobile max-w-3xl mx-auto text-gray-600 leading-relaxed">
                 {selectedCity.description}
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="card-hover text-center group">
-                <div className="bg-gradient-to-br from-primary-100 to-primary-200 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <FaGraduationCap className="h-8 w-8 text-primary-600" />
+            <div className="grid-responsive-3">
+              <div className="card-hover text-center group card-mobile">
+                <div className="bg-gradient-to-br from-primary-100 to-primary-200 w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-3 xs:mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
+                  <FaGraduationCap className="h-6 w-6 xs:h-7 xs:w-7 sm:h-8 sm:w-8 text-primary-600" />
                 </div>
-                <h3 className="heading-3 mb-2">{selectedCity.collegesCount}+</h3>
-                <p className="text-body text-gray-600">Colleges & Universities</p>
+                <h3 className="subheading-mobile mb-2 font-bold">{selectedCity.collegesCount}+</h3>
+                <p className="caption-mobile text-gray-600">Colleges & Universities</p>
               </div>
               
-              <div className="card-hover text-center group">
-                <div className="bg-gradient-to-br from-success-100 to-success-200 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <FaBuilding className="h-8 w-8 text-success-600" />
+              <div className="card-hover text-center group card-mobile">
+                <div className="bg-gradient-to-br from-success-100 to-success-200 w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-3 xs:mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
+                  <FaBuilding className="h-6 w-6 xs:h-7 xs:w-7 sm:h-8 sm:w-8 text-success-600" />
                 </div>
-                <h3 className="heading-3 mb-2">{selectedCity.techCompaniesCount}+</h3>
-                <p className="text-body text-gray-600">Tech Companies</p>
+                <h3 className="subheading-mobile mb-2 font-bold">{selectedCity.techCompaniesCount}+</h3>
+                <p className="caption-mobile text-gray-600">Tech Companies</p>
               </div>
               
-              <div className="card-hover text-center group">
-                <div className="bg-gradient-to-br from-accent-100 to-accent-200 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <FaMapPin className="h-8 w-8 text-accent-600" />
+              <div className="card-hover text-center group card-mobile">
+                <div className="bg-gradient-to-br from-accent-100 to-accent-200 w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-3 xs:mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
+                  <FaMapPin className="h-6 w-6 xs:h-7 xs:w-7 sm:h-8 sm:w-8 text-accent-600" />
                 </div>
-                <h3 className="heading-3 mb-2">Tier {selectedCity.tier}</h3>
-                <p className="text-body text-gray-600">City Category</p>
+                <h3 className="subheading-mobile mb-2 font-bold">Tier {selectedCity.tier}</h3>
+                <p className="caption-mobile text-gray-600">City Category</p>
               </div>
             </div>
           </div>

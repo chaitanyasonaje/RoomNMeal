@@ -12,14 +12,20 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/server/$1"
+      "dest": "https://roomnmeal.onrender.com/api/$1"
     },
     {
       "src": "/(.*)",
       "dest": "/client/$1"
     }
   ],
+  "rewrites": [
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ],
   "env": {
-    "REACT_APP_API_URL": "@react_app_api_url"
+    "REACT_APP_API_URL": "https://roomnmeal.onrender.com"
   }
 } 
