@@ -16,7 +16,9 @@
     "heroku-postbuild": "cd client && npm install && npm run build",
     "deploy": "node deploy.js",
     "fix-deployment": "node quick-deploy-fix.js",
-    "seed-production": "cd server && npm run seed-production"
+    "seed-production": "cd server && npm run seed-production",
+    "build-netlify": "cd client && npm install && npm run build && node ../scripts/netlify-build-fix.js",
+    "netlify-build": "bash netlify-build-fix.sh"
   },
   "keywords": ["mern", "student", "accommodation", "mess", "booking"],
   "author": "RoomNMeal Team",

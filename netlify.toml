@@ -7,6 +7,63 @@
     NODE_VERSION = "18"
     REACT_APP_API_URL = "https://roomnmeal.onrender.com"
 
+# Headers for proper MIME types
+[[headers]]
+  for = "/static/css/*"
+  [headers.values]
+    Content-Type = "text/css"
+
+[[headers]]
+  for = "/static/js/*"
+  [headers.values]
+    Content-Type = "application/javascript"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Content-Type = "text/css"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+
+[[headers]]
+  for = "/*.json"
+  [headers.values]
+    Content-Type = "application/json"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Content-Type = "image/png"
+
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Content-Type = "image/jpeg"
+
+[[headers]]
+  for = "/*.jpeg"
+  [headers.values]
+    Content-Type = "image/jpeg"
+
+[[headers]]
+  for = "/*.gif"
+  [headers.values]
+    Content-Type = "image/gif"
+
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Content-Type = "image/svg+xml"
+
+[[headers]]
+  for = "/*.ico"
+  [headers.values]
+    Content-Type = "image/x-icon"
+
+# Redirects
 [[redirects]]
   from = "/api/*"
   to = "https://roomnmeal.onrender.com/api/:splat"

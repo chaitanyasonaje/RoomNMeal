@@ -3,51 +3,112 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#0284c7" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="RoomNMeal" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="msapplication-TileColor" content="#0284c7" />
-    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="RoomNMeal - Find verified rooms, PGs, and subscribe to quality mess services across India. Perfect for students looking for accommodation near colleges and universities."
+      content="RoomNMeal - Student accommodation and mess services platform"
     />
-    <meta name="keywords" content="student accommodation, PG, hostel, mess services, college housing, university accommodation, India, student housing" />
-    <meta name="author" content="RoomNMeal" />
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://roomnmeal.com/" />
-    <meta property="og:title" content="RoomNMeal - Student Accommodation & Mess Services" />
-    <meta property="og:description" content="Find verified rooms, PGs, and subscribe to quality mess services across India." />
-    <meta property="og:image" content="%PUBLIC_URL%/og-image.png" />
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://roomnmeal.com/" />
-    <meta property="twitter:title" content="RoomNMeal - Student Accommodation & Mess Services" />
-    <meta property="twitter:description" content="Find verified rooms, PGs, and subscribe to quality mess services across India." />
-    <meta property="twitter:image" content="%PUBLIC_URL%/og-image.png" />
-    
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="%PUBLIC_URL%/logo152.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/logo180.png" />
-    <link rel="apple-touch-icon" sizes="167x167" href="%PUBLIC_URL%/logo167.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="mask-icon" href="%PUBLIC_URL%/safari-pinned-tab.svg" color="#0284c7" />
-    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
     
-    <!-- Preconnect to external domains for better performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/static/css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/static/css/main.css"></noscript>
+    
+    <!-- Fallback for MIME type issues -->
+    <style>
+      /* Critical CSS fallback */
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #f9fafb;
+      }
+      
+      .loading-fallback {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+      }
+      
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 2s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
     
     <title>RoomNMeal - Student Accommodation & Mess Services</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    
+    <!-- Fallback loading screen -->
+    <div id="loading-fallback" class="loading-fallback">
+      <div class="spinner"></div>
+      <p>Loading RoomNMeal...</p>
+    </div>
+    
     <div id="root"></div>
+    
+    <!-- Fallback script loading -->
+    <script>
+      // Hide loading fallback when React loads
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          const loadingFallback = document.getElementById('loading-fallback');
+          if (loadingFallback) {
+            loadingFallback.style.display = 'none';
+          }
+        }, 1000);
+      });
+      
+      // Fallback for MIME type issues
+      function loadScript(src, callback) {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = callback;
+        script.onerror = function() {
+          console.error('Failed to load script:', src);
+          // Try alternative loading method
+          const xhr = new XMLHttpRequest();
+          xhr.open('GET', src, true);
+          xhr.responseType = 'text';
+          xhr.onload = function() {
+            if (xhr.status === 200) {
+              eval(xhr.responseText);
+              if (callback) callback();
+            }
+          };
+          xhr.send();
+        };
+        document.head.appendChild(script);
+      }
+      
+      // Load CSS with fallback
+      function loadCSS(href) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.onerror = function() {
+          console.error('Failed to load CSS:', href);
+        };
+        document.head.appendChild(link);
+      }
+    </script>
   </body>
-</html> 
+</html>
