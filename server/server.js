@@ -21,6 +21,11 @@ const allowedOrigins = [
   "http://127.0.0.1:3000"
 ];
 
+// Allow all Netlify deploy previews
+function isNetlifyPreview(origin) {
+  return /^https:\/\/[a-z0-9]+--roomnmeal\.netlify\.app$/.test(origin);
+}
+
 console.log('Allowed CORS origins:', allowedOrigins);
 
 const app = express();
@@ -41,30 +46,28 @@ app.use(helmet({
 app.use(cors({
   origin: function (origin, callback) {
     console.log('CORS request from origin:', origin);
-    
-    // Allow requests with no origin (like mobile apps or curl requests)
+
     if (!origin) {
       console.log('Allowing request with no origin');
       return callback(null, true);
     }
-    
-    // For development, allow all origins
+
     if (process.env.NODE_ENV === 'development') {
       console.log('Development mode - allowing all origins');
       return callback(null, true);
     }
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
+
+    if (allowedOrigins.indexOf(origin) !== -1 || isNetlifyPreview(origin)) {
       console.log('Origin allowed:', origin);
-      callback(null, true);
-    } else {
-      console.log('Origin blocked:', origin);
-      // Explicitly block disallowed origins in production
-      if (process.env.NODE_ENV === 'production') {
-        return callback(new Error('Not allowed by CORS'));
-      }
-      callback(null, true);
+      return callback(null, true);
     }
+
+    console.log('Origin blocked:', origin);
+    // Explicitly block disallowed origins in production
+    if (process.env.NODE_ENV === 'production') {
+      return callback(new Error('Not allowed by CORS'));
+    }
+    callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
@@ -87,16 +90,16 @@ app.options('*', cors());
 
 // Test endpoint to verify CORS
 app.get('/api/test', (req, res) => {
-  res.json({ 
-    message: 'CORS test successful', 
+  res.json({
+    message: 'CORS test successful',
     timestamp: new Date().toISOString(),
-    origin: req.headers.origin 
+    origin: req.headers.origin
   });
 });
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ 
+  res.json({
     status: 'OK',
     message: 'Server is running',
     timestamp: new Date().toISOString(),
@@ -117,7 +120,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/roomnmeal
   const { setupDatabase, optimizeDatabase } = require('./utils/databaseSetup');
   await setupDatabase();
   await optimizeDatabase();
-  
+
   // Seed production data if in production and database is empty
   if (process.env.NODE_ENV === 'production') {
     const User = require('./models/User');
@@ -183,12 +186,12 @@ app.use((err, req, res, next) => {
 
 // Default route
 app.get('/', (req, res) => {
-  res.json({ 
+  res.json({
     message: 'RoomNMeal API is running!',
     version: '1.0.0',
     endpoints: {
       auth: '/api/auth',
-      users: '/api/users', 
+      users: '/api/users',
       rooms: '/api/rooms',
       mess: '/api/mess',
       bookings: '/api/bookings',
@@ -203,7 +206,7 @@ app.get('/', (req, res) => {
 if (process.env.NODE_ENV === 'production') {
   const path = require('path');
   app.use(express.static(path.join(__dirname, '../client/build')));
-  
+
   // Handle React routing, return all requests to React app
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
