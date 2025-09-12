@@ -1,321 +1,482 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 import { useCity } from '../context/CityContext';
-import { FaSearch, FaHome, FaUtensils, FaComments, FaShieldAlt, FaStar, FaArrowRight, FaCheck, FaMapMarkerAlt, FaUsers, FaClock, FaHeart, FaMapPin, FaBuilding, FaGraduationCap } from 'react-icons/fa';
+import Hero from '../components/Hero';
+import ListingGrid from '../components/ListingGrid';
+import { 
+  FaHome, 
+  FaUtensils, 
+  FaPlus, 
+  FaShieldAlt, 
+  FaStar, 
+  FaArrowRight, 
+  FaCheck, 
+  FaUsers, 
+  FaClock,
+  FaHeart,
+  FaGraduationCap
+} from 'react-icons/fa';
 
 const Home = () => {
+  const { isDark } = useTheme();
   const { selectedCity } = useCity();
-  const [isVisible, setIsVisible] = useState(false);
+  const [featuredRooms, setFeaturedRooms] = useState([]);
+  const [featuredMeals, setFeaturedMeals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsVisible(true);
+    // Simulate loading data
+    const loadData = async () => {
+      setIsLoading(true);
+      
+      // Mock data for featured rooms
+      const mockRooms = [
+        {
+          id: 1,
+          title: "Cozy PG near University",
+          description: "Furnished single room with all amenities, perfect for students",
+          price: 8000,
+          rating: 4.5,
+          location: "Near IIT Delhi",
+          images: ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500"],
+          amenities: ["WiFi", "AC", "Parking", "Meals"],
+          roomType: "Single",
+          propertyType: "PG",
+          isAvailable: true
+        },
+        {
+          id: 2,
+          title: "Modern Hostel Room",
+          description: "Shared accommodation with modern facilities and study area",
+          price: 6000,
+          rating: 4.2,
+          location: "Near Delhi University",
+          images: ["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500"],
+          amenities: ["WiFi", "Parking", "Common Room"],
+          roomType: "Double",
+          propertyType: "Hostel",
+          isAvailable: true
+        },
+        {
+          id: 3,
+          title: "Luxury Apartment",
+          description: "Spacious apartment with premium amenities and security",
+          price: 12000,
+          rating: 4.8,
+          location: "Near NIT Delhi",
+          images: ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500"],
+          amenities: ["WiFi", "AC", "Parking", "Gym", "Security"],
+          roomType: "Single",
+          propertyType: "Apartment",
+          isAvailable: true
+        }
+      ];
+
+      // Mock data for featured meals
+      const mockMeals = [
+        {
+          id: 1,
+          title: "North Indian Mess Plan",
+          description: "Delicious North Indian meals with fresh ingredients",
+          price: 2500,
+          rating: 4.3,
+          location: "Near IIT Delhi",
+          images: ["https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=500"],
+          category: "North Indian",
+          mealTypes: ["Breakfast", "Lunch", "Dinner"],
+          isAvailable: true
+        },
+        {
+          id: 2,
+          title: "South Indian Special",
+          description: "Authentic South Indian cuisine with traditional recipes",
+          price: 2000,
+          rating: 4.6,
+          location: "Near Delhi University",
+          images: ["https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500"],
+          category: "South Indian",
+          mealTypes: ["Breakfast", "Lunch", "Dinner"],
+          isAvailable: true
+        }
+      ];
+
+      setTimeout(() => {
+        setFeaturedRooms(mockRooms);
+        setFeaturedMeals(mockMeals);
+        setIsLoading(false);
+      }, 1000);
+    };
+
+    loadData();
   }, []);
 
+  const features = [
+    {
+      icon: FaHome,
+      title: "Find Perfect Rooms",
+      description: "Browse through verified accommodations with detailed photos and amenities",
+      color: "text-blue-600"
+    },
+    {
+      icon: FaUtensils,
+      title: "Quality Mess Services",
+      description: "Subscribe to reliable mess plans with diverse cuisines and flexible timings",
+      color: "text-orange-600"
+    },
+    {
+      icon: FaPlus,
+      title: "Essential Services",
+      description: "Access laundry, cleaning, and other services right from your doorstep",
+      color: "text-green-600"
+    },
+    {
+      icon: FaShieldAlt,
+      title: "Secure & Verified",
+      description: "All listings are verified and secure with 24/7 customer support",
+      color: "text-purple-600"
+    }
+  ];
+
+  const stats = [
+    { number: "500+", label: "Available Rooms" },
+    { number: "200+", label: "Mess Providers" },
+    { number: "50+", label: "Services" },
+    { number: "1000+", label: "Happy Students" }
+  ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 30, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50 pb-20 md:pb-0">
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-700/10 to-primary-800/10 opacity-20"></div>
-        </div>
-        
-        <div className="relative section-padding-mobile pt-16 xs:pt-18 sm:pt-20 md:pt-16">
-          <div className="max-w-6xl mx-auto text-center container-padding-mobile">
-            <div className={`animate-fade-in-up ${isVisible ? 'animate' : ''}`}>
-              <h1 className="heading-mobile text-white mb-4 xs:mb-6 font-bold leading-tight">
-                Find Your Perfect
-                <span className="block bg-gradient-to-r from-accent-400 to-accent-500 bg-clip-text text-transparent">
-                  Student Home
-                </span>
-              </h1>
-              <p className="body-mobile text-primary-100 mb-6 xs:mb-8 max-w-3xl mx-auto leading-relaxed">
-                Discover premium rooms, subscribe to quality mess services, and enjoy a comfortable student life {selectedCity ? `in ${selectedCity.name}` : 'across India'}. 
-                Everything you need for your academic journey in one place.
-              </p>
-              
-              <div className="flex-mobile gap-3 xs:gap-4 justify-center mb-8 xs:mb-12">
-                <Link to="/rooms" className="btn-primary btn-lg-mobile group touch-target">
-                  <span>Find Rooms</span>
-                  <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-200" />
-                </Link>
-                <Link to="/mess" className="btn-outline btn-lg-mobile border-white text-white hover:bg-white hover:text-primary-600 touch-target">
-                  <span>Mess Services</span>
-                </Link>
-              </div>
-            </div>
-
-            {/* Stats Section */}
-            <div className={`grid-responsive-3 max-w-4xl mx-auto animate-fade-in-up ${isVisible ? 'animate' : ''} [animation-delay:0.2s]`}>
-              <div className="card-glass text-center card-mobile">
-                <div className="heading-mobile text-white mb-2 font-bold">500+</div>
-                <div className="caption-mobile text-primary-100">Happy Students</div>
-              </div>
-              <div className="card-glass text-center card-mobile">
-                <div className="heading-mobile text-white mb-2 font-bold">100+</div>
-                <div className="caption-mobile text-primary-100">Verified Rooms</div>
-              </div>
-              <div className="card-glass text-center card-mobile">
-                <div className="heading-mobile text-white mb-2 font-bold">50+</div>
-                <div className="caption-mobile text-primary-100">Mess Providers</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* City Information Section */}
-      {selectedCity && (
-        <section className="section-padding-mobile bg-white border-b border-gray-100">
-          <div className="max-w-6xl mx-auto container-padding-mobile">
-            <div className="text-center mb-6 xs:mb-8">
-              <h2 className="subheading-mobile mb-3 xs:mb-4 font-bold">Welcome to {selectedCity.name}</h2>
-              <p className="body-mobile max-w-3xl mx-auto text-gray-600 leading-relaxed">
-                {selectedCity.description}
-              </p>
-            </div>
-            
-            <div className="grid-responsive-3">
-              <div className="card-hover text-center group card-mobile">
-                <div className="bg-gradient-to-br from-primary-100 to-primary-200 w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-3 xs:mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <FaGraduationCap className="h-6 w-6 xs:h-7 xs:w-7 sm:h-8 sm:w-8 text-primary-600" />
-                </div>
-                <h3 className="subheading-mobile mb-2 font-bold">{selectedCity.collegesCount}+</h3>
-                <p className="caption-mobile text-gray-600">Colleges & Universities</p>
-              </div>
-              
-              <div className="card-hover text-center group card-mobile">
-                <div className="bg-gradient-to-br from-success-100 to-success-200 w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-3 xs:mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <FaBuilding className="h-6 w-6 xs:h-7 xs:w-7 sm:h-8 sm:w-8 text-success-600" />
-                </div>
-                <h3 className="subheading-mobile mb-2 font-bold">{selectedCity.techCompaniesCount}+</h3>
-                <p className="caption-mobile text-gray-600">Tech Companies</p>
-              </div>
-              
-              <div className="card-hover text-center group card-mobile">
-                <div className="bg-gradient-to-br from-accent-100 to-accent-200 w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-3 xs:mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <FaMapPin className="h-6 w-6 xs:h-7 xs:w-7 sm:h-8 sm:w-8 text-accent-600" />
-                </div>
-                <h3 className="subheading-mobile mb-2 font-bold">Tier {selectedCity.tier}</h3>
-                <p className="caption-mobile text-gray-600">City Category</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+      <Hero />
 
       {/* Features Section */}
-      <section className="section-padding bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="heading-2 mb-4">Why Choose RoomNMeal?</h2>
-            <p className="text-body max-w-3xl mx-auto">
-              Everything you need for a comfortable and successful student life, all in one comprehensive platform
-            </p>
-          </div>
-          
-          <div className="grid-feature">
-            <div className={`card-hover text-center group animate-fade-in-up ${isVisible ? 'animate' : ''} [animation-delay:0.1s]`}>
-              <div className="bg-gradient-to-br from-primary-100 to-primary-200 w-20 h-20 rounded-3xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
-                <FaHome className="h-10 w-10 text-primary-600" />
-              </div>
-              <h3 className="heading-3 mb-4">Premium Accommodation</h3>
-              <p className="text-body mb-6">
-                Find verified rooms and PGs near your college with all essential amenities, 
-                modern facilities, and secure environments.
-              </p>
-              <div className="space-y-2 text-left">
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
-                  Verified properties
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
-                  Detailed photos & amenities
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
-                  Secure online booking
-                </div>
-              </div>
-            </div>
+      <section className={`py-20 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            className="text-center mb-16"
+          >
+            <motion.h2
+              variants={itemVariants}
+              className={`text-3xl sm:text-4xl font-heading font-bold mb-4 ${
+                isDark ? 'text-white' : 'text-gray-900'
+              }`}
+            >
+              Everything You Need for
+              <span className="block bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">
+                Student Life
+              </span>
+            </motion.h2>
+            <motion.p
+              variants={itemVariants}
+              className={`text-lg ${
+                isDark ? 'text-gray-300' : 'text-gray-600'
+              } max-w-3xl mx-auto`}
+            >
+              From finding the perfect room to subscribing to quality mess services, 
+              we've got everything covered for your student journey.
+            </motion.p>
+          </motion.div>
 
-            <div className={`card-hover text-center group animate-fade-in-up ${isVisible ? 'animate' : ''} [animation-delay:0.2s]`}>
-              <div className="bg-gradient-to-br from-success-100 to-success-200 w-20 h-20 rounded-3xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
-                <FaUtensils className="h-10 w-10 text-success-600" />
-              </div>
-              <h3 className="heading-3 mb-4">Quality Mess Services</h3>
-              <p className="text-body mb-6">
-                Subscribe to hygienic meal plans from trusted mess providers with 
-                flexible options and nutritional balance.
-              </p>
-              <div className="space-y-2 text-left">
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
-                  Hygienic food preparation
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
-                  Flexible meal plans
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
-                  Online payment options
-                </div>
-              </div>
-            </div>
-
-            <div className={`card-hover text-center group animate-fade-in-up ${isVisible ? 'animate' : ''} [animation-delay:0.3s]`}>
-              <div className="bg-gradient-to-br from-accent-100 to-accent-200 w-20 h-20 rounded-3xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
-                <FaComments className="h-10 w-10 text-accent-600" />
-              </div>
-              <h3 className="heading-3 mb-4">Seamless Communication</h3>
-              <p className="text-body mb-6">
-                Chat directly with hosts and service providers for any queries, 
-                instant support, and real-time updates.
-              </p>
-              <div className="space-y-2 text-left">
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
-                  Real-time chat support
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
-                  Instant notifications
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaCheck className="h-4 w-4 text-success-500 mr-2" />
-                  Direct provider contact
-                </div>
-              </div>
-            </div>
-          </div>
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  whileHover={{ y: -5 }}
+                  className={`p-6 rounded-2xl text-center transition-all duration-300 ${
+                    isDark 
+                      ? 'bg-gray-700 hover:bg-gray-600' 
+                      : 'bg-gray-50 hover:bg-white hover:shadow-lg'
+                  }`}
+                >
+                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 ${
+                    isDark ? 'bg-gray-600' : 'bg-primary-100'
+                  }`}>
+                    <Icon className={`h-8 w-8 ${feature.color}`} />
+                  </div>
+                  <h3 className={`text-xl font-heading font-semibold mb-2 ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {feature.title}
+                  </h3>
+                  <p className={`text-sm ${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  }`}>
+                    {feature.description}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </motion.div>
         </div>
       </section>
 
-      {/* Services Section */}
-      <section className="section-padding bg-gradient-to-br from-gray-50 to-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="heading-2 mb-4">Our Comprehensive Services</h2>
-            <p className="text-body max-w-3xl mx-auto">
-              From accommodation to daily meals, we provide end-to-end solutions for all your student needs
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-            {/* Room Booking */}
-            <div className={`card-hover overflow-hidden group animate-fade-in-left ${isVisible ? 'animate' : ''} [animation-delay:0.1s]`}>
-              <div className="bg-gradient-to-br from-primary-600 to-primary-700 p-8 text-white">
-                <div className="flex items-center justify-between mb-4">
-                  <FaHome className="h-12 w-12 text-white" />
-                  <FaHeart className="h-6 w-6 text-primary-200 group-hover:scale-110 transition-transform duration-300" />
+      {/* Stats Section */}
+      <section className={`py-16 ${isDark ? 'bg-gray-900' : 'bg-primary-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="grid grid-cols-2 lg:grid-cols-4 gap-8"
+          >
+            {stats.map((stat, index) => (
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                className="text-center"
+              >
+                <div className={`text-4xl font-heading font-bold mb-2 ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  {stat.number}
                 </div>
-                <h3 className="text-2xl font-bold mb-2">Room Booking</h3>
-                <p className="text-primary-100 text-lg">
-                  Find and book verified rooms, PGs, and hostels near your college
-                </p>
-              </div>
-              <div className="p-8">
-                <div className="space-y-4 mb-6">
-                  <div className="flex items-center text-gray-700">
-                    <FaStar className="h-5 w-5 text-primary-500 mr-3" />
-                    <span>Verified accommodations with detailed photos</span>
-                  </div>
-                  <div className="flex items-center text-gray-700">
-                    <FaMapMarkerAlt className="h-5 w-5 text-primary-500 mr-3" />
-                    <span>Prime locations near educational institutions</span>
-                  </div>
-                  <div className="flex items-center text-gray-700">
-                    <FaShieldAlt className="h-5 w-5 text-primary-500 mr-3" />
-                    <span>Secure online booking and payment</span>
-                  </div>
+                <div className={`text-sm ${
+                  isDark ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  {stat.label}
                 </div>
-                <Link to="/rooms" className="btn-primary w-full text-center group">
-                  <span>Browse Rooms</span>
-                  <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-200" />
-                </Link>
-              </div>
-            </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
 
-            {/* Mess Services */}
-            <div className={`card-hover overflow-hidden group animate-fade-in-right ${isVisible ? 'animate' : ''} [animation-delay:0.2s]`}>
-              <div className="bg-gradient-to-br from-success-600 to-success-700 p-8 text-white">
-                <div className="flex items-center justify-between mb-4">
-                  <FaUtensils className="h-12 w-12 text-white" />
-                  <FaClock className="h-6 w-6 text-success-200 group-hover:scale-110 transition-transform duration-300" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2">Mess Services</h3>
-                <p className="text-success-100 text-lg">
-                  Subscribe to quality meal plans from trusted mess providers
-                </p>
-              </div>
-              <div className="p-8">
-                <div className="space-y-4 mb-6">
-                  <div className="flex items-center text-gray-700">
-                    <FaStar className="h-5 w-5 text-success-500 mr-3" />
-                    <span>Hygienic food preparation standards</span>
-                  </div>
-                  <div className="flex items-center text-gray-700">
-                    <FaUsers className="h-5 w-5 text-success-500 mr-3" />
-                    <span>Flexible meal plans and schedules</span>
-                  </div>
-                  <div className="flex items-center text-gray-700">
-                    <FaShieldAlt className="h-5 w-5 text-success-500 mr-3" />
-                    <span>Online payment and subscription management</span>
-                  </div>
-                </div>
-                <Link to="/mess" className="btn-success w-full text-center group">
-                  <span>View Mess Plans</span>
-                  <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-200" />
-                </Link>
-              </div>
+      {/* Featured Rooms Section */}
+      <section className={`py-20 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            className="text-center mb-12"
+          >
+            <motion.h2
+              variants={itemVariants}
+              className={`text-3xl sm:text-4xl font-heading font-bold mb-4 ${
+                isDark ? 'text-white' : 'text-gray-900'
+              }`}
+            >
+              Featured Rooms
+            </motion.h2>
+            <motion.p
+              variants={itemVariants}
+              className={`text-lg ${
+                isDark ? 'text-gray-300' : 'text-gray-600'
+              } max-w-2xl mx-auto`}
+            >
+              Discover some of our most popular and highly-rated accommodations
+            </motion.p>
+          </motion.div>
+
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className={`animate-pulse rounded-2xl ${
+                    isDark ? 'bg-gray-700' : 'bg-gray-200'
+                  } h-96`}
+                />
+              ))}
             </div>
-          </div>
+          ) : (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {featuredRooms.slice(0, 3).map((room, index) => (
+                <motion.div
+                  key={room.id}
+                  variants={itemVariants}
+                  whileHover={{ y: -5 }}
+                  className={`group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 ${
+                    isDark ? 'bg-gray-700' : 'bg-white'
+                  }`}
+                >
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={room.images[0]}
+                      alt={room.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute top-4 left-4">
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-success-500 text-white">
+                        Available
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className={`text-lg font-heading font-semibold ${
+                        isDark ? 'text-white' : 'text-gray-900'
+                      }`}>
+                        {room.title}
+                      </h3>
+                      <div className="text-right">
+                        <div className={`text-2xl font-bold font-heading ${
+                          isDark ? 'text-white' : 'text-gray-900'
+                        }`}>
+                          ₹{room.price.toLocaleString()}
+                        </div>
+                        <div className={`text-sm ${
+                          isDark ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
+                          /month
+                        </div>
+                      </div>
+                    </div>
+                    <p className={`text-sm mb-4 ${
+                      isDark ? 'text-gray-300' : 'text-gray-600'
+                    }`}>
+                      {room.description}
+                    </p>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-2">
+                        <FaHome className="h-4 w-4 text-primary-600" />
+                        <span className={`text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        }`}>
+                          {room.roomType}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <FaStar className="h-4 w-4 text-yellow-400" />
+                        <span className={`text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        }`}>
+                          {room.rating}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex space-x-3">
+                      <Link
+                        to={`/rooms/${room.id}`}
+                        className={`flex-1 py-2 px-4 rounded-xl font-medium transition-all duration-200 text-center ${
+                          isDark
+                            ? 'bg-gray-600 text-white hover:bg-gray-500'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        View Details
+                      </Link>
+                      <Link
+                        to={`/rooms/${room.id}`}
+                        className="flex-1 py-2 px-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-200 text-center shadow-lg hover:shadow-xl"
+                      >
+                        Book Now
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="text-center mt-12"
+          >
+            <Link
+              to="/rooms"
+              className="inline-flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              <span>View All Rooms</span>
+              <FaArrowRight className="h-4 w-4" />
+            </Link>
+          </motion.div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="section-padding bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-800/10 to-gray-900/10 opacity-30"></div>
-        
-        <div className="relative max-w-4xl mx-auto text-center">
-          <h2 className="heading-2 text-white mb-6">
-            Ready to Find Your Perfect Student Home?
-          </h2>
-          <p className="text-body text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join thousands of students who trust RoomNMeal for their accommodation needs. 
-            Start your journey today and experience the difference.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/register" className="btn-primary text-lg px-8 py-4 group">
-              <span>Get Started Today</span>
-              <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-200" />
-            </Link>
-            <Link to="/rooms" className="btn-outline text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-gray-900">
-              <span>Browse Now</span>
-            </Link>
-          </div>
-          
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-2">24/7</div>
-              <div className="text-gray-400">Support Available</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-2">100%</div>
-              <div className="text-gray-400">Secure Payments</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-2">Instant</div>
-              <div className="text-gray-400">Booking Confirmation</div>
-            </div>
-          </div>
+      <section className={`py-20 ${isDark ? 'bg-gray-900' : 'bg-gradient-to-r from-primary-600 to-primary-700'}`}>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <motion.h2
+              variants={itemVariants}
+              className="text-3xl sm:text-4xl font-heading font-bold text-white mb-4"
+            >
+              Ready to Find Your Perfect Student Home?
+            </motion.h2>
+            <motion.p
+              variants={itemVariants}
+              className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto"
+            >
+              Join thousands of students who have found their ideal accommodation and mess services with us.
+            </motion.p>
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+              <Link
+                to="/register"
+                className="px-8 py-3 bg-white text-primary-600 font-semibold rounded-xl hover:bg-gray-100 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                Get Started Now
+              </Link>
+              <Link
+                to="/rooms"
+                className="px-8 py-3 border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-primary-600 transition-all duration-200"
+              >
+                Browse Rooms
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
     </div>
   );
 };
 
-export default Home; 
+export default Home;

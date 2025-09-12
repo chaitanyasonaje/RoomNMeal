@@ -1,7 +1,9 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from './context/AuthContext';
 import { CityProvider } from './context/CityContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AdvancedChatBot from './components/AdvancedChatBot';
@@ -31,14 +33,37 @@ import FAQ from './pages/FAQ';
 
 function App() {
   const { user } = useAuth();
+  const location = useLocation();
+
+  const pageVariants = {
+    initial: { opacity: 0, y: 20 },
+    in: { opacity: 1, y: 0 },
+    out: { opacity: 0, y: -20 }
+  };
+
+  const pageTransition = {
+    type: 'tween',
+    ease: 'anticipate',
+    duration: 0.4
+  };
 
   return (
     <ErrorBoundary>
-      <CityProvider>
-        <div className="min-h-screen flex flex-col">
-          <Navbar />
-          <main className="flex-grow">
-          <Routes>
+      <ThemeProvider>
+        <CityProvider>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-grow pt-20 md:pt-0">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={location.pathname}
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={pageTransition}
+                >
+                  <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -110,12 +135,15 @@ function App() {
               <ProviderPlans />
             </ProtectedRoute>
           } />
-        </Routes>
-      </main>
-      <AdvancedChatBot />
-      <Footer />
-    </div>
-    </CityProvider>
+                  </Routes>
+                </motion.div>
+              </AnimatePresence>
+            </main>
+            <AdvancedChatBot />
+            <Footer />
+          </div>
+        </CityProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

@@ -175,7 +175,7 @@ const FAQ = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50 pb-20 md:pb-0">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -120,37 +120,81 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Bottom Navbar for mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-t border-t border-gray-200 dark:border-gray-800 md:hidden pb-safe">
-        <div className="flex justify-between items-center px-1 py-2">
-          {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className="flex flex-col items-center justify-center flex-1 py-3 text-xs text-gray-600 dark:text-primary-200 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/30 mx-1"
+      {/* Top Navbar for mobile */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-soft border-b border-gray-100 dark:border-gray-800 md:hidden">
+        <div className="flex justify-between items-center px-4 py-3">
+          {/* Mobile Logo */}
+          <Link to="/" className="flex items-center space-x-2 group">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900 p-2 rounded-xl group-hover:shadow-glow transition-all duration-300">
+              <FaHome className="h-6 w-6 text-white dark:text-primary-200" />
+            </div>
+            <span className="text-lg font-bold bg-gradient-to-r from-primary-600 to-primary-800 dark:from-primary-300 dark:to-primary-700 bg-clip-text text-transparent">
+              RoomNMeal
+            </span>
+          </Link>
+
+          {/* Mobile Right Side */}
+          <div className="flex items-center space-x-3">
+            {/* City Selector */}
+            <button
+              onClick={() => setIsCitySelectorOpen(true)}
+              className="flex items-center space-x-1 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all duration-200 text-xs font-medium text-gray-700"
             >
-              <span className="text-xl mb-1">{link.icon}</span>
-              <span className="font-medium">{link.label}</span>
-            </Link>
-          ))}
-          {isAuthenticated ? (
-            <Link to="/profile" className="flex flex-col items-center justify-center flex-1 py-3 text-xs text-gray-600 dark:text-primary-200 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/30 mx-1">
-              <span className="text-xl mb-1"><FaUser /></span>
-              <span className="font-medium">Profile</span>
-            </Link>
-          ) : (
-            <Link to="/login" className="flex flex-col items-center justify-center flex-1 py-3 text-xs text-gray-600 dark:text-primary-200 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/30 mx-1">
-              <span className="text-xl mb-1"><FaUser /></span>
-              <span className="font-medium">Sign In</span>
-            </Link>
-          )}
+              <FaMapMarkerAlt className="h-3 w-3 text-primary-600" />
+              <span className="hidden sm:block">{selectedCity ? selectedCity.name : 'City'}</span>
+            </button>
+
+            {/* Notifications */}
+            {isAuthenticated && <NotificationBell />}
+
+            {/* User Profile / Auth */}
+            {isAuthenticated ? (
+              <Link to="/profile" className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full text-white text-sm font-semibold">
+                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+              </Link>
+            ) : (
+              <Link to="/login" className="px-3 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors duration-200">
+                Sign In
+              </Link>
+            )}
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={toggleMenu}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            >
+              <FaBars className="h-5 w-5 text-gray-600" />
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation Links */}
+        <div className="border-t border-gray-100 dark:border-gray-800">
+          <div className="flex justify-around items-center px-2 py-2">
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="flex flex-col items-center justify-center flex-1 py-2 text-xs text-gray-600 dark:text-primary-200 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/30 mx-1"
+              >
+                <span className="text-lg mb-1">{link.icon}</span>
+                <span className="font-medium">{link.label}</span>
+              </Link>
+            ))}
+            {isAuthenticated && (
+              <Link to="/wallet" className="flex flex-col items-center justify-center flex-1 py-2 text-xs text-gray-600 dark:text-primary-200 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/30 mx-1">
+                <span className="text-lg mb-1"><FaWallet /></span>
+                <span className="font-medium">Wallet</span>
+              </Link>
+            )}
+          </div>
         </div>
       </nav>
 
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 md:hidden">
-          <div className="absolute bottom-20 left-4 right-4 bg-white rounded-2xl shadow-large p-6">
+          <div className="absolute top-20 left-4 right-4 bg-white rounded-2xl shadow-large p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Menu</h3>
               <button
@@ -172,6 +216,38 @@ const Navbar = () => {
                   <span className="font-medium">{link.label}</span>
                 </Link>
               ))}
+              {isAuthenticated && (
+                <Link
+                  to="/wallet"
+                  onClick={toggleMenu}
+                  className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors duration-200"
+                >
+                  <span className="text-lg"><FaWallet /></span>
+                  <span className="font-medium">Wallet</span>
+                </Link>
+              )}
+              {isAuthenticated && (
+                <Link
+                  to="/profile"
+                  onClick={toggleMenu}
+                  className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors duration-200"
+                >
+                  <span className="text-lg"><FaUser /></span>
+                  <span className="font-medium">Profile</span>
+                </Link>
+              )}
+              {isAuthenticated && (
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    toggleMenu();
+                  }}
+                  className="flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors duration-200 w-full text-left"
+                >
+                  <span className="text-lg"><FaSignOutAlt /></span>
+                  <span className="font-medium">Sign Out</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
