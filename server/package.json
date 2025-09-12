@@ -10,7 +10,8 @@
     "seed": "node utils/seedData.js",
     "seed-production": "node scripts/seed-production.js",
     "migrate-atlas": "node scripts/migrate-to-atlas.js",
-    "test-db": "node test-database-setup.js"
+    "test-db": "node test-database-setup.js",
+    "mock-data": "node run-mock-data.js"
   },
   "dependencies": {
     "express": "^4.18.2",
