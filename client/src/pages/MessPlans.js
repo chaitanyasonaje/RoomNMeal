@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useCity } from '../context/CityContext';
+import { API_ENDPOINTS } from '../config/api';
 import ListingGrid from '../components/ListingGrid';
 
 const MessPlans = () => {
@@ -20,10 +21,97 @@ const MessPlans = () => {
     try {
       setLoading(true);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (selectedCity) {
+        params.append('city', selectedCity.name);
+        params.append('state', selectedCity.state);
+      }
       
-      // Mock data for mess plans
+      const queryString = params.toString();
+      const url = queryString ? `${API_ENDPOINTS.MESS.PLANS}?${queryString}` : API_ENDPOINTS.MESS.PLANS;
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Transform API data to match component expectations
+      const transformedPlans = data.plans.map(plan => ({
+        id: plan._id,
+        title: plan.name,
+        description: plan.description,
+        price: plan.price,
+        rating: plan.rating || 4.0,
+        location: `${plan.city.name}, ${plan.city.state}`,
+        images: plan.images || ["https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=500"],
+        category: plan.planType,
+        mealTypes: plan.mealTypes || ["Breakfast", "Lunch", "Dinner"],
+        cuisine: plan.cuisine || ["Indian"],
+        isAvailable: plan.isActive,
+        createdAt: new Date(plan.createdAt),
+        provider: plan.provider,
+        source: 'API'
+      }));
+      
+      // Add mock data alongside API data
+      const mockMessPlans = [
+        {
+          id: 'mock-1',
+          title: "North Indian Mess Plan (Mock)",
+          description: "Delicious North Indian meals with fresh ingredients. Perfect for students who love traditional Indian cuisine.",
+          price: 2500,
+          rating: 4.3,
+          location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
+          images: ["https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=500"],
+          category: "North Indian",
+          mealTypes: ["Breakfast", "Lunch", "Dinner"],
+          cuisine: ["North Indian", "Punjabi"],
+          isAvailable: true,
+          createdAt: new Date('2024-01-15'),
+          source: 'Mock'
+        },
+        {
+          id: 'mock-2',
+          title: "South Indian Special (Mock)",
+          description: "Authentic South Indian cuisine with traditional recipes. Fresh idlis, dosas, and sambhar daily.",
+          price: 2000,
+          rating: 4.6,
+          location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
+          images: ["https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500"],
+          category: "South Indian",
+          mealTypes: ["Breakfast", "Lunch", "Dinner"],
+          cuisine: ["South Indian", "Tamil"],
+          isAvailable: true,
+          createdAt: new Date('2024-01-10'),
+          source: 'Mock'
+        },
+        {
+          id: 'mock-3',
+          title: "Gujarati Thali (Mock)",
+          description: "Complete Gujarati thali with dal, sabzi, roti, rice, and sweet. Vegetarian meals with authentic flavors.",
+          price: 1800,
+          rating: 4.4,
+          location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
+          images: ["https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500"],
+          category: "Gujarati",
+          mealTypes: ["Lunch", "Dinner"],
+          cuisine: ["Gujarati", "Vegetarian"],
+          isAvailable: true,
+          createdAt: new Date('2024-01-20'),
+          source: 'Mock'
+        }
+      ];
+      
+      // Combine API data with mock data
+      setMessPlans([...transformedPlans, ...mockMessPlans]);
+    } catch (error) {
+      console.error('Error fetching mess plans:', error);
+      
+      // Fallback to mock data if API fails
       const mockMessPlans = [
         {
           id: 1,
@@ -66,54 +154,10 @@ const MessPlans = () => {
           cuisine: ["Gujarati", "Vegetarian"],
           isAvailable: true,
           createdAt: new Date('2024-01-20')
-        },
-        {
-          id: 4,
-          title: "Jain Mess Plan",
-          description: "Pure vegetarian Jain meals without onion and garlic. Perfect for students following Jain dietary restrictions.",
-          price: 2200,
-          rating: 4.5,
-          location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
-          images: ["https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=500"],
-          category: "Jain",
-          mealTypes: ["Breakfast", "Lunch", "Dinner"],
-          cuisine: ["Jain", "Vegetarian"],
-          isAvailable: true,
-          createdAt: new Date('2024-01-12')
-        },
-        {
-          id: 5,
-          title: "Punjabi Dhaba Style",
-          description: "Hearty Punjabi meals with rich gravies, fresh rotis, and traditional recipes. Perfect for students who love spicy food.",
-          price: 2800,
-          rating: 4.7,
-          location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
-          images: ["https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500"],
-          category: "Punjabi",
-          mealTypes: ["Lunch", "Dinner"],
-          cuisine: ["Punjabi", "North Indian"],
-          isAvailable: false,
-          createdAt: new Date('2024-01-08')
-        },
-        {
-          id: 6,
-          title: "Bengali Home Food",
-          description: "Traditional Bengali cuisine with fish curry, rice, and Bengali sweets. A taste of home for Bengali students.",
-          price: 2600,
-          rating: 4.2,
-          location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
-          images: ["https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500"],
-          category: "Bengali",
-          mealTypes: ["Lunch", "Dinner"],
-          cuisine: ["Bengali", "Fish"],
-          isAvailable: true,
-          createdAt: new Date('2024-01-18')
         }
       ];
-
+      
       setMessPlans(mockMessPlans);
-    } catch (error) {
-      console.error('Error fetching mess plans:', error);
     } finally {
       setLoading(false);
     }

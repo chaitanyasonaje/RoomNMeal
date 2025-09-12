@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useCity } from '../context/CityContext';
+import { API_ENDPOINTS } from '../config/api';
 import ListingGrid from '../components/ListingGrid';
 
 const Services = () => {
@@ -20,14 +21,46 @@ const Services = () => {
     try {
       setLoading(true);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Try to fetch from API first
+      const params = new URLSearchParams();
+      if (selectedCity) {
+        params.append('location', selectedCity.name);
+      }
+      
+      const queryString = params.toString();
+      const url = queryString ? `${API_ENDPOINTS.SERVICES}?${queryString}` : API_ENDPOINTS.SERVICES;
+      
+      let apiServices = [];
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          const data = await response.json();
+          // Transform API data to match component expectations
+          apiServices = data.services.map(service => ({
+            id: service._id,
+            title: service.name,
+            description: service.description,
+            price: service.price,
+            rating: service.rating?.average || 4.0,
+            location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
+            images: service.images || ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500"],
+            category: service.category,
+            serviceType: service.type,
+            isAvailable: service.availability?.isAvailable || true,
+            createdAt: new Date(service.createdAt),
+            provider: service.provider,
+            source: 'API'
+          }));
+        }
+      } catch (apiError) {
+        console.log('API not available, using mock data only');
+      }
       
       // Mock data for services
       const mockServices = [
         {
-          id: 1,
-          title: "Professional Laundry Service",
+          id: 'mock-1',
+          title: "Professional Laundry Service (Mock)",
           description: "Complete laundry service with pickup and delivery. We handle all your clothes with care and return them fresh and clean.",
           price: 150,
           rating: 4.5,
@@ -36,11 +69,12 @@ const Services = () => {
           category: "Laundry",
           serviceType: "laundry",
           isAvailable: true,
-          createdAt: new Date('2024-01-15')
+          createdAt: new Date('2024-01-15'),
+          source: 'Mock'
         },
         {
-          id: 2,
-          title: "Room Cleaning Service",
+          id: 'mock-2',
+          title: "Room Cleaning Service (Mock)",
           description: "Professional room cleaning service for students. We keep your space clean and organized so you can focus on studies.",
           price: 200,
           rating: 4.3,
@@ -49,11 +83,12 @@ const Services = () => {
           category: "Cleaning",
           serviceType: "cleaning",
           isAvailable: true,
-          createdAt: new Date('2024-01-10')
+          createdAt: new Date('2024-01-10'),
+          source: 'Mock'
         },
         {
-          id: 3,
-          title: "Food Delivery Service",
+          id: 'mock-3',
+          title: "Food Delivery Service (Mock)",
           description: "Quick food delivery from local restaurants. Order your favorite meals and get them delivered to your doorstep.",
           price: 50,
           rating: 4.4,
@@ -62,11 +97,12 @@ const Services = () => {
           category: "Food",
           serviceType: "food",
           isAvailable: true,
-          createdAt: new Date('2024-01-20')
+          createdAt: new Date('2024-01-20'),
+          source: 'Mock'
         },
         {
-          id: 4,
-          title: "Campus Transport",
+          id: 'mock-4',
+          title: "Campus Transport (Mock)",
           description: "Reliable transport service for campus commuting. Safe and comfortable rides to and from your college.",
           price: 100,
           rating: 4.6,
@@ -75,11 +111,12 @@ const Services = () => {
           category: "Transport",
           serviceType: "transport",
           isAvailable: true,
-          createdAt: new Date('2024-01-12')
+          createdAt: new Date('2024-01-12'),
+          source: 'Mock'
         },
         {
-          id: 5,
-          title: "Laptop Repair Service",
+          id: 'mock-5',
+          title: "Laptop Repair Service (Mock)",
           description: "Professional laptop and computer repair service. Quick diagnosis and repair for all your tech needs.",
           price: 500,
           rating: 4.7,
@@ -88,11 +125,12 @@ const Services = () => {
           category: "Maintenance",
           serviceType: "maintenance",
           isAvailable: true,
-          createdAt: new Date('2024-01-08')
+          createdAt: new Date('2024-01-08'),
+          source: 'Mock'
         },
         {
-          id: 6,
-          title: "Tutoring Service",
+          id: 'mock-6',
+          title: "Tutoring Service (Mock)",
           description: "One-on-one tutoring for various subjects. Get help from experienced tutors for your academic needs.",
           price: 300,
           rating: 4.8,
@@ -101,11 +139,13 @@ const Services = () => {
           category: "Education",
           serviceType: "other",
           isAvailable: true,
-          createdAt: new Date('2024-01-18')
+          createdAt: new Date('2024-01-18'),
+          source: 'Mock'
         }
       ];
 
-      setServices(mockServices);
+      // Combine API data with mock data
+      setServices([...apiServices, ...mockServices]);
     } catch (error) {
       console.error('Error fetching services:', error);
     } finally {

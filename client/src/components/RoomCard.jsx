@@ -22,7 +22,8 @@ const RoomCard = ({
     amenities = [],
     roomType,
     propertyType,
-    isAvailable = true
+    isAvailable = true,
+    source = 'API'
   } = room;
 
   const cardVariants = {
@@ -104,8 +105,19 @@ const RoomCard = ({
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
-        {/* Availability Badge */}
+        {/* Source Badge */}
         <div className="absolute top-4 left-4">
+          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+            source === 'API' 
+              ? 'bg-green-500 text-white' 
+              : 'bg-orange-500 text-white'
+          }`}>
+            {source}
+          </span>
+        </div>
+        
+        {/* Availability Badge */}
+        <div className="absolute top-4 left-16">
           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
             isAvailable 
               ? 'bg-success-500 text-white' 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useCity } from '../context/CityContext';
+import { API_ENDPOINTS } from '../config/api';
 import ListingGrid from '../components/ListingGrid';
 
 const Rooms = () => {
@@ -20,14 +21,47 @@ const Rooms = () => {
     try {
       setLoading(true);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Try to fetch from API first
+      const params = new URLSearchParams();
+      if (selectedCity) {
+        params.append('city', selectedCity.name);
+        params.append('state', selectedCity.state);
+      }
+      
+      const queryString = params.toString();
+      const url = queryString ? `${API_ENDPOINTS.ROOMS.LIST}?${queryString}` : API_ENDPOINTS.ROOMS.LIST;
+      
+      let apiRooms = [];
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          const data = await response.json();
+          // Transform API data to match component expectations
+          apiRooms = data.rooms.map(room => ({
+            id: room._id,
+            title: room.title,
+            description: room.description,
+            price: room.price,
+            rating: room.rating || 4.0,
+            location: `${room.location.city}, ${room.location.state}`,
+            images: room.images || ["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500"],
+            category: room.roomType,
+            amenities: room.amenities || [],
+            isAvailable: room.isAvailable,
+            createdAt: new Date(room.createdAt),
+            host: room.host,
+            source: 'API'
+          }));
+        }
+      } catch (apiError) {
+        console.log('API not available, using mock data only');
+      }
       
       // Mock data for rooms
       const mockRooms = [
         {
-          id: 1,
-          title: "Cozy PG near University",
+          id: 'mock-1',
+          title: "Cozy PG near University (Mock)",
           description: "Furnished single room with all amenities, perfect for students. Located in a safe neighborhood with easy access to public transport.",
           price: 8000,
           rating: 4.5,
@@ -37,11 +71,12 @@ const Rooms = () => {
           roomType: "Single",
           propertyType: "PG",
           category: "PG",
+          source: 'Mock',
           isAvailable: true,
           createdAt: new Date('2024-01-15')
         },
         {
-          id: 2,
+          id: 'mock-2',
           title: "Modern Hostel Room",
           description: "Shared accommodation with modern facilities and study area. Perfect for students who prefer community living.",
           price: 6000,
@@ -147,7 +182,8 @@ const Rooms = () => {
         }
       ];
 
-      setRooms(mockRooms);
+      // Combine API data with mock data
+      setRooms([...apiRooms, ...mockRooms]);
     } catch (error) {
       console.error('Error fetching rooms:', error);
     } finally {
