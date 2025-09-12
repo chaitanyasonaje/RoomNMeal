@@ -1,11 +1,12 @@
 [build]
   base = "client"
-  command = "npm run build"
+  command = "npm install && npm run build"
   publish = "build"
 
   [build.environment]
     NODE_VERSION = "18"
     REACT_APP_API_URL = "https://roomnmeal.onrender.com"
+    CI = "false"
 
 # Headers for proper MIME types
 [[headers]]
@@ -69,11 +70,4 @@
   to = "https://roomnmeal.onrender.com/api/:splat"
   status = 200
   force = true
-
-# SPA fallback - exclude static assets
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = false
 
