@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaSearch, FaMapMarkerAlt, FaBed, FaUtensils, FaPlus } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
@@ -7,6 +8,7 @@ const Hero = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('rooms');
   const { isDark } = useTheme();
+  const navigate = useNavigate();
 
   const categories = [
     { id: 'rooms', label: 'Rooms', icon: FaBed, color: 'text-blue-600' },
@@ -16,8 +18,16 @@ const Hero = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Handle search logic here
-    console.log('Searching for:', searchQuery, 'in category:', selectedCategory);
+    if (searchQuery.trim()) {
+      // Navigate to search results based on active tab
+      if (selectedCategory === 'rooms') {
+        navigate(`/rooms?search=${encodeURIComponent(searchQuery)}`);
+      } else if (selectedCategory === 'meals') {
+        navigate(`/mess?search=${encodeURIComponent(searchQuery)}`);
+      } else if (selectedCategory === 'services') {
+        navigate(`/services?search=${encodeURIComponent(searchQuery)}`);
+      }
+    }
   };
 
   const containerVariants = {

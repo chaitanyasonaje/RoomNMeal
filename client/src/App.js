@@ -53,7 +53,7 @@ function App() {
         <CityProvider>
           <div className="min-h-screen flex flex-col">
             <Navbar />
-            <main className="flex-grow pt-20 md:pt-0">
+            <main className="flex-grow pt-16">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={location.pathname}

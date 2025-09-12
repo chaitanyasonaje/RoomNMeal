@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FaRobot, FaUser, FaTimes, FaPaperPlane, FaQuestionCircle, FaHome, FaUtensils, FaCreditCard, FaShieldAlt, FaPhone, FaEnvelope, FaMapMarkerAlt, FaLightbulb, FaBookOpen } from 'react-icons/fa';
+import { useTheme } from '../context/ThemeContext';
 
 const AdvancedChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +11,7 @@ const AdvancedChatBot = () => {
   const [suggestedQuestions, setSuggestedQuestions] = useState([]);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const { isDark } = useTheme();
 
   // Enhanced FAQ Data with more detailed responses
   const faqData = {
@@ -249,25 +252,43 @@ const AdvancedChatBot = () => {
   return (
     <>
       {/* Chat Bot Toggle Button */}
-      {!isOpen && (
-        <button
-          onClick={openChat}
-          className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
-          aria-label="Open chatbot"
-        >
-          <FaRobot className="h-6 w-6" />
-          <div className="absolute -top-2 -right-2 bg-accent-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center animate-pulse">
-            <FaQuestionCircle className="h-3 w-3" />
-          </div>
-          <div className="absolute -bottom-1 -right-1 bg-green-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-            <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
-          </div>
-        </button>
-      )}
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={openChat}
+            className="fixed bottom-20 right-6 z-50 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
+            aria-label="Open chatbot"
+          >
+            <FaRobot className="h-6 w-6" />
+            <div className="absolute -top-2 -right-2 bg-secondary-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center animate-pulse">
+              <FaQuestionCircle className="h-3 w-3" />
+            </div>
+            <div className="absolute -bottom-1 -right-1 bg-green-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+              <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
+            </div>
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Chat Bot Window */}
-      {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-96 h-[600px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.8, opacity: 0, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className={`fixed bottom-6 right-6 z-50 w-96 h-[600px] rounded-2xl shadow-2xl border flex flex-col overflow-hidden ${
+              isDark 
+                ? 'bg-gray-800 border-gray-700' 
+                : 'bg-white border-gray-200'
+            }`}
+          >
           {/* Header */}
           <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -293,14 +314,19 @@ const AdvancedChatBot = () => {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((message) => (
-              <div
+              <motion.div
                 key={message.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
                   className={`max-w-[85%] p-3 rounded-2xl ${
                     message.sender === 'user'
                       ? 'bg-primary-600 text-white'
+                      : isDark
+                      ? 'bg-gray-700 text-gray-200'
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
@@ -309,13 +335,15 @@ const AdvancedChatBot = () => {
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
 
             {/* Typing Indicator */}
             {isTyping && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 text-gray-800 p-3 rounded-2xl">
+                <div className={`p-3 rounded-2xl ${
+                  isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'
+                }`}>
                   <div className="flex space-x-1">
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -366,7 +394,9 @@ const AdvancedChatBot = () => {
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t border-gray-200">
+          <div className={`p-4 border-t ${
+            isDark ? 'border-gray-700' : 'border-gray-200'
+          }`}>
             <div className="flex space-x-2">
               <input
                 ref={inputRef}
@@ -375,20 +405,27 @@ const AdvancedChatBot = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask me anything about RoomNMeal..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                className={`flex-1 px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm ${
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                }`}
                 disabled={isTyping}
               />
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleSendMessage}
                 disabled={!inputValue.trim() || isTyping}
                 className="bg-primary-600 hover:bg-primary-700 disabled:bg-gray-300 text-white p-2 rounded-xl transition-colors duration-200"
               >
                 <FaPaperPlane className="h-4 w-4" />
-              </button>
+              </motion.button>
             </div>
           </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

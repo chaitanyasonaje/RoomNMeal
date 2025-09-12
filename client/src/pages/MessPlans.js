@@ -1,244 +1,193 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useTheme } from '../context/ThemeContext';
 import { useCity } from '../context/CityContext';
-import { FaUtensils, FaStar, FaMapMarkerAlt, FaClock, FaUsers, FaFilter, FaTimes } from 'react-icons/fa';
-import { getMockData } from '../data/mockData';
-import { safeArray, safeAccess, logError } from '../utils/errorHandler';
-
-// Safety check for getMockData
-const safeGetMockData = {
-  messPlans: () => {
-    try {
-      const result = getMockData?.messPlans?.();
-      return safeArray(result);
-    } catch (error) {
-      logError(error, 'messPlans access');
-      return [];
-    }
-  },
-  getMessByCity: (city) => {
-    try {
-      const result = getMockData?.getMessByCity?.(city);
-      return safeArray(result);
-    } catch (error) {
-      logError(error, 'getMessByCity access');
-      return [];
-    }
-  }
-};
+import ListingGrid from '../components/ListingGrid';
 
 const MessPlans = () => {
+  const { isDark } = useTheme();
   const { selectedCity } = useCity();
-  const [plans, setPlans] = useState([]);
+  const navigate = useNavigate();
+  const [messPlans, setMessPlans] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    minPrice: '',
-    maxPrice: '',
-    planType: '',
-    cuisine: '',
-    dietaryOptions: ''
-  });
-  const [showFilters, setShowFilters] = useState(false);
 
-  const fetchMessPlans = useCallback(async () => {
+  useEffect(() => {
+    fetchMessPlans();
+  }, [selectedCity]);
+
+  const fetchMessPlans = async () => {
     try {
       setLoading(true);
-      // Ensure plans is always an array during loading
-      setPlans([]);
       
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Get initial data with proper null checks
-      let filteredPlans = safeGetMockData.messPlans();
-      
-      // Apply city filter with enhanced error handling
-      if (selectedCity && selectedCity.name) {
-        const cityPlans = safeGetMockData.getMessByCity(selectedCity.name);
-        filteredPlans = Array.isArray(cityPlans) && cityPlans.length > 0 ? cityPlans : filteredPlans;
-      }
-      
-      // Apply other filters with enhanced safety checks
-      if (filters.minPrice && Array.isArray(filteredPlans)) {
-        const minPrice = parseInt(filters.minPrice);
-        if (!isNaN(minPrice)) {
-          filteredPlans = filteredPlans.filter(plan => {
-            try {
-              return plan && plan.mealPlans && Array.isArray(plan.mealPlans) && 
-                     plan.mealPlans.some(meal => meal && typeof meal.price === 'number' && meal.price >= minPrice);
-            } catch (filterError) {
-              console.error('Error in minPrice filter:', filterError);
-              return false;
-            }
-          });
+      // Mock data for mess plans
+      const mockMessPlans = [
+        {
+          id: 1,
+          title: "North Indian Mess Plan",
+          description: "Delicious North Indian meals with fresh ingredients. Perfect for students who love traditional Indian cuisine.",
+          price: 2500,
+          rating: 4.3,
+          location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
+          images: ["https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=500"],
+          category: "North Indian",
+          mealTypes: ["Breakfast", "Lunch", "Dinner"],
+          cuisine: ["North Indian", "Punjabi"],
+          isAvailable: true,
+          createdAt: new Date('2024-01-15')
+        },
+        {
+          id: 2,
+          title: "South Indian Special",
+          description: "Authentic South Indian cuisine with traditional recipes. Fresh idlis, dosas, and sambhar daily.",
+          price: 2000,
+          rating: 4.6,
+          location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
+          images: ["https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500"],
+          category: "South Indian",
+          mealTypes: ["Breakfast", "Lunch", "Dinner"],
+          cuisine: ["South Indian", "Tamil"],
+          isAvailable: true,
+          createdAt: new Date('2024-01-10')
+        },
+        {
+          id: 3,
+          title: "Gujarati Thali",
+          description: "Complete Gujarati thali with dal, sabzi, roti, rice, and sweet. Vegetarian meals with authentic flavors.",
+          price: 1800,
+          rating: 4.4,
+          location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
+          images: ["https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500"],
+          category: "Gujarati",
+          mealTypes: ["Lunch", "Dinner"],
+          cuisine: ["Gujarati", "Vegetarian"],
+          isAvailable: true,
+          createdAt: new Date('2024-01-20')
+        },
+        {
+          id: 4,
+          title: "Jain Mess Plan",
+          description: "Pure vegetarian Jain meals without onion and garlic. Perfect for students following Jain dietary restrictions.",
+          price: 2200,
+          rating: 4.5,
+          location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
+          images: ["https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=500"],
+          category: "Jain",
+          mealTypes: ["Breakfast", "Lunch", "Dinner"],
+          cuisine: ["Jain", "Vegetarian"],
+          isAvailable: true,
+          createdAt: new Date('2024-01-12')
+        },
+        {
+          id: 5,
+          title: "Punjabi Dhaba Style",
+          description: "Hearty Punjabi meals with rich gravies, fresh rotis, and traditional recipes. Perfect for students who love spicy food.",
+          price: 2800,
+          rating: 4.7,
+          location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
+          images: ["https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500"],
+          category: "Punjabi",
+          mealTypes: ["Lunch", "Dinner"],
+          cuisine: ["Punjabi", "North Indian"],
+          isAvailable: false,
+          createdAt: new Date('2024-01-08')
+        },
+        {
+          id: 6,
+          title: "Bengali Home Food",
+          description: "Traditional Bengali cuisine with fish curry, rice, and Bengali sweets. A taste of home for Bengali students.",
+          price: 2600,
+          rating: 4.2,
+          location: selectedCity ? `${selectedCity.name}, India` : "Delhi, India",
+          images: ["https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500"],
+          category: "Bengali",
+          mealTypes: ["Lunch", "Dinner"],
+          cuisine: ["Bengali", "Fish"],
+          isAvailable: true,
+          createdAt: new Date('2024-01-18')
         }
-      }
-      
-      if (filters.maxPrice && Array.isArray(filteredPlans)) {
-        const maxPrice = parseInt(filters.maxPrice);
-        if (!isNaN(maxPrice)) {
-          filteredPlans = filteredPlans.filter(plan => {
-            try {
-              return plan && plan.mealPlans && Array.isArray(plan.mealPlans) && 
-                     plan.mealPlans.some(meal => meal && typeof meal.price === 'number' && meal.price <= maxPrice);
-            } catch (filterError) {
-              console.error('Error in maxPrice filter:', filterError);
-              return false;
-            }
-          });
-        }
-      }
-      
-      if (filters.cuisine && Array.isArray(filteredPlans)) {
-        filteredPlans = filteredPlans.filter(plan => {
-          try {
-            return plan && plan.cuisine && Array.isArray(plan.cuisine) && plan.cuisine.includes(filters.cuisine);
-          } catch (filterError) {
-            console.error('Error in cuisine filter:', filterError);
-            return false;
-          }
-        });
-      }
-      
-      // Ensure we always set an array
-      const finalPlans = Array.isArray(filteredPlans) ? filteredPlans : [];
-      setPlans(finalPlans);
-      
+      ];
+
+      setMessPlans(mockMessPlans);
     } catch (error) {
       console.error('Error fetching mess plans:', error);
-      // Always ensure plans is an array, even in error state
-      setPlans([]);
     } finally {
       setLoading(false);
     }
-  }, [selectedCity, filters]);
+  };
 
-  useEffect(() => {
-    fetchMessPlans();
-  }, [fetchMessPlans]);
+  const handleMessPlanClick = (messPlan) => {
+    navigate(`/mess/${messPlan.id}`);
+  };
+
+  const handleSubscribeMessPlan = (messPlan) => {
+    // Handle subscription logic here
+    console.log('Subscribing to mess plan:', messPlan);
+    // You can redirect to subscription page or show subscription modal
+    navigate(`/mess/${messPlan.id}?action=subscribe`);
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className={`min-h-screen flex items-center justify-center ${
+        isDark ? 'bg-gray-900' : 'bg-gray-50'
+      }`}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center"
+        >
+          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${
+            isDark ? 'border-white' : 'border-primary-600'
+          } mx-auto mb-4`}></div>
+          <p className={`text-lg ${
+            isDark ? 'text-gray-300' : 'text-gray-600'
+          }`}>
+            Loading mess plans...
+          </p>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
-      <div className="max-w-5xl mx-auto px-2 sm:px-4 lg:px-8">
-        {/* Header */}
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
-            Mess Services
-            {selectedCity && (
-              <span className="block text-primary-600 text-lg mt-1">
-                in {selectedCity.name}
-              </span>
-            )}
-          </h1>
-          <p className="text-gray-600 text-base">
-            Subscribe to quality meal plans from verified providers
-            {selectedCity && (
-              <span className="block mt-1 text-sm text-primary-600">
-                {selectedCity.collegesCount}+ colleges • {selectedCity.techCompaniesCount}+ companies
-              </span>
-            )}
-          </p>
-        </div>
-
-        {/* Mobile Filter Toggle */}
-        <div className="md:hidden mb-6">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="w-full btn-secondary flex items-center justify-center gap-2"
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      {/* Header Section */}
+      <div className={`py-12 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center"
           >
-            <FaFilter />
-            <span>{showFilters ? 'Hide' : 'Show'} Filters</span>
-          </button>
+            <h1 className={`text-3xl sm:text-4xl font-heading font-bold mb-4 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              Discover Delicious Meals
+            </h1>
+            <p className={`text-lg ${
+              isDark ? 'text-gray-300' : 'text-gray-600'
+            } max-w-2xl mx-auto`}>
+              Subscribe to quality mess plans with diverse cuisines and flexible timings. 
+              {selectedCity && ` Currently showing mess plans in ${selectedCity.name}.`}
+            </p>
+          </motion.div>
         </div>
-        {/* Mess Plans Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {safeArray(plans).map((plan) => {
-            // Safety check for each plan object
-            if (!plan || !safeAccess(plan, '_id')) {
-              console.warn('Invalid plan object:', plan);
-              return null;
-            }
-            
-            return (
-            <div key={plan._id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow flex flex-col">
-              {/* Plan Image */}
-              <div className="h-44 bg-gray-200 relative">
-                {plan.images && plan.images.length > 0 ? (
-                  <img
-                    src={plan.images[0]}
-                    alt={plan.planName}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <FaUtensils className="h-12 w-12" />
-                  </div>
-                )}
-                <div className="absolute top-2 right-2">
-                  <span className="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">₹{plan.price || 'N/A'}/month</span>
-                </div>
-              </div>
-              {/* Plan Details */}
-              <div className="p-5 flex-1 flex flex-col justify-between">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">{plan.planName || plan.name || 'Unnamed Plan'}</h3>
-                <p className="text-gray-600 text-sm mb-2">{plan.description ? plan.description.substring(0, 100) + '...' : 'No description available'}</p>
-                <div className="flex items-center text-gray-500 text-xs mb-2">
-                  <FaMapMarkerAlt className="h-4 w-4 mr-1" />
-                  <span>{plan.provider?.messDetails?.messName || plan.provider?.name || 'Mess Provider'}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
-                  <div className="flex items-center"><FaClock className="h-4 w-4 mr-1" />{plan.planType || 'N/A'}</div>
-                  <div className="flex items-center"><FaUsers className="h-4 w-4 mr-1" />{plan.currentSubscribers || 0}/{plan.capacity || 'N/A'}</div>
-                </div>
-                <div className="flex items-center mb-2">
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <FaStar
-                      key={i}
-                      className={`h-4 w-4 ${i < Math.floor((plan.ratings?.average || 0)) ? 'text-yellow-400' : 'text-gray-300'}`}
-                    />
-                  ))}
-                  <span className="text-xs text-gray-600 ml-2">({plan.ratings?.count || 0} reviews)</span>
-                </div>
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {plan.mealTypes && Array.isArray(plan.mealTypes) && plan.mealTypes.map((meal, index) => {
-                    if (!meal || typeof meal !== 'string') return null;
-                    return (
-                      <span key={index} className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">{meal}</span>
-                    );
-                  })}
-                </div>
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {plan.cuisine && Array.isArray(plan.cuisine) && plan.cuisine.slice(0, 2).map((cuisine, index) => {
-                    if (!cuisine || typeof cuisine !== 'string') return null;
-                    return (
-                      <span key={index} className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">{cuisine}</span>
-                    );
-                  })}
-                </div>
-                <Link to={`/mess/${plan._id}`} className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center mt-2">View Details</Link>
-              </div>
-            </div>
-            );
-          })}
-        </div>
-        {safeArray(plans).length === 0 && !loading && (
-          <div className="text-center py-12">
-            <FaUtensils className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No mess plans available</h3>
-            <p className="text-gray-600">Check back later for new mess plans</p>
-          </div>
-        )}
       </div>
+
+      {/* Mess Plans Grid */}
+      <ListingGrid
+        items={messPlans}
+        type="meals"
+        onItemClick={handleMessPlanClick}
+        onBookItem={handleSubscribeMessPlan}
+      />
     </div>
   );
 };
 
-export default MessPlans; 
+export default MessPlans;

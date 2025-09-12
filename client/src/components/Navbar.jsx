@@ -17,6 +17,7 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { useCity } from '../context/CityContext';
+import CitySelector from './CitySelector';
 
 const navLinks = [
   { to: '/', label: 'Home', icon: FaHome },
@@ -47,143 +48,12 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Desktop Navbar */}
+      {/* Mobile Header - Only Logo and Controls */}
       <motion.nav 
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className={`hidden md:block sticky top-0 z-50 ${
-          isDark 
-            ? 'bg-gray-900/95 backdrop-blur-md border-b border-gray-800' 
-            : 'bg-white/95 backdrop-blur-md border-b border-gray-200'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-3 group">
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-gradient-to-r from-primary-600 to-primary-700 p-3 rounded-2xl group-hover:shadow-glow transition-all duration-300"
-              >
-                <FaHome className="h-6 w-6 text-white" />
-              </motion.div>
-              <span className="text-2xl font-heading font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
-                RoomNMeal
-              </span>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="flex items-center space-x-1">
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      isActive(link.to)
-                        ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-                        : isDark
-                        ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                        : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{link.label}</span>
-                  </Link>
-                );
-              })}
-              
-              {isAuthenticated && (
-                <Link
-                  to="/wallet"
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                    isActive('/wallet')
-                      ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-                      : isDark
-                      ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                      : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
-                  }`}
-                >
-                  <FaWallet className="h-4 w-4" />
-                  <span>Wallet</span>
-                </Link>
-              )}
-            </div>
-
-            {/* Right Side */}
-            <div className="flex items-center space-x-4">
-              {/* City Selector */}
-              <button
-                onClick={() => setIsCitySelectorOpen(true)}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  isDark
-                    ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <FaMapMarkerAlt className="h-4 w-4 text-primary-600" />
-                <span>{selectedCity ? selectedCity.name : 'Select City'}</span>
-                <FaChevronDown className="h-3 w-3" />
-              </button>
-
-              {/* Theme Toggle */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={toggleTheme}
-                className={`p-2 rounded-lg transition-all duration-200 ${
-                  isDark
-                    ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-                aria-label="Toggle theme"
-              >
-                {isDark ? '☀️' : '🌙'}
-              </motion.button>
-
-              {/* User Profile */}
-              {isAuthenticated ? (
-                <div className="relative group">
-                  <Link
-                    to="/profile"
-                    className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                      {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                    </div>
-                    <span className="hidden lg:block">{user?.name}</span>
-                  </Link>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-3">
-                  <Link
-                    to="/login"
-                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors duration-200"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors duration-200"
-                  >
-                    Get Started
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </motion.nav>
-
-      {/* Mobile Navbar */}
-      <motion.nav 
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className={`md:hidden fixed top-0 left-0 right-0 z-50 ${
+        className={`fixed top-0 left-0 right-0 z-50 ${
           isDark 
             ? 'bg-gray-900/95 backdrop-blur-md border-b border-gray-800' 
             : 'bg-white/95 backdrop-blur-md border-b border-gray-200'
@@ -245,46 +115,6 @@ const Navbar = () => {
             </motion.button>
           </div>
         </div>
-
-        {/* Mobile Navigation Links */}
-        <div className={`border-t ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
-          <div className="flex justify-around items-center px-2 py-2">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={`flex flex-col items-center justify-center flex-1 py-2 text-xs font-medium transition-all duration-200 rounded-lg mx-1 ${
-                    isActive(link.to)
-                      ? 'text-primary-600 bg-primary-50 dark:text-primary-400 dark:bg-primary-900/30'
-                      : isDark
-                      ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                      : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
-                  }`}
-                >
-                  <Icon className="h-5 w-5 mb-1" />
-                  <span>{link.label}</span>
-                </Link>
-              );
-            })}
-            {isAuthenticated && (
-              <Link
-                to="/wallet"
-                className={`flex flex-col items-center justify-center flex-1 py-2 text-xs font-medium transition-all duration-200 rounded-lg mx-1 ${
-                  isActive('/wallet')
-                    ? 'text-primary-600 bg-primary-50 dark:text-primary-400 dark:bg-primary-900/30'
-                    : isDark
-                    ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                    : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
-                }`}
-              >
-                <FaWallet className="h-5 w-5 mb-1" />
-                <span>Wallet</span>
-              </Link>
-            )}
-          </div>
-        </div>
       </motion.nav>
 
       {/* Mobile Menu Overlay */}
@@ -295,7 +125,7 @@ const Navbar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 z-50 md:hidden"
+            className="fixed inset-0 bg-black/50 z-50"
             onClick={toggleMobileMenu}
           >
             <motion.div
@@ -382,7 +212,7 @@ const Navbar = () => {
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className={`md:hidden fixed bottom-0 left-0 right-0 z-40 ${
+        className={`fixed bottom-0 left-0 right-0 z-40 ${
           isDark 
             ? 'bg-gray-900/95 backdrop-blur-md border-t border-gray-800' 
             : 'bg-white/95 backdrop-blur-md border-t border-gray-200'
@@ -401,7 +231,7 @@ const Navbar = () => {
                   to={link.to}
                   className={`flex flex-col items-center justify-center flex-1 py-2 text-xs font-medium transition-all duration-200 rounded-lg mx-1 ${
                     isActive(link.to)
-                      ? 'text-primary-600 dark:text-primary-400'
+                      ? 'text-primary-600 bg-primary-100 dark:text-primary-400 dark:bg-primary-900/30'
                       : isDark
                       ? 'text-gray-400 hover:text-white'
                       : 'text-gray-500 hover:text-primary-600'
@@ -419,17 +249,17 @@ const Navbar = () => {
               whileTap={{ scale: 0.95 }}
             >
               <Link
-                to="/profile"
+                to="/wallet"
                 className={`flex flex-col items-center justify-center flex-1 py-2 text-xs font-medium transition-all duration-200 rounded-lg mx-1 ${
-                  isActive('/profile')
-                    ? 'text-primary-600 dark:text-primary-400'
+                  isActive('/wallet')
+                    ? 'text-primary-600 bg-primary-100 dark:text-primary-400 dark:bg-primary-900/30'
                     : isDark
                     ? 'text-gray-400 hover:text-white'
                     : 'text-gray-500 hover:text-primary-600'
                 }`}
               >
-                <FaUser className="h-5 w-5 mb-1" />
-                <span>Profile</span>
+                <FaWallet className="h-5 w-5 mb-1" />
+                <span>Wallet</span>
               </Link>
             </motion.div>
           ) : (
@@ -441,7 +271,7 @@ const Navbar = () => {
                 to="/login"
                 className={`flex flex-col items-center justify-center flex-1 py-2 text-xs font-medium transition-all duration-200 rounded-lg mx-1 ${
                   isActive('/login')
-                    ? 'text-primary-600 dark:text-primary-400'
+                    ? 'text-primary-600 bg-primary-100 dark:text-primary-400 dark:bg-primary-900/30'
                     : isDark
                     ? 'text-gray-400 hover:text-white'
                     : 'text-gray-500 hover:text-primary-600'
@@ -454,6 +284,17 @@ const Navbar = () => {
           )}
         </div>
       </motion.nav>
+
+      {/* City Selector Modal */}
+      <CitySelector
+        isOpen={isCitySelectorOpen}
+        onClose={() => setIsCitySelectorOpen(false)}
+        onCitySelect={(city) => {
+          // Handle city selection
+          console.log('City selected:', city);
+          setIsCitySelectorOpen(false);
+        }}
+      />
     </>
   );
 };
