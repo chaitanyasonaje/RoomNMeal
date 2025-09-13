@@ -34,6 +34,7 @@ import ServiceOrders from './pages/ServiceOrders';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Analytics from './pages/Analytics';
+import ServiceDetail from './pages/ServiceDetail';
 
 function App() {
   const { user } = useAuth();

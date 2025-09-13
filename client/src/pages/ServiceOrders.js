@@ -19,7 +19,8 @@ import {
   FaEdit,
   FaTrash,
   FaPlus,
-  FaSortAmountDown
+  FaSortAmountDown,
+  FaTimes
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
