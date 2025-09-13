@@ -253,31 +253,31 @@ const AdvancedChatBot = () => {
     <>
       {/* Chat Bot Toggle Button */}
       <AnimatePresence>
-        {!isOpen && (
+      {!isOpen && (
           <motion.button
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            onClick={openChat}
+          onClick={openChat}
             className="fixed bottom-20 right-6 z-50 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
-            aria-label="Open chatbot"
-          >
-            <FaRobot className="h-6 w-6" />
+          aria-label="Open chatbot"
+        >
+          <FaRobot className="h-6 w-6" />
             <div className="absolute -top-2 -right-2 bg-secondary-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center animate-pulse">
-              <FaQuestionCircle className="h-3 w-3" />
-            </div>
-            <div className="absolute -bottom-1 -right-1 bg-green-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
-            </div>
+            <FaQuestionCircle className="h-3 w-3" />
+          </div>
+          <div className="absolute -bottom-1 -right-1 bg-green-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+            <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
+          </div>
           </motion.button>
-        )}
+      )}
       </AnimatePresence>
 
       {/* Chat Bot Window */}
       <AnimatePresence>
-        {isOpen && (
+      {isOpen && (
           <motion.div
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -424,7 +424,7 @@ const AdvancedChatBot = () => {
             </div>
           </div>
           </motion.div>
-        )}
+      )}
       </AnimatePresence>
     </>
   );

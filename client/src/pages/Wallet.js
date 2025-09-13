@@ -366,8 +366,8 @@ const Wallet = () => {
                     isDark ? 'text-gray-400' : 'text-gray-500'
                   }`}>
                     {transaction.status}
-                  </p>
-                </div>
+          </p>
+        </div>
               </motion.div>
             ))}
           </div>
@@ -377,4 +377,4 @@ const Wallet = () => {
   );
 };
 
-export default Wallet;
+export default Wallet; 

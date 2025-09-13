@@ -30,6 +30,10 @@ import AddMessPlan from './pages/AddMessPlan';
 import EditMessPlan from './pages/EditMessPlan';
 import ProviderPlans from './pages/ProviderPlans';
 import FAQ from './pages/FAQ';
+import ServiceOrders from './pages/ServiceOrders';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Analytics from './pages/Analytics';
 
 function App() {
   const { user } = useAuth();
@@ -67,11 +71,14 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/rooms" element={<Rooms />} />
           <Route path="/rooms/:id" element={<RoomDetail />} />
           <Route path="/mess" element={<MessPlans />} />
           <Route path="/mess/:id" element={<MessDetail />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/services/:id" element={<ServiceDetail />} />
           <Route path="/faq" element={<FAQ />} />
           
           {/* Protected Routes */}
@@ -100,9 +107,19 @@ function App() {
                           <AdminDashboard />
                         </ProtectedRoute>
                       } />
+                      <Route path="/analytics" element={
+                        <ProtectedRoute allowedRoles={['admin']}>
+                          <Analytics />
+                        </ProtectedRoute>
+                      } />
                       <Route path="/wallet" element={
                         <ProtectedRoute>
                           <Wallet />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/service-orders" element={
+                        <ProtectedRoute>
+                          <ServiceOrders />
                         </ProtectedRoute>
                       } />
           <Route path="/rooms/add" element={

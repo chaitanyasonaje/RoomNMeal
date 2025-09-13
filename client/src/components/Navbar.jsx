@@ -12,7 +12,8 @@ import {
   FaTimes,
   FaWallet,
   FaMapMarkerAlt,
-  FaChevronDown
+  FaChevronDown,
+  FaClipboardList
 } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -180,6 +181,17 @@ const Navbar = () => {
                       >
                         <FaWallet className="h-5 w-5" />
                         <span className="font-medium">Wallet</span>
+                      </Link>
+                      
+                      <Link
+                        to="/service-orders"
+                        onClick={toggleMobileMenu}
+                        className={`flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400 rounded-xl transition-colors duration-200 ${
+                          isActive('/service-orders') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : ''
+                        }`}
+                      >
+                        <FaClipboardList className="h-5 w-5" />
+                        <span className="font-medium">Service Orders</span>
                       </Link>
                       
                       <Link

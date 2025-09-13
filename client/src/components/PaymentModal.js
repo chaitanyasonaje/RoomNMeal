@@ -10,7 +10,10 @@ const PaymentModal = ({
   relatedId, 
   description, 
   onSuccess, 
-  onFailure 
+  onFailure,
+  bookingData,
+  setBookingData,
+  service
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -175,8 +178,8 @@ const PaymentModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Payment</h2>
           <button
@@ -192,6 +195,90 @@ const PaymentModal = ({
           <p className="text-2xl font-bold text-green-600">₹{amount}</p>
           <p className="text-sm text-gray-500 mt-1">{description}</p>
         </div>
+
+        {/* Service Booking Form */}
+        {type === 'service_booking' && service && (
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Booking Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Quantity
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={bookingData?.quantity || 1}
+                  onChange={(e) => setBookingData({...bookingData, quantity: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Unit
+                </label>
+                <select
+                  value={bookingData?.unit || 'items'}
+                  onChange={(e) => setBookingData({...bookingData, unit: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="items">Items</option>
+                  <option value="kg">Kilograms</option>
+                  <option value="hours">Hours</option>
+                  <option value="room">Room</option>
+                  <option value="trip">Trip</option>
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Special Instructions
+                </label>
+                <textarea
+                  value={bookingData?.specialInstructions || ''}
+                  onChange={(e) => setBookingData({...bookingData, specialInstructions: e.target.value})}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Any special requirements or instructions..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Scheduled Date
+                </label>
+                <input
+                  type="date"
+                  value={bookingData?.scheduledDate || ''}
+                  onChange={(e) => setBookingData({...bookingData, scheduledDate: e.target.value})}
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Scheduled Time
+                </label>
+                <input
+                  type="time"
+                  value={bookingData?.scheduledTime || ''}
+                  onChange={(e) => setBookingData({...bookingData, scheduledTime: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Delivery Address
+                </label>
+                <textarea
+                  value={bookingData?.deliveryAddress || ''}
+                  onChange={(e) => setBookingData({...bookingData, deliveryAddress: e.target.value})}
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter delivery address..."
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">

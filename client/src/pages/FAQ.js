@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useTheme } from '../context/ThemeContext';
 import { FaChevronDown, FaChevronUp, FaQuestionCircle, FaHome, FaUtensils, FaCreditCard, FaShieldAlt, FaPhone, FaEnvelope, FaMapMarkerAlt, FaSearch } from 'react-icons/fa';
 
 const FAQ = () => {
+  const { isDark } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedItems, setExpandedItems] = useState({});
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -174,33 +177,94 @@ const FAQ = () => {
     ...faqData.map(category => ({ value: category.category, label: category.category }))
   ];
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { y: 30, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut",
+      },
+    },
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50">
+    <div className={`min-h-screen ${
+      isDark 
+        ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
+        : 'bg-gradient-to-br from-gray-50 via-white to-primary-50'
+    }`}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-16">
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-20"
+      >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h1>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-center"
+          >
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">Frequently Asked Questions</h1>
             <p className="text-xl text-primary-100 max-w-3xl mx-auto">
               Find answers to common questions about RoomNMeal services, bookings, and support
             </p>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Search and Filter */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-2xl shadow-soft p-6 mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className={`rounded-2xl shadow-lg p-6 mb-8 ${
+            isDark ? 'bg-gray-800' : 'bg-white'
+          }`}
+        >
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
                 placeholder="Search questions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className={`w-full pl-12 pr-4 py-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors ${
+                  isDark 
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                }`}
               />
             </div>
             
@@ -208,7 +272,11 @@ const FAQ = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+              className={`px-4 py-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors ${
+                isDark 
+                  ? 'bg-gray-700 border-gray-600 text-white' 
+                  : 'bg-white border-gray-300 text-gray-900'
+              }`}
             >
               {categories.map(category => (
                 <option key={category.value} value={category.value}>
@@ -217,41 +285,85 @@ const FAQ = () => {
               ))}
             </select>
           </div>
-        </div>
+        </motion.div>
 
         {/* FAQ Content */}
-        <div className="space-y-6">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-6"
+        >
           {filteredData.length === 0 ? (
-            <div className="text-center py-12">
-              <FaQuestionCircle className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">No questions found</h3>
-              <p className="text-gray-500">Try adjusting your search terms or category filter.</p>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="text-center py-12"
+            >
+              <FaQuestionCircle className="h-20 w-20 text-gray-400 mx-auto mb-6" />
+              <h3 className={`text-2xl font-semibold mb-3 ${
+                isDark ? 'text-gray-300' : 'text-gray-600'
+              }`}>
+                No questions found
+              </h3>
+              <p className={`text-lg ${
+                isDark ? 'text-gray-400' : 'text-gray-500'
+              }`}>
+                Try adjusting your search terms or category filter.
+              </p>
+            </motion.div>
           ) : (
             filteredData.map((category, categoryIndex) => (
-              <div key={category.category} className="bg-white rounded-2xl shadow-soft overflow-hidden">
+              <motion.div
+                key={category.category}
+                variants={cardVariants}
+                className={`rounded-2xl shadow-lg overflow-hidden ${
+                  isDark ? 'bg-gray-800' : 'bg-white'
+                }`}
+              >
                 {/* Category Header */}
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                <div className={`px-6 py-4 border-b ${
+                  isDark 
+                    ? 'bg-gradient-to-r from-gray-700 to-gray-600 border-gray-700' 
+                    : 'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200'
+                }`}>
                   <div className="flex items-center space-x-3">
                     <div className="text-primary-600">{category.icon}</div>
-                    <h2 className="text-xl font-semibold text-gray-800">{category.category}</h2>
-                    <span className="bg-primary-100 text-primary-800 text-sm px-2 py-1 rounded-full">
+                    <h2 className={`text-xl font-bold ${
+                      isDark ? 'text-white' : 'text-gray-800'
+                    }`}>
+                      {category.category}
+                    </h2>
+                    <span className="bg-primary-100 text-primary-800 text-sm px-3 py-1 rounded-full font-medium">
                       {category.questions.length} questions
                     </span>
                   </div>
                 </div>
 
                 {/* Questions */}
-                <div className="divide-y divide-gray-200">
+                <div className={`divide-y ${
+                  isDark ? 'divide-gray-700' : 'divide-gray-200'
+                }`}>
                   {category.questions.map((question, questionIndex) => {
                     const isExpanded = expandedItems[`${categoryIndex}-${questionIndex}`];
                     return (
-                      <div key={questionIndex} className="p-6">
-                        <button
+                      <motion.div
+                        key={questionIndex}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: questionIndex * 0.1 }}
+                        className="p-6"
+                      >
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => toggleExpanded(categoryIndex, questionIndex)}
                           className="w-full text-left flex items-center justify-between group"
                         >
-                          <h3 className="text-lg font-medium text-gray-800 group-hover:text-primary-600 transition-colors duration-200 pr-4">
+                          <h3 className={`text-lg font-semibold group-hover:text-primary-600 transition-colors duration-200 pr-4 ${
+                            isDark ? 'text-white' : 'text-gray-800'
+                          }`}>
                             {question.question}
                           </h3>
                           <div className="flex-shrink-0">
@@ -261,49 +373,67 @@ const FAQ = () => {
                               <FaChevronDown className="h-5 w-5 text-gray-400 group-hover:text-primary-600 transition-colors duration-200" />
                             )}
                           </div>
-                        </button>
+                        </motion.button>
                         
                         {isExpanded && (
-                          <div className="mt-4 pl-0">
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="mt-4 pl-0"
+                          >
                             <div className="prose prose-sm max-w-none">
-                              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                              <p className={`leading-relaxed whitespace-pre-line ${
+                                isDark ? 'text-gray-300' : 'text-gray-600'
+                              }`}>
                                 {question.answer}
                               </p>
                             </div>
-                          </div>
+                          </motion.div>
                         )}
-                      </div>
+                      </motion.div>
                     );
                   })}
                 </div>
-              </div>
+              </motion.div>
             ))
           )}
-        </div>
+        </motion.div>
 
         {/* Contact CTA */}
-        <div className="mt-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 text-center text-white">
-          <h3 className="text-2xl font-bold mb-4">Still have questions?</h3>
-          <p className="text-primary-100 mb-6 max-w-2xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="mt-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 text-center text-white"
+        >
+          <h3 className="text-3xl font-bold mb-4">Still have questions?</h3>
+          <p className="text-primary-100 mb-8 max-w-2xl mx-auto text-lg">
             Our support team is here to help you 24/7. Get in touch with us for personalized assistance.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               href="tel:+919876543210"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-primary-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors duration-200"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl"
             >
               <FaPhone className="h-5 w-5 mr-2" />
               Call Us Now
-            </a>
-            <a
+            </motion.a>
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               href="mailto:support@roomnmeal.com"
-              className="inline-flex items-center justify-center px-6 py-3 border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-primary-600 transition-colors duration-200"
+              className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-primary-600 transition-colors duration-200"
             >
               <FaEnvelope className="h-5 w-5 mr-2" />
               Email Support
-            </a>
+            </motion.a>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

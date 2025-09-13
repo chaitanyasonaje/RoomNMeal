@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { FaHome, FaUtensils, FaComments, FaPlus, FaEye, FaEdit, FaCalendar, FaUsers, FaMoneyBillWave } from 'react-icons/fa';
+import { useTheme } from '../context/ThemeContext';
+import { FaHome, FaUtensils, FaComments, FaPlus, FaEye, FaEdit, FaCalendar, FaUsers, FaMoneyBillWave, FaArrowRight } from 'react-icons/fa';
 import axios from 'axios';
 import BookingCard from '../components/BookingCard';
 import toast from 'react-hot-toast';
@@ -9,6 +11,7 @@ import { getMockData } from '../data/mockData';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const [stats, setStats] = useState({
     bookings: { total: 0, pending: 0, confirmed: 0, active: 0, completed: 0 },
     subscriptions: { total: 0, active: 0, paused: 0 },
@@ -101,6 +104,42 @@ const Dashboard = () => {
       default:
         return [];
     }
+  };
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { y: 30, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut",
+      },
+    },
   };
 
   const getStatsCards = () => {
@@ -199,128 +238,268 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="text-center"
+        >
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Loading dashboard...</p>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
-      <div className="max-w-5xl mx-auto px-2 sm:px-4 lg:px-8">
-        {/* Welcome Section */}
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{getWelcomeMessage()}</h1>
-          <p className="text-gray-600 text-base mt-1">Here's what's happening with your account</p>
-        </div>
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-          {getStatsCards().map((stat, index) => (
-            <div key={index} className="bg-white rounded-lg shadow p-6 flex items-center">
-              <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                <stat.icon className={`h-6 w-6 ${stat.textColor}`} />
-              </div>
-              <div className="ml-4">
-                <p className="text-xs font-medium text-gray-600">{stat.title}</p>
-                <p className="text-xl font-bold text-gray-900">{stat.value}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow mb-8">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-base font-semibold text-gray-900">Quick Actions</h2>
-          </div>
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {getQuickActions().map((action, index) => (
-                <Link
-                  key={index}
-                  to={action.link}
-                  className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <div className={`p-3 rounded-full ${action.color}`}>
-                    <action.icon className="h-6 w-6 text-white" />
-                  </div>
-                  <span className="ml-3 font-medium text-gray-900">{action.title}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-        {/* Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Bookings */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-base font-semibold text-gray-900">Recent Bookings</h2>
-              <Link to="/bookings" className="text-primary-600 hover:text-primary-700 text-xs">View all →</Link>
+    <div className={`min-h-screen py-6 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {/* Welcome Section */}
+          <motion.div
+            variants={itemVariants}
+            className="mb-8 text-center"
+          >
+            <h1 className={`text-3xl md:text-4xl font-bold mb-2 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              {getWelcomeMessage()}
+            </h1>
+            <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+              Here's what's happening with your account
+            </p>
+          </motion.div>
+          {/* Stats Cards */}
+          <motion.div
+            variants={itemVariants}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          >
+            {getStatsCards().map((stat, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.05 }}
+                className={`rounded-2xl shadow-lg p-6 flex items-center ${
+                  isDark ? 'bg-gray-800' : 'bg-white'
+                }`}
+              >
+                <div className={`p-4 rounded-2xl ${
+                  isDark ? 'bg-gray-700' : stat.bgColor
+                }`}>
+                  <stat.icon className={`h-8 w-8 ${
+                    isDark ? 'text-gray-300' : stat.textColor
+                  }`} />
+                </div>
+                <div className="ml-4">
+                  <p className={`text-sm font-medium ${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  }`}>
+                    {stat.title}
+                  </p>
+                  <p className={`text-2xl font-bold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {stat.value}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+          {/* Quick Actions */}
+          <motion.div
+            variants={cardVariants}
+            className={`rounded-2xl shadow-lg mb-8 ${
+              isDark ? 'bg-gray-800' : 'bg-white'
+            }`}
+          >
+            <div className={`px-6 py-4 border-b ${
+              isDark ? 'border-gray-700' : 'border-gray-200'
+            }`}>
+              <h2 className={`text-xl font-bold ${
+                isDark ? 'text-white' : 'text-gray-900'
+              }`}>
+                Quick Actions
+              </h2>
             </div>
             <div className="p-6">
-              {bookings.length > 0 ? (
-                <div className="space-y-4">
-                  {bookings.slice(0, 3).map((booking) => (
-                    <BookingCard
-                      key={booking._id}
-                      booking={booking}
-                      userRole={user.role}
-                      onStatusUpdate={handleBookingUpdate}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <FaCalendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No bookings yet</p>
-                  {user?.role === 'student' && (
-                    <Link to="/rooms" className="mt-2 inline-block text-primary-600 hover:text-primary-700">Find rooms to book →</Link>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-          {/* Recent Subscriptions or Additional Info */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-base font-semibold text-gray-900">{user?.role === 'student' ? 'Recent Subscriptions' : 'Recent Activity'}</h2>
-              <Link to={user?.role === 'student' ? '/mess' : '/dashboard'} className="text-primary-600 hover:text-primary-700 text-xs">View all →</Link>
-            </div>
-            <div className="p-6">
-              {user?.role === 'student' ? (
-                recentSubscriptions.length > 0 ? (
-                  <div className="space-y-4">
-                    {recentSubscriptions.map((subscription) => (
-                      <div key={subscription._id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900 text-sm">{subscription.messPlan?.planName}</p>
-                          <p className="text-xs text-gray-600">₹{subscription.totalAmount}</p>
-                        </div>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          subscription.status === 'active' ? 'bg-green-100 text-green-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {subscription.status}
-                        </span>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {getQuickActions().map((action, index) => (
+                  <motion.div
+                    key={index}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Link
+                      to={action.link}
+                      className={`flex items-center p-4 border rounded-xl transition-all duration-200 ${
+                        isDark 
+                          ? 'border-gray-700 hover:bg-gray-700' 
+                          : 'border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className={`p-3 rounded-2xl ${action.color}`}>
+                        <action.icon className="h-6 w-6 text-white" />
                       </div>
+                      <span className={`ml-3 font-semibold ${
+                        isDark ? 'text-white' : 'text-gray-900'
+                      }`}>
+                        {action.title}
+                      </span>
+                      <FaArrowRight className="h-4 w-4 ml-auto text-gray-400" />
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+          {/* Recent Activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Recent Bookings */}
+            <motion.div
+              variants={cardVariants}
+              className={`rounded-2xl shadow-lg ${
+                isDark ? 'bg-gray-800' : 'bg-white'
+              }`}
+            >
+              <div className={`px-6 py-4 border-b ${
+                isDark ? 'border-gray-700' : 'border-gray-200'
+              } flex justify-between items-center`}>
+                <h2 className={`text-xl font-bold ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  Recent Bookings
+                </h2>
+                <Link 
+                  to="/bookings" 
+                  className="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center"
+                >
+                  View all <FaArrowRight className="ml-1 h-3 w-3" />
+                </Link>
+              </div>
+              <div className="p-6">
+                {bookings.length > 0 ? (
+                  <div className="space-y-4">
+                    {bookings.slice(0, 3).map((booking, index) => (
+                      <motion.div
+                        key={booking._id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <BookingCard
+                          booking={booking}
+                          userRole={user.role}
+                          onStatusUpdate={handleBookingUpdate}
+                        />
+                      </motion.div>
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <FaUtensils className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">No subscriptions yet</p>
-                    <Link to="/mess" className="mt-2 inline-block text-primary-600 hover:text-primary-700">Browse mess plans →</Link>
+                    <FaCalendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                      No bookings yet
+                    </p>
+                    {user?.role === 'student' && (
+                      <Link 
+                        to="/rooms" 
+                        className="mt-4 inline-block text-primary-600 hover:text-primary-700 font-medium"
+                      >
+                        Find rooms to book →
+                      </Link>
+                    )}
                   </div>
-                )
-              ) : (
-                <div className="text-center py-8">
-                  <FaMoneyBillWave className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">Earnings and analytics coming soon</p>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </motion.div>
+            {/* Recent Subscriptions or Additional Info */}
+            <motion.div
+              variants={cardVariants}
+              className={`rounded-2xl shadow-lg ${
+                isDark ? 'bg-gray-800' : 'bg-white'
+              }`}
+            >
+              <div className={`px-6 py-4 border-b ${
+                isDark ? 'border-gray-700' : 'border-gray-200'
+              } flex justify-between items-center`}>
+                <h2 className={`text-xl font-bold ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  {user?.role === 'student' ? 'Recent Subscriptions' : 'Recent Activity'}
+                </h2>
+                <Link 
+                  to={user?.role === 'student' ? '/mess' : '/dashboard'} 
+                  className="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center"
+                >
+                  View all <FaArrowRight className="ml-1 h-3 w-3" />
+                </Link>
+              </div>
+              <div className="p-6">
+                {user?.role === 'student' ? (
+                  recentSubscriptions.length > 0 ? (
+                    <div className="space-y-4">
+                      {recentSubscriptions.map((subscription, index) => (
+                        <motion.div
+                          key={subscription._id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className={`flex items-center justify-between p-4 border rounded-xl ${
+                            isDark ? 'border-gray-700 bg-gray-700' : 'border-gray-200 bg-gray-50'
+                          }`}
+                        >
+                          <div>
+                            <p className={`font-semibold text-sm ${
+                              isDark ? 'text-white' : 'text-gray-900'
+                            }`}>
+                              {subscription.messPlan?.planName}
+                            </p>
+                            <p className={`text-sm ${
+                              isDark ? 'text-gray-300' : 'text-gray-600'
+                            }`}>
+                              ₹{subscription.totalAmount}
+                            </p>
+                          </div>
+                          <span className={`px-3 py-1 text-xs rounded-full font-medium ${
+                            subscription.status === 'active' 
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                          }`}>
+                            {subscription.status}
+                          </span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <FaUtensils className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                      <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                        No subscriptions yet
+                      </p>
+                      <Link 
+                        to="/mess" 
+                        className="mt-4 inline-block text-primary-600 hover:text-primary-700 font-medium"
+                      >
+                        Browse mess plans →
+                      </Link>
+                    </div>
+                  )
+                ) : (
+                  <div className="text-center py-8">
+                    <FaMoneyBillWave className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                      Earnings and analytics coming soon
+                    </p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

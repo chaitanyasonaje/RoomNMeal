@@ -191,7 +191,7 @@ const Services = () => {
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header Section */}
       <div className={`py-12 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -210,10 +210,10 @@ const Services = () => {
               right from your doorstep. {selectedCity && `Currently showing services in ${selectedCity.name}.`}
             </p>
           </motion.div>
+          </div>
         </div>
-      </div>
 
-      {/* Services Grid */}
+        {/* Services Grid */}
       <ListingGrid
         items={services}
         type="services"

@@ -1,12 +1,11 @@
+// Service Worker for RoomNMeal
 const CACHE_NAME = 'roomnmeal-v1';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
   '/static/css/main.css',
   '/manifest.json',
-  '/favicon.ico',
-  '/logo192.png',
-  '/logo512.png'
+  '/favicon.ico'
 ];
 
 // Install event
@@ -22,20 +21,16 @@ self.addEventListener('install', (event) => {
 
 // Fetch event
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-
-  // Bypass caching for cross-origin API calls (e.g., Render backend)
-  const isCrossOrigin = new URL(request.url).origin !== self.location.origin;
-  const isApiCall = request.url.includes('/api/');
-  if (isCrossOrigin && isApiCall) {
-    return; // let the network handle it; avoids SW errors on failed fetch
-  }
-
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request);
-    })
+    caches.match(event.request)
+      .then((response) => {
+        // Return cached version or fetch from network
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
+      }
+    )
   );
 });
 
@@ -55,12 +50,19 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Push notification event
+// Background sync for offline actions
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'background-sync') {
+    event.waitUntil(doBackgroundSync());
+  }
+});
+
+// Push notifications
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'New notification from RoomNMeal',
-    icon: '/logo192.png',
-    badge: '/logo192.png',
+    icon: '/favicon.ico',
+    badge: '/favicon.ico',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -70,12 +72,12 @@ self.addEventListener('push', (event) => {
       {
         action: 'explore',
         title: 'View Details',
-        icon: '/logo192.png'
+        icon: '/favicon.ico'
       },
       {
         action: 'close',
         title: 'Close',
-        icon: '/logo192.png'
+        icon: '/favicon.ico'
       }
     ]
   };
@@ -85,7 +87,7 @@ self.addEventListener('push', (event) => {
   );
 });
 
-// Notification click event
+// Notification click
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
@@ -95,3 +97,9 @@ self.addEventListener('notificationclick', (event) => {
     );
   }
 });
+
+// Background sync function
+async function doBackgroundSync() {
+  // Implement background sync logic here
+  console.log('Performing background sync...');
+}
