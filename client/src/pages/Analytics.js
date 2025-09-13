@@ -17,7 +17,7 @@ import {
   FaEye,
   FaDownload,
   FaFilter,
-  FaRefresh
+  FaSync
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
@@ -325,7 +325,7 @@ const Analytics = () => {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <FaRefresh className="h-4 w-4" />
+                <FaSync className="h-4 w-4" />
               </button>
 
               {/* Export Button */}
