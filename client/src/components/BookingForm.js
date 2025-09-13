@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { FaCalendar, FaUtensils, FaTshirt, FaCoffee, FaInfoCircle, FaCreditCard } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import axios from 'axios';
@@ -8,8 +6,8 @@ import PaymentModal from './PaymentModal';
 
 const BookingForm = ({ room, onBookingSuccess, onClose }) => {
   const [formData, setFormData] = useState({
-    checkIn: null,
-    checkOut: null,
+    checkIn: '',
+    checkOut: '',
     additionalServices: {
       meals: { included: false, mealTypes: [], price: 0 },
       laundry: { included: false, price: 0 },
@@ -24,7 +22,9 @@ const BookingForm = ({ room, onBookingSuccess, onClose }) => {
   const calculateTotal = () => {
     if (!formData.checkIn || !formData.checkOut) return room.rent;
     
-    const duration = Math.ceil((formData.checkOut - formData.checkIn) / (1000 * 60 * 60 * 24));
+    const checkInDate = new Date(formData.checkIn);
+    const checkOutDate = new Date(formData.checkOut);
+    const duration = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
     let total = room.rent * duration;
     
     if (formData.additionalServices.meals.included) {
@@ -76,7 +76,10 @@ const BookingForm = ({ room, onBookingSuccess, onClose }) => {
       return;
     }
 
-    if (formData.checkOut <= formData.checkIn) {
+    const checkInDate = new Date(formData.checkIn);
+    const checkOutDate = new Date(formData.checkOut);
+    
+    if (checkOutDate <= checkInDate) {
       toast.error('Check-out date must be after check-in date');
       return;
     }
@@ -87,8 +90,8 @@ const BookingForm = ({ room, onBookingSuccess, onClose }) => {
       const token = localStorage.getItem('token');
       const response = await axios.post('https://roomnmeal.onrender.com/api/bookings', {
         roomId: room._id,
-        checkIn: formData.checkIn.toISOString(),
-        checkOut: formData.checkOut.toISOString(),
+        checkIn: checkInDate.toISOString(),
+        checkOut: checkOutDate.toISOString(),
         additionalServices: formData.additionalServices,
         specialRequests: formData.specialRequests
       }, {
@@ -109,7 +112,7 @@ const BookingForm = ({ room, onBookingSuccess, onClose }) => {
   };
 
   const duration = formData.checkIn && formData.checkOut 
-    ? Math.ceil((formData.checkOut - formData.checkIn) / (1000 * 60 * 60 * 24))
+    ? Math.ceil((new Date(formData.checkOut) - new Date(formData.checkIn)) / (1000 * 60 * 60 * 24))
     : 0;
 
   return (
@@ -140,12 +143,12 @@ const BookingForm = ({ room, onBookingSuccess, onClose }) => {
                   <FaCalendar className="mr-2" />
                   Check-in Date
                 </label>
-                <DatePicker
-                  selected={formData.checkIn}
-                  onChange={(date) => setFormData(prev => ({ ...prev, checkIn: date }))}
-                  minDate={new Date()}
+                <input
+                  type="date"
+                  value={formData.checkIn}
+                  onChange={(e) => setFormData(prev => ({ ...prev, checkIn: e.target.value }))}
+                  min={new Date().toISOString().split('T')[0]}
                   className="input-field"
-                  placeholderText="Select check-in date"
                 />
               </div>
               <div>
@@ -153,12 +156,12 @@ const BookingForm = ({ room, onBookingSuccess, onClose }) => {
                   <FaCalendar className="mr-2" />
                   Check-out Date
                 </label>
-                <DatePicker
-                  selected={formData.checkOut}
-                  onChange={(date) => setFormData(prev => ({ ...prev, checkOut: date }))}
-                  minDate={formData.checkIn || new Date()}
+                <input
+                  type="date"
+                  value={formData.checkOut}
+                  onChange={(e) => setFormData(prev => ({ ...prev, checkOut: e.target.value }))}
+                  min={formData.checkIn || new Date().toISOString().split('T')[0]}
                   className="input-field"
-                  placeholderText="Select check-out date"
                 />
               </div>
             </div>
