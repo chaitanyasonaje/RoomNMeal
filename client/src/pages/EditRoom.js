@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -18,6 +19,7 @@ const EditRoom = () => {
   const { id } = useParams();
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(true);
+  const { isDark } = useTheme();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,12 +75,12 @@ const EditRoom = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className={`${isDark ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} min-h-screen flex items-center justify-center`}>Loading...</div>;
 
   return (
-    <div className="max-w-xl mx-auto py-8">
-      <h2 className="text-2xl font-bold mb-4">Edit Room</h2>
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded shadow">
+    <div className={`max-w-xl mx-auto py-8 px-4 ${isDark ? 'bg-gray-900' : 'bg-gray-50'} min-h-screen`}>
+      <h2 className={`text-2xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Edit Room</h2>
+      <form onSubmit={handleSubmit} className={`space-y-4 ${isDark ? 'bg-gray-800' : 'bg-white'} p-4 sm:p-6 rounded shadow`}>
         <input name="title" value={form.title} onChange={handleChange} placeholder="Title" className="input-field w-full" required />
         <textarea name="description" value={form.description} onChange={handleChange} placeholder="Description" className="input-field w-full" />
         <select name="propertyType" value={form.propertyType} onChange={handleChange} className="input-field w-full">

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 import axios from 'axios';
 import { buildApiUrl } from '../config/api';
 import toast from 'react-hot-toast';
@@ -18,6 +19,7 @@ const EditMessPlan = () => {
   const { id } = useParams();
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(true);
+  const { isDark } = useTheme();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,12 +75,12 @@ const EditMessPlan = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className={`${isDark ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} min-h-screen flex items-center justify-center`}>Loading...</div>;
 
   return (
-    <div className="max-w-xl mx-auto py-8">
-      <h2 className="text-2xl font-bold mb-4">Edit Mess Plan</h2>
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded shadow">
+    <div className={`max-w-xl mx-auto py-8 px-4 ${isDark ? 'bg-gray-900' : 'bg-gray-50'} min-h-screen`}>
+      <h2 className={`text-2xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Edit Mess Plan</h2>
+      <form onSubmit={handleSubmit} className={`space-y-4 ${isDark ? 'bg-gray-800' : 'bg-white'} p-4 sm:p-6 rounded shadow`}>
         <input name="planName" value={form.planName} onChange={handleChange} placeholder="Plan Name" className="input-field w-full" required />
         <textarea name="description" value={form.description} onChange={handleChange} placeholder="Description" className="input-field w-full" />
         <select name="planType" value={form.planType} onChange={handleChange} className="input-field w-full">
@@ -88,10 +90,10 @@ const EditMessPlan = () => {
         <input name="duration" value={form.duration} onChange={handleChange} placeholder="Duration (days)" type="number" className="input-field w-full" required />
         <input name="price" value={form.price} onChange={handleChange} placeholder="Price" type="number" className="input-field w-full" required />
         <div>
-          <label className="block mb-1">Meal Types</label>
-          <label><input type="checkbox" name="mealTypes" value="breakfast" checked={form.mealTypes.includes('breakfast')} onChange={handleChange} /> Breakfast </label>
-          <label><input type="checkbox" name="mealTypes" value="lunch" checked={form.mealTypes.includes('lunch')} onChange={handleChange} /> Lunch </label>
-          <label><input type="checkbox" name="mealTypes" value="dinner" checked={form.mealTypes.includes('dinner')} onChange={handleChange} /> Dinner </label>
+          <label className={`block mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Meal Types</label>
+          <label className={`${isDark ? 'text-gray-300' : 'text-gray-700'}`}><input type="checkbox" name="mealTypes" value="breakfast" checked={form.mealTypes.includes('breakfast')} onChange={handleChange} /> Breakfast </label>
+          <label className={`${isDark ? 'text-gray-300' : 'text-gray-700'}`}><input type="checkbox" name="mealTypes" value="lunch" checked={form.mealTypes.includes('lunch')} onChange={handleChange} /> Lunch </label>
+          <label className={`${isDark ? 'text-gray-300' : 'text-gray-700'}`}><input type="checkbox" name="mealTypes" value="dinner" checked={form.mealTypes.includes('dinner')} onChange={handleChange} /> Dinner </label>
         </div>
         <input name="capacity" value={form.capacity} onChange={handleChange} placeholder="Capacity" type="number" className="input-field w-full" required />
         <button type="submit" className="btn-primary w-full" disabled={loading}>{loading ? 'Updating...' : 'Update Plan'}</button>

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { FaUser, FaEdit, FaSave, FaTimes, FaCamera, FaShieldAlt, FaBell, FaWallet } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { getMockData } from '../data/mockData';
 
 const Profile = () => {
   const { user, updateProfile } = useAuth();
+  const { isDark } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -178,17 +180,17 @@ const Profile = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading profile...</p>
+          <p className={`mt-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Loading profile...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} py-6`}>
       <div className="max-w-4xl mx-auto px-2 sm:px-4 lg:px-8">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6 flex flex-col md:flex-row items-center md:items-start gap-6">
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm p-6 mb-6 flex flex-col md:flex-row items-center md:items-start gap-6`}>
           <div className="flex items-center space-x-4">
             <div className="relative">
               <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center">
@@ -209,8 +211,8 @@ const Profile = () => {
               )}
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
-              <p className="text-gray-600">{user.email}</p>
+              <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{user.name}</h1>
+              <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{user.email}</p>
               <div className="flex items-center space-x-2 mt-1">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                   user.role === 'admin' ? 'bg-red-100 text-red-800' :
@@ -259,8 +261,8 @@ const Profile = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Personal Information */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h2>
+            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm p-6`}>
+              <h2 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>Personal Information</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -321,7 +323,7 @@ const Profile = () => {
                 </div>
                 {/* Address */}
                 <div>
-                  <h3 className="text-base font-medium text-gray-900 mb-2">Address</h3>
+                  <h3 className={`text-base font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>Address</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Street</label>
@@ -375,14 +377,14 @@ const Profile = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Wallet */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm p-6`}>
               <div className="flex items-center space-x-3 mb-4">
                 <FaWallet className="h-6 w-6 text-green-600" />
-                <h3 className="text-base font-semibold text-gray-900">Wallet</h3>
+                <h3 className={`text-base font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Wallet</h3>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-green-600">₹{user.wallet?.balance || 0}</p>
-                <p className="text-xs text-gray-600">Available Balance</p>
+                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Available Balance</p>
               </div>
             </div>
             {/* Notifications */}
