@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { loadScript } from '@razorpay/react';
 import { FaCreditCard, FaShieldAlt, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import Button from '../ui/Button';
 import Typography from '../ui/Typography';
@@ -19,35 +20,9 @@ const RazorpayCheckout = ({
 
   // Load Razorpay script
   useEffect(() => {
-    const loadRazorpay = () => {
-      return new Promise((resolve, reject) => {
-        // Check if Razorpay is already loaded
-        if (window.Razorpay) {
-          resolve();
-          return;
-        }
-
-        // Check if script is already being loaded
-        const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
-        if (existingScript) {
-          existingScript.addEventListener('load', resolve);
-          existingScript.addEventListener('error', reject);
-          return;
-        }
-
-        // Create and load script
-        const script = document.createElement('script');
-        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-        script.async = true;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    };
-
-    const initializeRazorpay = async () => {
+    const loadRazorpay = async () => {
       try {
-        await loadRazorpay();
+        await loadScript('https://checkout.razorpay.com/v1/checkout.js');
         setRazorpayLoaded(true);
       } catch (error) {
         console.error('Failed to load Razorpay:', error);
@@ -56,7 +31,7 @@ const RazorpayCheckout = ({
     };
 
     if (isOpen && !razorpayLoaded) {
-      initializeRazorpay();
+      loadRazorpay();
     }
   }, [isOpen, razorpayLoaded]);
 
