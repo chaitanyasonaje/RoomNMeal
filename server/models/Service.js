@@ -8,7 +8,7 @@ const serviceSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['laundry', 'cleaning', 'food', 'transport', 'maintenance', 'other'],
+    enum: ['laundry', 'wifi', 'tiffin', 'housekeeping', 'tutor', 'bike-rental', 'cleaning', 'food', 'transport', 'maintenance', 'other'],
     required: true
   },
   provider: {
@@ -25,6 +25,10 @@ const serviceSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0
+  },
+  contact: {
+    type: String,
+    required: true
   },
   priceType: {
     type: String,

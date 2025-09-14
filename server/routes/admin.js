@@ -1,227 +1,342 @@
 const express = require('express');
-const User = require('../models/User');
-const Room = require('../models/Room');
-const Booking = require('../models/Booking');
-const MessPlan = require('../models/MessPlan');
-const Transaction = require('../models/Transaction');
-const { auth, requireRole } = require('../middlewares/auth');
-
 const router = express.Router();
+const auth = require('../middlewares/auth');
+const Payment = require('../models/Payment');
+const User = require('../models/User');
+const { convertToRupees } = require('../utils/razorpay');
 
-// Admin middleware
-const adminAuth = [auth, requireRole(['admin'])];
-
-// Get dashboard stats
-router.get('/stats', adminAuth, async (req, res) => {
-  try {
-    const [
-      totalUsers,
-      totalRooms,
-      totalBookings,
-      totalMessPlans,
-      pendingVerifications,
-      totalRevenue
-    ] = await Promise.all([
-      User.countDocuments(),
-      Room.countDocuments(),
-      Booking.countDocuments(),
-      MessPlan.countDocuments(),
-      User.countDocuments({ isVerified: false }),
-      Transaction.aggregate([
-        { $match: { status: 'completed' } },
-        { $group: { _id: null, total: { $sum: '$amount' } } }
-      ])
-    ]);
-
-    const stats = {
-      totalUsers,
-      totalRooms,
-      totalBookings,
-      totalMessPlans,
-      pendingVerifications,
-      totalRevenue: totalRevenue.length > 0 ? totalRevenue[0].total : 0
-    };
-
-    res.json(stats);
-  } catch (error) {
-    console.error('Stats error:', error);
-    res.status(500).json({ message: 'Server error' });
+// Admin middleware - check if user is admin
+const adminAuth = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'Access denied. Admin privileges required.'
+    });
   }
-});
+  next();
+};
 
-// Get all users
-router.get('/users', adminAuth, async (req, res) => {
+// Get all payments with filters and pagination
+router.get('/payments', auth, adminAuth, async (req, res) => {
   try {
-    const users = await User.find()
-      .select('-password')
-      .sort({ createdAt: -1 });
+    const { 
+      page = 1, 
+      limit = 20, 
+      status, 
+      itemType, 
+      userId, 
+      startDate, 
+      endDate, 
+      search 
+    } = req.query;
 
-    res.json({ users });
-  } catch (error) {
-    console.error('Users error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Update user verification status
-router.put('/users/:userId/verify', adminAuth, async (req, res) => {
-  try {
-    const { isVerified } = req.body;
-    const user = await User.findByIdAndUpdate(
-      req.params.userId,
-      { isVerified },
-      { new: true }
-    ).select('-password');
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    const filter = {};
+    
+    if (status) filter.status = status;
+    if (itemType) filter.itemType = itemType;
+    if (userId) filter.userId = userId;
+    
+    if (startDate || endDate) {
+      filter.createdAt = {};
+      if (startDate) filter.createdAt.$gte = new Date(startDate);
+      if (endDate) filter.createdAt.$lte = new Date(endDate);
     }
 
-    res.json({ message: 'User verification updated', user });
-  } catch (error) {
-    console.error('Verify user error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Update user status
-router.put('/users/:userId/status', adminAuth, async (req, res) => {
-  try {
-    const { isActive } = req.body;
-    const user = await User.findByIdAndUpdate(
-      req.params.userId,
-      { isActive },
-      { new: true }
-    ).select('-password');
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    if (search) {
+      filter.$or = [
+        { orderId: { $regex: search, $options: 'i' } },
+        { paymentId: { $regex: search, $options: 'i' } },
+        { itemName: { $regex: search, $options: 'i' } },
+        { receipt: { $regex: search, $options: 'i' } }
+      ];
     }
 
-    res.json({ message: 'User status updated', user });
+    const payments = await Payment.find(filter)
+      .populate('userId', 'name email phone')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const total = await Payment.countDocuments(filter);
+
+    // Get payment statistics
+    const stats = await Payment.getStats();
+
+    res.json({
+      success: true,
+      payments: payments.map(payment => ({
+        id: payment._id,
+        orderId: payment.orderId,
+        paymentId: payment.paymentId,
+        amount: payment.amount,
+        currency: payment.currency,
+        itemType: payment.itemType,
+        itemName: payment.itemName,
+        status: payment.status,
+        paidAt: payment.paidAt,
+        createdAt: payment.createdAt,
+        receipt: payment.receipt,
+        customerDetails: payment.customerDetails,
+        userId: payment.userId
+      })),
+      pagination: {
+        current: parseInt(page),
+        pages: Math.ceil(total / limit),
+        total
+      },
+      stats: {
+        totalAmount: stats.totalAmount,
+        totalCount: stats.totalCount,
+        completedAmount: stats.completedAmount,
+        completedCount: stats.completedCount,
+        pendingCount: stats.pendingCount,
+        failedCount: stats.failedCount
+      }
+    });
+
   } catch (error) {
-    console.error('Update user status error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Get admin payments error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
   }
 });
 
-// Get all rooms
-router.get('/rooms', adminAuth, async (req, res) => {
+// Get payment statistics
+router.get('/stats', auth, adminAuth, async (req, res) => {
   try {
-    const rooms = await Room.find()
-      .populate('host', 'name email')
-      .sort({ createdAt: -1 });
-
-    res.json({ rooms });
-  } catch (error) {
-    console.error('Rooms error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Update room status
-router.put('/rooms/:roomId/status', adminAuth, async (req, res) => {
-  try {
-    const { isActive } = req.body;
-    const room = await Room.findByIdAndUpdate(
-      req.params.roomId,
-      { isActive },
-      { new: true }
-    ).populate('host', 'name email');
-
-    if (!room) {
-      return res.status(404).json({ message: 'Room not found' });
+    const { period = 'all' } = req.query;
+    
+    let dateFilter = {};
+    if (period === 'today') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      dateFilter.createdAt = { $gte: today };
+    } else if (period === 'week') {
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      dateFilter.createdAt = { $gte: weekAgo };
+    } else if (period === 'month') {
+      const monthAgo = new Date();
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+      dateFilter.createdAt = { $gte: monthAgo };
     }
 
-    res.json({ message: 'Room status updated', room });
+    const stats = await Payment.getStats(null, null, null, dateFilter);
+
+    res.json({
+      success: true,
+      stats: {
+        totalAmount: stats.totalAmount,
+        totalCount: stats.totalCount,
+        completedAmount: stats.completedAmount,
+        completedCount: stats.completedCount,
+        pendingCount: stats.pendingCount,
+        failedCount: stats.failedCount,
+        formattedTotalAmount: convertToRupees(stats.totalAmount),
+        formattedCompletedAmount: convertToRupees(stats.completedAmount)
+      }
+    });
+
   } catch (error) {
-    console.error('Update room status error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Get admin stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
   }
 });
 
-// Get all bookings
-router.get('/bookings', adminAuth, async (req, res) => {
+// Get user payment history (admin view)
+router.get('/users/:userId/payments', auth, adminAuth, async (req, res) => {
   try {
-    const bookings = await Booking.find()
-      .populate('user', 'name email')
-      .populate('room', 'title location')
-      .sort({ createdAt: -1 });
+    const { userId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
 
-    res.json({ bookings });
+    const payments = await Payment.find({ userId })
+      .populate('itemId', 'name title')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const total = await Payment.countDocuments({ userId });
+
+    res.json({
+      success: true,
+      payments: payments.map(payment => ({
+        id: payment._id,
+        orderId: payment.orderId,
+        paymentId: payment.paymentId,
+        amount: payment.amount,
+        currency: payment.currency,
+        itemType: payment.itemType,
+        itemName: payment.itemName,
+        status: payment.status,
+        paidAt: payment.paidAt,
+        createdAt: payment.createdAt,
+        receipt: payment.receipt
+      })),
+      pagination: {
+        current: parseInt(page),
+        pages: Math.ceil(total / limit),
+        total
+      }
+    });
+
   } catch (error) {
-    console.error('Bookings error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Get user payments error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
   }
 });
 
-// Get all mess plans
-router.get('/mess-plans', adminAuth, async (req, res) => {
+// Get payment details (admin view)
+router.get('/payments/:paymentId', auth, adminAuth, async (req, res) => {
   try {
-    const messPlans = await MessPlan.find()
-      .populate('provider', 'name email')
-      .sort({ createdAt: -1 });
+    const { paymentId } = req.params;
 
-    res.json({ messPlans });
-  } catch (error) {
-    console.error('Mess plans error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+    const payment = await Payment.findById(paymentId)
+      .populate('userId', 'name email phone')
+      .populate('itemId', 'name title description');
 
-// Update mess plan status
-router.put('/mess-plans/:messId/status', adminAuth, async (req, res) => {
-  try {
-    const { isActive } = req.body;
-    const messPlan = await MessPlan.findByIdAndUpdate(
-      req.params.messId,
-      { isActive },
-      { new: true }
-    ).populate('provider', 'name email');
-
-    if (!messPlan) {
-      return res.status(404).json({ message: 'Mess plan not found' });
+    if (!payment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Payment not found'
+      });
     }
 
-    res.json({ message: 'Mess plan status updated', messPlan });
+    res.json({
+      success: true,
+      payment: {
+        id: payment._id,
+        orderId: payment.orderId,
+        paymentId: payment.paymentId,
+        amount: payment.amount,
+        currency: payment.currency,
+        itemType: payment.itemType,
+        itemName: payment.itemName,
+        status: payment.status,
+        paidAt: payment.paidAt,
+        createdAt: payment.createdAt,
+        receipt: payment.receipt,
+        customerDetails: payment.customerDetails,
+        billingAddress: payment.billingAddress,
+        userId: payment.userId,
+        itemId: payment.itemId,
+        webhookData: payment.webhookData
+      }
+    });
+
   } catch (error) {
-    console.error('Update mess plan status error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Get payment details error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
   }
 });
 
-// Get pending verifications
-router.get('/verifications', adminAuth, async (req, res) => {
+// Export payments data
+router.get('/payments/export', auth, adminAuth, async (req, res) => {
   try {
-    const users = await User.find({ isVerified: false })
-      .select('name email role createdAt')
-      .sort({ createdAt: -1 });
+    const { format = 'csv', startDate, endDate, status, itemType } = req.query;
 
-    res.json({ users });
-  } catch (error) {
-    console.error('Verifications error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Verify user
-router.put('/verify/:userId', adminAuth, async (req, res) => {
-  try {
-    const user = await User.findByIdAndUpdate(
-      req.params.userId,
-      { isVerified: true },
-      { new: true }
-    ).select('-password');
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    const filter = {};
+    
+    if (status) filter.status = status;
+    if (itemType) filter.itemType = itemType;
+    
+    if (startDate || endDate) {
+      filter.createdAt = {};
+      if (startDate) filter.createdAt.$gte = new Date(startDate);
+      if (endDate) filter.createdAt.$lte = new Date(endDate);
     }
 
-    res.json({ message: 'User verified', user });
+    const payments = await Payment.find(filter)
+      .populate('userId', 'name email phone')
+      .sort({ createdAt: -1 });
+
+    if (format === 'csv') {
+      const csvData = generateCSV(payments);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=payments.csv');
+      res.send(csvData);
+    } else {
+      res.json({
+        success: true,
+        payments: payments.map(payment => ({
+          id: payment._id,
+          orderId: payment.orderId,
+          paymentId: payment.paymentId,
+          amount: payment.amount,
+          currency: payment.currency,
+          itemType: payment.itemType,
+          itemName: payment.itemName,
+          status: payment.status,
+          paidAt: payment.paidAt,
+          createdAt: payment.createdAt,
+          customerName: payment.userId?.name || 'N/A',
+          customerEmail: payment.userId?.email || 'N/A',
+          customerPhone: payment.userId?.phone || 'N/A'
+        }))
+      });
+    }
+
   } catch (error) {
-    console.error('Verify user error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Export payments error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
   }
 });
 
-module.exports = router; 
+// Generate CSV data
+function generateCSV(payments) {
+  const headers = [
+    'Payment ID',
+    'Order ID',
+    'Amount',
+    'Currency',
+    'Item Type',
+    'Item Name',
+    'Status',
+    'Customer Name',
+    'Customer Email',
+    'Customer Phone',
+    'Created At',
+    'Paid At'
+  ];
+
+  const rows = payments.map(payment => [
+    payment._id,
+    payment.orderId,
+    payment.amount / 100, // Convert from paise to rupees
+    payment.currency,
+    payment.itemType,
+    payment.itemName,
+    payment.status,
+    payment.userId?.name || 'N/A',
+    payment.userId?.email || 'N/A',
+    payment.userId?.phone || 'N/A',
+    payment.createdAt.toISOString(),
+    payment.paidAt ? payment.paidAt.toISOString() : 'N/A'
+  ]);
+
+  const csvContent = [headers, ...rows]
+    .map(row => row.map(field => `"${field}"`).join(','))
+    .join('\n');
+
+  return csvContent;
+}
+
+module.exports = router;

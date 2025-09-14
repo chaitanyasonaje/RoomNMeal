@@ -17,12 +17,20 @@
     "deploy": "node deploy.js",
     "fix-deployment": "node quick-deploy-fix.js",
     "seed-production": "cd server && npm run seed-production",
+    "seed-atlas": "node seed-atlas.js",
+    "test-seed": "node test-seed.js",
+    "run-seed": "node run-seed.js",
     "build-netlify": "cd client && npm install && npm run build && node ../scripts/netlify-build-fix.js",
     "netlify-build": "bash netlify-build-fix.sh"
   },
   "keywords": ["mern", "student", "accommodation", "mess", "booking"],
   "author": "RoomNMeal Team",
   "license": "MIT",
+  "dependencies": {
+    "mongoose": "^7.5.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.3.1"
+  },
   "devDependencies": {
     "concurrently": "^9.0.1"
   }

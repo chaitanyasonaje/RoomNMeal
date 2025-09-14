@@ -19,7 +19,7 @@ const messPlanSchema = new mongoose.Schema({
   description: String,
   planType: {
     type: String,
-    enum: ['weekly', 'monthly'],
+    enum: ['daily', 'weekly', 'monthly'],
     required: true
   },
   duration: {

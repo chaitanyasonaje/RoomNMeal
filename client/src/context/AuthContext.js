@@ -65,18 +65,37 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await axios.post('https://roomnmeal.onrender.com/api/auth/register', userData);
-      const { token: newToken, user: userInfo } = response.data;
+      const { message, userId, email, requiresVerification } = response.data;
       
-      setToken(newToken);
-      setUser(userInfo);
-      localStorage.setItem('token', newToken);
-      
-      toast.success('Registration successful!');
-      return { success: true };
+      if (requiresVerification) {
+        toast.success(message);
+        return { 
+          success: true, 
+          requiresVerification: true,
+          userId,
+          email
+        };
+      } else {
+        // Legacy flow for backward compatibility
+        const { token: newToken, user: userInfo } = response.data;
+        setToken(newToken);
+        setUser(userInfo);
+        localStorage.setItem('token', newToken);
+        
+        toast.success('Registration successful!');
+        return { success: true };
+      }
     } catch (error) {
       const message = error.response?.data?.message || 'Registration failed';
-      toast.error(message);
-      return { success: false, error: message };
+      const errors = error.response?.data?.errors || [];
+      
+      if (errors.length > 0) {
+        toast.error(errors.join(', '));
+      } else {
+        toast.error(message);
+      }
+      
+      return { success: false, error: message, errors };
     }
   };
 

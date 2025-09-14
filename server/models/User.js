@@ -17,7 +17,15 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 6
+    minlength: 8,
+    validate: {
+      validator: function(password) {
+        // Password policy: minimum 8 characters, must include uppercase, lowercase, number, and special symbol
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        return passwordRegex.test(password);
+      },
+      message: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)'
+    }
   },
   phone: {
     type: String,
@@ -42,6 +50,33 @@ const userSchema = new mongoose.Schema({
     default: undefined
   },
   resetPasswordExpiry: {
+    type: Date,
+    default: undefined
+  },
+  // OTP fields for email verification
+  emailOTP: {
+    type: String,
+    default: undefined
+  },
+  emailOTPExpiry: {
+    type: Date,
+    default: undefined
+  },
+  // OTP fields for phone verification
+  phoneOTP: {
+    type: String,
+    default: undefined
+  },
+  phoneOTPExpiry: {
+    type: Date,
+    default: undefined
+  },
+  // OTP fields for password reset
+  resetOTP: {
+    type: String,
+    default: undefined
+  },
+  resetOTPExpiry: {
     type: Date,
     default: undefined
   },
@@ -190,6 +225,56 @@ userSchema.methods.updateWallet = function(amount, transactionId) {
   if (transactionId) {
     this.wallet.transactions.push(transactionId);
   }
+  return this.save();
+};
+
+// Generate OTP for email verification
+userSchema.methods.generateEmailOTP = function() {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+  this.emailOTP = otp;
+  this.emailOTPExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes
+  return otp;
+};
+
+// Generate OTP for phone verification
+userSchema.methods.generatePhoneOTP = function() {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+  this.phoneOTP = otp;
+  this.phoneOTPExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes
+  return otp;
+};
+
+// Generate OTP for password reset
+userSchema.methods.generateResetOTP = function() {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+  this.resetOTP = otp;
+  this.resetOTPExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes
+  return otp;
+};
+
+// Verify email OTP
+userSchema.methods.verifyEmailOTP = function(otp) {
+  return this.emailOTP === otp && this.emailOTPExpiry > Date.now();
+};
+
+// Verify phone OTP
+userSchema.methods.verifyPhoneOTP = function(otp) {
+  return this.phoneOTP === otp && this.phoneOTPExpiry > Date.now();
+};
+
+// Verify reset OTP
+userSchema.methods.verifyResetOTP = function(otp) {
+  return this.resetOTP === otp && this.resetOTPExpiry > Date.now();
+};
+
+// Clear OTPs
+userSchema.methods.clearOTPs = function() {
+  this.emailOTP = undefined;
+  this.emailOTPExpiry = undefined;
+  this.phoneOTP = undefined;
+  this.phoneOTPExpiry = undefined;
+  this.resetOTP = undefined;
+  this.resetOTPExpiry = undefined;
   return this.save();
 };
 

@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaSearch, FaMapMarkerAlt, FaBed, FaUtensils, FaPlus } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
+import Button from './ui/Button';
+import Input from './ui/Input';
+import Typography from './ui/Typography';
+import Layout from './ui/Layout';
 
 const Hero = () => {
   const [searchQuery, setSearchQuery] = useState('');

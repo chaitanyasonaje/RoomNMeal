@@ -33,8 +33,10 @@ import FAQ from './pages/FAQ';
 import ServiceOrders from './pages/ServiceOrders';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import EmailVerification from './pages/EmailVerification';
 import Analytics from './pages/Analytics';
 import ServiceDetail from './pages/ServiceDetail';
+import Payments from './pages/Payments';
 
 function App() {
   const { user } = useAuth();
@@ -72,6 +74,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/email-verification" element={<EmailVerification />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/rooms" element={<Rooms />} />
@@ -121,6 +124,11 @@ function App() {
                       <Route path="/service-orders" element={
                         <ProtectedRoute>
                           <ServiceOrders />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/payments" element={
+                        <ProtectedRoute>
+                          <Payments />
                         </ProtectedRoute>
                       } />
           <Route path="/rooms/add" element={

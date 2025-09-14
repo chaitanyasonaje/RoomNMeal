@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { FaHome, FaUtensils, FaComments, FaPlus, FaEye, FaEdit, FaCalendar, FaUsers, FaMoneyBillWave, FaArrowRight } from 'react-icons/fa';
+import { FaHome, FaUtensils, FaComments, FaPlus, FaEye, FaEdit, FaCalendar, FaUsers, FaMoneyBillWave, FaArrowRight, FaCreditCard, FaReceipt } from 'react-icons/fa';
 import axios from 'axios';
 import BookingCard from '../components/BookingCard';
+import PaymentHistory from '../components/payment/PaymentHistory';
 import toast from 'react-hot-toast';
 import { getMockData } from '../data/mockData';
 
@@ -17,11 +18,14 @@ const Dashboard = () => {
     subscriptions: { total: 0, active: 0, paused: 0 },
     rooms: 0,
     messPlans: 0,
-    earnings: 0
+    earnings: 0,
+    payments: { total: 0, completed: 0, pending: 0, failed: 0 }
   });
   const [bookings, setBookings] = useState([]);
   const [recentSubscriptions, setRecentSubscriptions] = useState([]);
+  const [recentPayments, setRecentPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     fetchDashboardData();
@@ -30,23 +34,65 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     if (user && user._id) {
-      const bookingsData = getMockData.getUserBookings(user._id) || [];
-      const subscriptionsData = getMockData.getUserSubscriptions(user._id) || [];
-      setBookings(bookingsData);
-      setRecentSubscriptions(subscriptionsData.slice(0, 3));
-      setStats({
-        bookings: {
-          total: bookingsData.length,
-          pending: bookingsData.filter(b => b.status === 'pending').length,
-          confirmed: bookingsData.filter(b => b.status === 'confirmed').length,
-          active: bookingsData.filter(b => b.status === 'active').length,
-          completed: bookingsData.filter(b => b.status === 'completed').length
-        },
-        subscriptions: { total: subscriptionsData.length },
-        rooms: 0,
-        messPlans: 0,
-        earnings: 0
-      });
+      try {
+        // Fetch bookings
+        const bookingsData = getMockData.getUserBookings(user._id) || [];
+        setBookings(bookingsData);
+
+        // Fetch subscriptions
+        const subscriptionsData = getMockData.getUserSubscriptions(user._id) || [];
+        setRecentSubscriptions(subscriptionsData.slice(0, 3));
+
+        // Fetch payment history
+        const paymentsResponse = await axios.get('/api/payments/history?limit=5', {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        
+        if (paymentsResponse.data.success) {
+          setRecentPayments(paymentsResponse.data.payments);
+        }
+
+        setStats({
+          bookings: {
+            total: bookingsData.length,
+            pending: bookingsData.filter(b => b.status === 'pending').length,
+            confirmed: bookingsData.filter(b => b.status === 'confirmed').length,
+            active: bookingsData.filter(b => b.status === 'active').length,
+            completed: bookingsData.filter(b => b.status === 'completed').length
+          },
+          subscriptions: { total: subscriptionsData.length },
+          rooms: 0,
+          messPlans: 0,
+          earnings: 0,
+          payments: {
+            total: paymentsResponse.data?.pagination?.total || 0,
+            completed: paymentsResponse.data?.payments?.filter(p => p.status === 'completed').length || 0,
+            pending: paymentsResponse.data?.payments?.filter(p => p.status === 'pending').length || 0,
+            failed: paymentsResponse.data?.payments?.filter(p => p.status === 'failed').length || 0
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        // Fallback to mock data
+        const bookingsData = getMockData.getUserBookings(user._id) || [];
+        const subscriptionsData = getMockData.getUserSubscriptions(user._id) || [];
+        setBookings(bookingsData);
+        setRecentSubscriptions(subscriptionsData.slice(0, 3));
+        setStats({
+          bookings: {
+            total: bookingsData.length,
+            pending: bookingsData.filter(b => b.status === 'pending').length,
+            confirmed: bookingsData.filter(b => b.status === 'confirmed').length,
+            active: bookingsData.filter(b => b.status === 'active').length,
+            completed: bookingsData.filter(b => b.status === 'completed').length
+          },
+          subscriptions: { total: subscriptionsData.length },
+          rooms: 0,
+          messPlans: 0,
+          earnings: 0,
+          payments: { total: 0, completed: 0, pending: 0, failed: 0 }
+        });
+      }
     } else {
       setBookings([]);
       setRecentSubscriptions([]);
@@ -354,6 +400,108 @@ const Dashboard = () => {
                   </motion.div>
                 ))}
               </div>
+            </div>
+          </motion.div>
+
+          {/* Payment History Section */}
+          <motion.div
+            variants={cardVariants}
+            className={`rounded-2xl shadow-lg mb-8 ${
+              isDark ? 'bg-gray-800' : 'bg-white'
+            }`}
+          >
+            <div className={`px-6 py-4 border-b ${
+              isDark ? 'border-gray-700' : 'border-gray-200'
+            }`}>
+              <div className="flex justify-between items-center">
+                <h2 className={`text-xl font-bold ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  Recent Payments
+                </h2>
+                <Link
+                  to="/payments"
+                  className={`flex items-center space-x-2 text-sm font-medium ${
+                    isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'
+                  }`}
+                >
+                  <span>View All</span>
+                  <FaArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
+            </div>
+            <div className="p-6">
+              {recentPayments.length === 0 ? (
+                <div className="text-center py-8">
+                  <FaCreditCard className={`h-12 w-12 mx-auto mb-4 ${
+                    isDark ? 'text-gray-600' : 'text-gray-400'
+                  }`} />
+                  <p className={`text-lg ${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  }`}>
+                    No payments yet
+                  </p>
+                  <p className={`text-sm ${
+                    isDark ? 'text-gray-500' : 'text-gray-500'
+                  }`}>
+                    Your payment history will appear here
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {recentPayments.map((payment, index) => (
+                    <motion.div
+                      key={payment.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className={`flex items-center justify-between p-4 border rounded-xl ${
+                        isDark ? 'border-gray-700' : 'border-gray-200'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className={`p-3 rounded-full ${
+                          payment.status === 'completed' ? 'bg-green-100' :
+                          payment.status === 'pending' ? 'bg-yellow-100' :
+                          'bg-red-100'
+                        }`}>
+                          <FaCreditCard className={`h-5 w-5 ${
+                            payment.status === 'completed' ? 'text-green-600' :
+                            payment.status === 'pending' ? 'text-yellow-600' :
+                            'text-red-600'
+                          }`} />
+                        </div>
+                        <div>
+                          <p className={`font-semibold ${
+                            isDark ? 'text-white' : 'text-gray-900'
+                          }`}>
+                            {payment.itemName}
+                          </p>
+                          <p className={`text-sm ${
+                            isDark ? 'text-gray-400' : 'text-gray-500'
+                          }`}>
+                            {new Date(payment.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className={`font-bold ${
+                          isDark ? 'text-white' : 'text-gray-900'
+                        }`}>
+                          ₹{(payment.amount / 100).toLocaleString('en-IN')}
+                        </p>
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          payment.status === 'completed' ? 'bg-green-100 text-green-800' :
+                          payment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {payment.status}
+                        </span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </div>
           </motion.div>
           {/* Recent Activity */}
