@@ -147,7 +147,6 @@ app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/mess', require('./routes/mess'));
 app.use('/api/services', require('./routes/services'));
 app.use('/api/payments', require('./routes/payments'));
-app.use('/api/webhooks', require('./routes/webhooks'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/chat', require('./routes/chat'));
 app.use('/api/reviews', require('./routes/reviews'));

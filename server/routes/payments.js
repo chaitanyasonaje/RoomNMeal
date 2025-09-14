@@ -1,482 +1,388 @@
 const express = require('express');
-const router = express.Router();
-const { body, validationResult } = require('express-validator');
-const auth = require('../middlewares/auth');
-const Payment = require('../models/Payment');
+const Razorpay = require('razorpay');
+const { auth } = require('../middlewares/auth');
+const crypto = require('crypto');
+const Transaction = require('../models/Transaction');
 const User = require('../models/User');
-const MessPlan = require('../models/MessPlan');
-const Room = require('../models/Room');
-const Service = require('../models/Service');
 const Booking = require('../models/Booking');
 const MessSubscription = require('../models/MessSubscription');
-const {
-  createOrder,
-  verifyPayment,
-  getPaymentDetails,
-  refundPayment,
-  generateReceiptData,
-  convertToPaise,
-  convertToRupees,
-  formatAmount,
-  PAYMENT_TYPES,
-  CURRENCY
-} = require('../utils/razorpay');
 
-// Validation middleware
-const validatePaymentRequest = [
-  body('itemType').isIn(Object.values(PAYMENT_TYPES)).withMessage('Invalid item type'),
-  body('itemId').isMongoId().withMessage('Invalid item ID'),
-  body('amount').isNumeric().isFloat({ min: 1 }).withMessage('Amount must be at least 1'),
-  body('customerDetails.name').notEmpty().withMessage('Customer name is required'),
-  body('customerDetails.email').isEmail().withMessage('Valid email is required'),
-  body('customerDetails.phone').isMobilePhone('en-IN').withMessage('Valid phone number is required')
-];
+const router = express.Router();
+
+// Initialize Razorpay with fallback for development
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_dummy',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || 'dummy_secret'
+});
+
+// Public config for client (open for all authenticated users)
+router.get('/public-key', auth, async (req, res) => {
+  try {
+    res.json({ key: process.env.RAZORPAY_KEY_ID || 'rzp_test_dummy' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch key' });
+  }
+});
 
 // Create payment order
-router.post('/create-order', auth, validatePaymentRequest, async (req, res) => {
+router.post('/create-order', auth, async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
-    }
+    const { amount, currency = 'INR', receipt, type, relatedId } = req.body;
 
-    const { itemType, itemId, amount, customerDetails, billingAddress, notes } = req.body;
-    const userId = req.user.id;
-
-    // Convert amount to paise
-    const amountInPaise = convertToPaise(amount);
-
-    // Validate item exists and get details
-    let itemDetails;
-    switch (itemType) {
-      case PAYMENT_TYPES.MESS_PLAN:
-        itemDetails = await MessPlan.findById(itemId);
-        if (!itemDetails) {
-          return res.status(404).json({
-            success: false,
-            message: 'Mess plan not found'
-          });
-        }
-        break;
-      case PAYMENT_TYPES.ROOM_BOOKING:
-        itemDetails = await Room.findById(itemId);
-        if (!itemDetails) {
-          return res.status(404).json({
-            success: false,
-            message: 'Room not found'
-          });
-        }
-        break;
-      case PAYMENT_TYPES.SERVICE:
-        itemDetails = await Service.findById(itemId);
-        if (!itemDetails) {
-          return res.status(404).json({
-            success: false,
-            message: 'Service not found'
-          });
-        }
-        break;
-      default:
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid item type'
-        });
-    }
-
-    // Generate receipt ID
-    const receipt = `receipt_${itemType}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-    // Create Razorpay order
-    const orderResult = await createOrder({
-      amount: amountInPaise,
-      currency: CURRENCY,
-      receipt: receipt,
-      notes: {
-        itemType,
-        itemId: itemId.toString(),
-        userId: userId.toString(),
-        ...notes
-      }
-    });
-
-    if (!orderResult.success) {
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to create payment order',
-        error: orderResult.error
-      });
-    }
-
-    // Save payment record to database
-    const payment = new Payment({
-      userId,
-      orderId: orderResult.order.id,
-      amount: amountInPaise,
-      currency: CURRENCY,
-      itemType,
-      itemId,
-      itemName: itemDetails.name || itemDetails.title,
+    const options = {
+      amount: amount * 100, // Razorpay expects amount in paise
+      currency,
       receipt,
-      notes: notes || '',
-      customerDetails,
-      billingAddress: billingAddress || {},
-      razorpayOrderId: orderResult.order.id,
-      status: 'pending'
+      payment_capture: 1
+    };
+
+    const order = await razorpay.orders.create(options);
+
+    // Create transaction record
+    const transaction = new Transaction({
+      user: req.user._id,
+      type,
+      amount,
+      currency,
+      status: 'pending',
+      paymentMethod: 'razorpay',
+      razorpayOrderId: order.id,
+      description: `Payment for ${type}`,
+      relatedBooking: type === 'room_booking' ? relatedId : undefined,
+      relatedSubscription: type === 'mess_subscription' ? relatedId : undefined
     });
 
-    await payment.save();
+    await transaction.save();
 
-    res.json({
-      success: true,
-      message: 'Order created successfully',
-      order: {
-        id: orderResult.order.id,
-        amount: orderResult.order.amount,
-        currency: orderResult.order.currency,
-        receipt: orderResult.order.receipt,
-        key: process.env.RAZORPAY_KEY_ID
-      },
-      payment: {
-        id: payment._id,
-        orderId: payment.orderId,
-        amount: payment.amount,
-        itemType: payment.itemType,
-        itemName: payment.itemName
-      }
+    res.json({ 
+      order,
+      transactionId: transaction._id 
     });
-
   } catch (error) {
-    console.error('Create order error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message
-    });
+    console.error('Payment creation error:', error);
+    res.status(500).json({ message: 'Payment creation failed' });
   }
 });
 
 // Verify payment
 router.post('/verify', auth, async (req, res) => {
   try {
-    const { orderId, paymentId, signature } = req.body;
-    const userId = req.user.id;
+    const { 
+      razorpay_order_id, 
+      razorpay_payment_id, 
+      razorpay_signature,
+      transactionId 
+    } = req.body;
 
-    if (!orderId || !paymentId || !signature) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required payment details'
-      });
+    const sign = razorpay_order_id + '|' + razorpay_payment_id;
+    const expectedSign = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(sign.toString())
+      .digest('hex');
+
+    if (razorpay_signature === expectedSign) {
+      // Update transaction
+      const transaction = await Transaction.findById(transactionId);
+      if (transaction) {
+        transaction.status = 'completed';
+        transaction.razorpayPaymentId = razorpay_payment_id;
+        transaction.razorpaySignature = razorpay_signature;
+        await transaction.save();
+
+        // Update related booking or subscription
+        if (transaction.relatedBooking) {
+          const booking = await Booking.findById(transaction.relatedBooking);
+          if (booking) {
+            booking.paidAmount += transaction.amount;
+            booking.paymentStatus = booking.paidAmount >= booking.totalAmount ? 'completed' : 'partial';
+            booking.transactions.push(transaction._id);
+            await booking.save();
+          }
+        }
+
+        if (transaction.relatedSubscription) {
+          const subscription = await MessSubscription.findById(transaction.relatedSubscription);
+          if (subscription) {
+            subscription.paidAmount += transaction.amount;
+            subscription.paymentStatus = subscription.paidAmount >= subscription.totalAmount ? 'completed' : 'partial';
+            subscription.transactions.push(transaction._id);
+            await subscription.save();
+          }
+        }
+
+        res.json({ 
+          message: 'Payment verified successfully',
+          transaction: transaction
+        });
+      } else {
+        res.status(404).json({ message: 'Transaction not found' });
+      }
+    } else {
+      // Update transaction as failed
+      if (transactionId) {
+        await Transaction.findByIdAndUpdate(transactionId, {
+          status: 'failed',
+          failureReason: 'Invalid signature'
+        });
+      }
+      res.status(400).json({ message: 'Invalid signature' });
     }
-
-    // Find payment record
-    const payment = await Payment.findOne({
-      orderId,
-      userId,
-      status: 'pending'
-    });
-
-    if (!payment) {
-      return res.status(404).json({
-        success: false,
-        message: 'Payment record not found'
-      });
-    }
-
-    // Verify payment signature
-    const isVerified = verifyPayment(orderId, paymentId, signature);
-
-    if (!isVerified) {
-      // Update payment status to failed
-      payment.status = 'failed';
-      payment.razorpayPaymentId = paymentId;
-      payment.razorpaySignature = signature;
-      await payment.save();
-
-      return res.status(400).json({
-        success: false,
-        message: 'Payment verification failed'
-      });
-    }
-
-    // Get payment details from Razorpay
-    const paymentDetails = await getPaymentDetails(paymentId);
-    
-    if (!paymentDetails.success) {
-      payment.status = 'failed';
-      payment.razorpayPaymentId = paymentId;
-      payment.razorpaySignature = signature;
-      await payment.save();
-
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to fetch payment details'
-      });
-    }
-
-    // Update payment record
-    payment.status = 'completed';
-    payment.paymentId = paymentId;
-    payment.razorpayPaymentId = paymentId;
-    payment.razorpaySignature = signature;
-    payment.paidAt = new Date();
-    payment.webhookData = paymentDetails.payment;
-
-    await payment.save();
-
-    // Create booking/subscription based on item type
-    let bookingResult;
-    switch (payment.itemType) {
-      case PAYMENT_TYPES.MESS_PLAN:
-        bookingResult = await createMessSubscription(payment);
-        break;
-      case PAYMENT_TYPES.ROOM_BOOKING:
-        bookingResult = await createRoomBooking(payment);
-        break;
-      case PAYMENT_TYPES.SERVICE:
-        bookingResult = await createServiceOrder(payment);
-        break;
-    }
-
-    res.json({
-      success: true,
-      message: 'Payment verified successfully',
-      payment: {
-        id: payment._id,
-        orderId: payment.orderId,
-        paymentId: payment.paymentId,
-        amount: payment.amount,
-        status: payment.status,
-        paidAt: payment.paidAt,
-        itemType: payment.itemType,
-        itemName: payment.itemName
-      },
-      booking: bookingResult
-    });
-
   } catch (error) {
-    console.error('Verify payment error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message
-    });
+    console.error('Payment verification error:', error);
+    res.status(500).json({ message: 'Payment verification failed' });
   }
 });
 
-// Get payment history
-router.get('/history', auth, async (req, res) => {
+// Wallet recharge
+router.post('/wallet/recharge', auth, async (req, res) => {
   try {
-    const { page = 1, limit = 10, status, itemType, startDate, endDate } = req.query;
-    const userId = req.user.id;
+    const { amount, paymentMethod = 'razorpay' } = req.body;
 
-    const filter = { userId };
-    
-    if (status) filter.status = status;
-    if (itemType) filter.itemType = itemType;
-    
-    if (startDate || endDate) {
-      filter.createdAt = {};
-      if (startDate) filter.createdAt.$gte = new Date(startDate);
-      if (endDate) filter.createdAt.$lte = new Date(endDate);
+    if (paymentMethod === 'razorpay') {
+      // Create Razorpay order for wallet recharge
+      const options = {
+        amount: amount * 100,
+        currency: 'INR',
+        receipt: `wallet_recharge_${Date.now()}`,
+        payment_capture: 1
+      };
+
+      const order = await razorpay.orders.create(options);
+
+      const transaction = new Transaction({
+        user: req.user._id,
+        type: 'wallet_recharge',
+        amount,
+        currency: 'INR',
+        status: 'pending',
+        paymentMethod: 'razorpay',
+        razorpayOrderId: order.id,
+        description: 'Wallet recharge',
+        walletBalance: {
+          before: req.user.wallet.balance,
+          after: req.user.wallet.balance + amount
+        }
+      });
+
+      await transaction.save();
+
+      res.json({ 
+        order,
+        transactionId: transaction._id 
+      });
+    } else {
+      // Direct wallet recharge (for cash payments)
+      const transaction = new Transaction({
+        user: req.user._id,
+        type: 'wallet_recharge',
+        amount,
+        currency: 'INR',
+        status: 'completed',
+        paymentMethod: 'cash',
+        description: 'Wallet recharge (cash)',
+        walletBalance: {
+          before: req.user.wallet.balance,
+          after: req.user.wallet.balance + amount
+        }
+      });
+
+      await transaction.save();
+
+      // Update user wallet
+      await User.findByIdAndUpdate(req.user._id, {
+        $inc: { 'wallet.balance': amount },
+        $push: { 'wallet.transactions': transaction._id }
+      });
+
+      res.json({ 
+        message: 'Wallet recharged successfully',
+        transaction: transaction
+      });
     }
+  } catch (error) {
+    console.error('Wallet recharge error:', error);
+    res.status(500).json({ message: 'Wallet recharge failed' });
+  }
+});
 
-    const payments = await Payment.find(filter)
+// Get user transactions
+router.get('/transactions', auth, async (req, res) => {
+  try {
+    const { page = 1, limit = 10, type, status } = req.query;
+    const skip = (page - 1) * limit;
+
+    const filter = { user: req.user._id };
+    if (type) filter.type = type;
+    if (status) filter.status = status;
+
+    const transactions = await Transaction.find(filter)
       .sort({ createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .populate('itemId', 'name title');
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate('relatedBooking', 'room')
+      .populate('relatedSubscription', 'messPlan');
 
-    const total = await Payment.countDocuments(filter);
+    const total = await Transaction.countDocuments(filter);
 
     res.json({
-      success: true,
-      payments: payments.map(payment => ({
-        id: payment._id,
-        orderId: payment.orderId,
-        paymentId: payment.paymentId,
-        amount: payment.amount,
-        currency: payment.currency,
-        itemType: payment.itemType,
-        itemName: payment.itemName,
-        status: payment.status,
-        paidAt: payment.paidAt,
-        createdAt: payment.createdAt,
-        receipt: payment.receipt
-      })),
+      transactions,
       pagination: {
         current: parseInt(page),
-        pages: Math.ceil(total / limit),
-        total
+        total: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1
+      }
+    });
+  } catch (error) {
+    console.error('Get transactions error:', error);
+    res.status(500).json({ message: 'Failed to fetch transactions' });
+  }
+});
+
+// Process refund
+router.post('/refund', auth, async (req, res) => {
+  try {
+    const { transactionId, amount, reason } = req.body;
+
+    const transaction = await Transaction.findById(transactionId);
+    if (!transaction) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+
+    if (transaction.status !== 'completed') {
+      return res.status(400).json({ message: 'Transaction is not completed' });
+    }
+
+    // Process refund through Razorpay if it was a Razorpay payment
+    if (transaction.paymentMethod === 'razorpay' && transaction.razorpayPaymentId) {
+      const refund = await razorpay.payments.refund(transaction.razorpayPaymentId, {
+        amount: amount * 100,
+        notes: {
+          reason: reason
+        }
+      });
+
+      transaction.status = 'refunded';
+      transaction.refundAmount = amount;
+      transaction.refundReason = reason;
+      await transaction.save();
+
+      // Update user wallet if refunding to wallet
+      if (req.body.refundToWallet) {
+        await User.findByIdAndUpdate(req.user._id, {
+          $inc: { 'wallet.balance': amount },
+          $push: { 'wallet.transactions': transaction._id }
+        });
+      }
+
+      res.json({ 
+        message: 'Refund processed successfully',
+        refund: refund,
+        transaction: transaction
+      });
+    } else {
+      // Handle wallet/cash refunds
+      transaction.status = 'refunded';
+      transaction.refundAmount = amount;
+      transaction.refundReason = reason;
+      await transaction.save();
+
+      // Update user wallet
+      await User.findByIdAndUpdate(req.user._id, {
+        $inc: { 'wallet.balance': amount },
+        $push: { 'wallet.transactions': transaction._id }
+      });
+
+      res.json({ 
+        message: 'Refund processed successfully',
+        transaction: transaction
+      });
+    }
+  } catch (error) {
+    console.error('Refund error:', error);
+    res.status(500).json({ message: 'Refund processing failed' });
+  }
+});
+
+// Get wallet balance
+router.get('/wallet/balance', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('wallet');
+    res.json({ 
+      balance: user.wallet.balance,
+      currency: 'INR'
+    });
+  } catch (error) {
+    console.error('Get wallet balance error:', error);
+    res.status(500).json({ message: 'Failed to fetch wallet balance' });
+  }
+});
+
+// Pay from wallet
+router.post('/wallet/pay', auth, async (req, res) => {
+  try {
+    const { amount, type, relatedId, description } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (user.wallet.balance < amount) {
+      return res.status(400).json({ message: 'Insufficient wallet balance' });
+    }
+
+    // Create transaction record
+    const transaction = new Transaction({
+      user: req.user._id,
+      type,
+      amount,
+      currency: 'INR',
+      status: 'completed',
+      paymentMethod: 'wallet',
+      description: description,
+      relatedBooking: type === 'room_booking' ? relatedId : undefined,
+      relatedSubscription: type === 'mess_subscription' ? relatedId : undefined,
+      walletBalance: {
+        before: user.wallet.balance,
+        after: user.wallet.balance - amount
       }
     });
 
-  } catch (error) {
-    console.error('Get payment history error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message
+    await transaction.save();
+
+    // Update user wallet
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: { 'wallet.balance': -amount },
+      $push: { 'wallet.transactions': transaction._id }
     });
-  }
-});
 
-// Get payment details
-router.get('/:paymentId', auth, async (req, res) => {
-  try {
-    const { paymentId } = req.params;
-    const userId = req.user.id;
-
-    const payment = await Payment.findOne({
-      _id: paymentId,
-      userId
-    }).populate('itemId', 'name title description');
-
-    if (!payment) {
-      return res.status(404).json({
-        success: false,
-        message: 'Payment not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      payment: {
-        id: payment._id,
-        orderId: payment.orderId,
-        paymentId: payment.paymentId,
-        amount: payment.amount,
-        currency: payment.currency,
-        itemType: payment.itemType,
-        itemName: payment.itemName,
-        status: payment.status,
-        paidAt: payment.paidAt,
-        createdAt: payment.createdAt,
-        receipt: payment.receipt,
-        customerDetails: payment.customerDetails,
-        billingAddress: payment.billingAddress,
-        itemDetails: payment.itemId
+    // Update related booking or subscription
+    if (type === 'room_booking' && relatedId) {
+      const booking = await Booking.findById(relatedId);
+      if (booking) {
+        booking.paidAmount += amount;
+        booking.paymentStatus = booking.paidAmount >= booking.totalAmount ? 'completed' : 'partial';
+        booking.transactions.push(transaction._id);
+        await booking.save();
       }
-    });
-
-  } catch (error) {
-    console.error('Get payment details error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message
-    });
-  }
-});
-
-// Generate receipt
-router.get('/:paymentId/receipt', auth, async (req, res) => {
-  try {
-    const { paymentId } = req.params;
-    const userId = req.user.id;
-
-    const payment = await Payment.findOne({
-      _id: paymentId,
-      userId,
-      status: 'completed'
-    });
-
-    if (!payment) {
-      return res.status(404).json({
-        success: false,
-        message: 'Payment not found or not completed'
-      });
     }
 
-    const receiptData = generateReceiptData(payment);
+    if (type === 'mess_subscription' && relatedId) {
+      const subscription = await MessSubscription.findById(relatedId);
+      if (subscription) {
+        subscription.paidAmount += amount;
+        subscription.paymentStatus = subscription.paidAmount >= subscription.totalAmount ? 'completed' : 'partial';
+        subscription.transactions.push(transaction._id);
+        await subscription.save();
+      }
+    }
 
-    res.json({
-      success: true,
-      receipt: receiptData
+    res.json({ 
+      message: 'Payment successful',
+      transaction: transaction,
+      newBalance: user.wallet.balance - amount
     });
-
   } catch (error) {
-    console.error('Generate receipt error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message
-    });
+    console.error('Wallet payment error:', error);
+    res.status(500).json({ message: 'Wallet payment failed' });
   }
 });
 
-// Helper functions for creating bookings/subscriptions
-async function createMessSubscription(payment) {
-  try {
-    const messPlan = await MessPlan.findById(payment.itemId);
-    if (!messPlan) throw new Error('Mess plan not found');
-
-    const subscription = new MessSubscription({
-      userId: payment.userId,
-      messPlanId: payment.itemId,
-      paymentId: payment._id,
-      startDate: new Date(),
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-      status: 'active',
-      amount: payment.amount
-    });
-
-    await subscription.save();
-    return { type: 'mess_subscription', id: subscription._id };
-  } catch (error) {
-    console.error('Create mess subscription error:', error);
-    throw error;
-  }
-}
-
-async function createRoomBooking(payment) {
-  try {
-    const room = await Room.findById(payment.itemId);
-    if (!room) throw new Error('Room not found');
-
-    const booking = new Booking({
-      userId: payment.userId,
-      roomId: payment.itemId,
-      paymentId: payment._id,
-      checkIn: new Date(),
-      checkOut: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-      status: 'confirmed',
-      amount: payment.amount
-    });
-
-    await booking.save();
-    return { type: 'room_booking', id: booking._id };
-  } catch (error) {
-    console.error('Create room booking error:', error);
-    throw error;
-  }
-}
-
-async function createServiceOrder(payment) {
-  try {
-    const service = await Service.findById(payment.itemId);
-    if (!service) throw new Error('Service not found');
-
-    // Create service order (you may need to create a ServiceOrder model)
-    const serviceOrder = {
-      userId: payment.userId,
-      serviceId: payment.itemId,
-      paymentId: payment._id,
-      status: 'confirmed',
-      amount: payment.amount,
-      createdAt: new Date()
-    };
-
-    // For now, return the service order data
-    // You can implement ServiceOrder model if needed
-    return { type: 'service_order', data: serviceOrder };
-  } catch (error) {
-    console.error('Create service order error:', error);
-    throw error;
-  }
-}
-
-module.exports = router;
+module.exports = router; 

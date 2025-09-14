@@ -19,9 +19,6 @@ import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { useCity } from '../context/CityContext';
 import CitySelector from './CitySelector';
-import Button from './ui/Button';
-import Typography from './ui/Typography';
-import Badge from './ui/Badge';
 
 const navLinks = [
   { to: '/', label: 'Home', icon: FaHome },
@@ -195,17 +192,6 @@ const Navbar = () => {
                       >
                         <FaClipboardList className="h-5 w-5" />
                         <span className="font-medium">Service Orders</span>
-                      </Link>
-                      
-                      <Link
-                        to="/payments"
-                        onClick={toggleMobileMenu}
-                        className={`flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400 rounded-xl transition-colors duration-200 ${
-                          isActive('/payments') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : ''
-                        }`}
-                      >
-                        <FaCreditCard className="h-5 w-5" />
-                        <span className="font-medium">Payments</span>
                       </Link>
                       
                       <Link

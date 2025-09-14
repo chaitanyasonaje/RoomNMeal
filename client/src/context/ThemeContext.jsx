@@ -34,8 +34,7 @@ export const ThemeProvider = ({ children }) => {
     // Save theme preference to localStorage
     localStorage.setItem('roomnmeal-theme', theme);
     
-    // Apply theme to document using data attribute for design system
-    document.documentElement.setAttribute('data-theme', theme);
+    // Apply theme to document
     document.documentElement.classList.remove('light', 'dark');
     document.documentElement.classList.add(theme);
     

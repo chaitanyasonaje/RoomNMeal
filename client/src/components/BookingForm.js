@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FaCalendar, FaUtensils, FaTshirt, FaCoffee, FaInfoCircle, FaCreditCard } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import PaymentModal from './payment/PaymentModal';
+import PaymentModal from './PaymentModal';
 
 const BookingForm = ({ room, onBookingSuccess, onClose }) => {
   const [formData, setFormData] = useState({
@@ -88,7 +88,7 @@ const BookingForm = ({ room, onBookingSuccess, onClose }) => {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('/api/bookings', {
+      const response = await axios.post('https://roomnmeal.onrender.com/api/bookings', {
         roomId: room._id,
         checkIn: checkInDate.toISOString(),
         checkOut: checkOutDate.toISOString(),
@@ -400,9 +400,8 @@ const BookingForm = ({ room, onBookingSuccess, onClose }) => {
           }}
           amount={calculateTotal()}
           type="room_booking"
-          relatedId={room._id}
+          relatedId={bookingData._id}
           description={`Room booking for ${room.title}`}
-          itemName={room.title}
           onSuccess={(data) => {
             toast.success('Payment successful! Booking confirmed.');
             onBookingSuccess(bookingData);
