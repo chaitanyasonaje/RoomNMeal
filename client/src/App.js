@@ -158,7 +158,7 @@ function App() {
               </AnimatePresence>
             </main>
             <AdvancedChatBot />
-            <Footer />
+            {location.pathname === '/dashboard' && <Footer />}
           </div>
         </CityProvider>
       </ThemeProvider>

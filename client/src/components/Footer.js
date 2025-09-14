@@ -38,14 +38,14 @@ const Footer = () => {
   return (
     <footer className={`relative overflow-hidden ${
       isDark 
-        ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
-        : 'bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900'
-    } text-white`}>
+        ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white' 
+        : 'bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200 text-gray-800'
+    }`}>
       {/* Background Pattern */}
       <div className={`absolute inset-0 ${
         isDark 
           ? 'bg-gradient-to-br from-gray-800/20 to-gray-900/20' 
-          : 'bg-gradient-to-br from-gray-700/20 to-gray-800/20'
+          : 'bg-gradient-to-br from-gray-200/20 to-gray-100/20'
       } opacity-30`}></div>
       
       <div className="relative">
