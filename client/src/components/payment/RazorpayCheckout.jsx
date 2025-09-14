@@ -71,7 +71,7 @@ const RazorpayCheckout = ({
 
     try {
       const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_dummy',
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'RoomNMeal',
