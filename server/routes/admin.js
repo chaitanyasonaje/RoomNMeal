@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middlewares/auth');
+const auth = require('../middlewares/auth');
 const Payment = require('../models/Payment');
 const User = require('../models/User');
 const { convertToRupees } = require('../utils/razorpay');
