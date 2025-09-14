@@ -13,6 +13,7 @@ import {
   FaWallet,
   FaMapMarkerAlt,
   FaChevronDown,
+  FaCreditCard,
   FaClipboardList
 } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';

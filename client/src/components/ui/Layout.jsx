@@ -113,6 +113,16 @@ const Flex = ({
   );
 };
 
+// Main Layout component
+const Layout = ({ children, className = '', ...props }) => {
+  return (
+    <div className={`min-h-screen bg-background-light dark:bg-background-dark ${className}`} {...props}>
+      {children}
+    </div>
+  );
+};
+
+// Attach sub-components to Layout
 Layout.Container = Container;
 Layout.Section = Section;
 Layout.Grid = Grid;
