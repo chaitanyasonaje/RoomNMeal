@@ -12,7 +12,12 @@ router.get('/', async (req, res) => {
     const {
       type,
       category,
-      location,
+      location, // city name
+      city,
+      state,
+      lat,
+      lng,
+      radius,
       priceMin,
       priceMax,
       rating,
@@ -35,6 +40,23 @@ router.get('/', async (req, res) => {
       if (priceMax) query.price.$lte = parseFloat(priceMax);
     }
     if (isAvailable === 'true') query['availability.isAvailable'] = true;
+
+    // Location filters
+    if (city || location) {
+      query['location.city'] = new RegExp(`^${city || location}$`, 'i');
+    }
+    if (state) {
+      query['location.state'] = new RegExp(`^${state}$`, 'i');
+    }
+    // Geo radius filter if lat/lng provided and schema has coordinates
+    if (lat && lng && radius) {
+      const r = parseFloat(radius) / 6378.1; // radius in radians (km/EarthRadius)
+      query['location.coordinates'] = {
+        $geoWithin: {
+          $centerSphere: [ [ parseFloat(lng), parseFloat(lat) ], r ]
+        }
+      };
+    }
 
     // Build sort options
     let sortOptions = {};

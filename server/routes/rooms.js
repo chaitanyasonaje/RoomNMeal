@@ -7,18 +7,21 @@ const router = express.Router();
 // Get all rooms
 router.get('/', async (req, res) => {
   try {
-    const { city, state, minRent, maxRent, propertyType, roomType, amenities } = req.query;
+    const { city, state, cityId, minRent, maxRent, propertyType, roomType, amenities } = req.query;
     
     let query = { isActive: true };
 
-    // Filter by city
-    if (city) {
-      query['address.city.id'] = city;
+    // Filter by city (accepts id or name)
+    if (cityId) {
+      query['address.city.id'] = cityId;
+    } else if (city) {
+      // Match by name, case-insensitive
+      query['address.city.name'] = new RegExp(`^${city}$`, 'i');
     }
 
     // Filter by state
     if (state) {
-      query['address.city.state'] = state;
+      query['address.city.state'] = new RegExp(`^${state}$`, 'i');
     }
 
     // Filter by rent range

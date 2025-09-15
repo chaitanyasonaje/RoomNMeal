@@ -474,6 +474,131 @@ const indianCities = [
       'Shirpur ITI',
       'Shirpur Nursing College'
     ],
+    accommodations: [
+      {
+        name: 'NMIMS Shirpur Campus Hostel',
+        type: 'Hostel + Mess',
+        address: 'Babulde, Bank of Tapi River, NH-3, Shirpur, Savalad, Maharashtra 425405',
+        contacts: {
+          main: ['02563-295545', '02563-295546', '02563-295547', '02563-295548', '02563-295549'],
+          boys_hostel_1: '8806759888',
+          boys_hostel_2: '9373985038',
+          girls_hostel: '7448243446'
+        },
+        images: [
+          'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&auto=format&fit=crop&q=60',
+          'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=1200&auto=format&fit=crop&q=60'
+        ],
+        website: 'https://engineering-shirpur.nmims.edu/contact-us/'
+      },
+      {
+        name: 'R. C. Patel Institute of Technology (RCPIT)',
+        type: 'Hostel + Mess',
+        address: 'In front of RCPIT college, Shirpur',
+        contacts: {},
+        capacity: { boys: 430, girls: 600 },
+        images: [
+          'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1200&auto=format&fit=crop&q=60'
+        ],
+        website: 'https://collegedunia.com/college/14640-rc-patel-institute-of-technology-rcpit-shirpur/hostel'
+      },
+      {
+        name: 'Institute of Management Research & Development (IMRD)',
+        type: 'Hostel + Mess',
+        address: 'On IMRD campus, Shirpur',
+        contacts: {
+          boys_hostel: ['7840902163', '8177947735', '9922274500'],
+          girls_hostel: ['9421676155', '9922828226']
+        },
+        images: [
+          'https://images.unsplash.com/photo-1598965402089-897ce52e8357?w=1200&auto=format&fit=crop&q=60'
+        ],
+        website: 'https://www.rcpimrd.ac.in/hostel'
+      },
+      {
+        name: 'College of Agriculture (SVKM COA)',
+        type: 'Hostel + Mess',
+        address: 'Shirpur',
+        contacts: {},
+        images: [
+          'https://images.unsplash.com/photo-1596495578065-8a35f6b4d090?w=1200&auto=format&fit=crop&q=60'
+        ],
+        website: 'https://svkmcoa.ac.in/hostel/'
+      },
+      {
+        name: 'R. C. Patel Polytechnic Institute',
+        type: 'Hostel + Mess',
+        address: 'Near Nimazari Naka, Shirpur',
+        contacts: {
+          phone: '9325054746',
+          email: 'rcpatelpolytechnic@gmail.com'
+        },
+        images: [
+          'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&auto=format&fit=crop&q=60'
+        ],
+        website: 'https://www.rcpatelpolytechnic.org/hostel'
+      },
+      {
+        name: 'Abai Hostel',
+        type: 'Hostel',
+        address: 'Near R. C. Patel Pharmacy College, Karvand Naka, Shirpur',
+        contacts: {},
+        images: [
+          'https://images.unsplash.com/photo-1582582621959-48d0b3f4b5a6?w=1200&auto=format&fit=crop&q=60'
+        ],
+        website: 'https://www.justdial.com/Shirpur/Abai-Hostel-Near-R-C-Patel-Phamacy-CollegeKarvand-Naka-Shirpur-Dhule/9999P2562-2562-150821125109-M7A7_BZDET'
+      },
+      {
+        name: 'Khodiyar Mess',
+        type: 'Mess',
+        address: 'Rasiklal Patel Nagar, Nimzari Naka, Shirpur',
+        contacts: {},
+        images: [
+          'https://images.unsplash.com/photo-1551782450-17144c3a09f2?w=1200&auto=format&fit=crop&q=60'
+        ],
+        website: 'https://www.justdial.com/Shirpur/Mess/nct-10319116'
+      },
+      {
+        name: 'Jogeshwari Mess',
+        type: 'Mess',
+        address: 'Swami Vivekanand Nagar, Pitreshwer Colony, Shirpur',
+        contacts: {},
+        images: [
+          'https://images.unsplash.com/photo-1541542684-4aee2b0a6a1f?w=1200&auto=format&fit=crop&q=60'
+        ],
+        website: 'https://www.justdial.com/Shirpur/Mess/nct-10319116'
+      },
+      {
+        name: 'Om Sai Bhojanalay Mess',
+        type: 'Mess',
+        address: 'Karvand Road, Shirpur',
+        contacts: {},
+        images: [
+          'https://images.unsplash.com/photo-1521017432531-fbd92d1cf00b?w=1200&auto=format&fit=crop&q=60'
+        ],
+        website: 'https://www.justdial.com/Shirpur/Mess/nct-10319116'
+      },
+      {
+        name: 'Shiv Shakti Mess',
+        type: 'Mess',
+        address: 'Dadusing Colony, Gajanan Colony, Karvand, Shirpur',
+        contacts: {},
+        images: [
+          'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&auto=format&fit=crop&q=60'
+        ],
+        website: 'https://www.justdial.com/Shirpur/Mess/nct-10319116'
+      },
+      {
+        name: 'Shri Ganesh Mess & Tiffin Service',
+        type: 'Mess + Tiffin Service',
+        address: 'Opp. Hotel Kings Park, Rasiklal Patel Nagar, Shirpur',
+        contacts: {},
+        images: [
+          'https://images.unsplash.com/photo-1593030668930-8130abedb5d6?w=1200&auto=format&fit=crop&q=60'
+        ],
+        website: 'https://www.justdial.com/Shirpur/Tiffin-Services/nct-10481155'
+      }
+    ],
     techCompanies: [
       'Local IT Companies',
       'Startups',

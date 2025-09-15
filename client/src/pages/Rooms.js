@@ -8,7 +8,7 @@ import ListingGrid from '../components/ListingGrid';
 
 const Rooms = () => {
   const { isDark } = useTheme();
-  const { selectedCity } = useCity();
+  const { selectedCity, getCityDetails } = useCity();
   const navigate = useNavigate();
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,6 +55,35 @@ const Rooms = () => {
         }
       } catch (apiError) {
         console.log('API not available, using mock data only');
+      }
+
+      // Enrich with city accommodations (e.g., hostels in Shirpur)
+      let accommodationRooms = [];
+      try {
+        if (selectedCity?.id) {
+          const city = await getCityDetails(selectedCity.id);
+          if (city?.accommodations?.length) {
+            accommodationRooms = city.accommodations
+              .filter(acc => /hostel/i.test(acc.type))
+              .map((acc, idx) => ({
+                id: `acc-${selectedCity.id}-${idx}`,
+                title: acc.name,
+                description: `${acc.type}${acc.address ? ' • ' + acc.address : ''}`,
+                price: 0,
+                rating: 4.2,
+                location: `${selectedCity.name}, ${selectedCity.state}`,
+                images: acc.images && acc.images.length ? acc.images : ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500"],
+                amenities: [],
+                roomType: 'Hostel',
+                category: 'Hostel',
+                isAvailable: true,
+                createdAt: new Date(),
+                source: 'CityData'
+              }));
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to enrich rooms with city accommodations:', e);
       }
       
       // Mock data for rooms
@@ -182,8 +211,8 @@ const Rooms = () => {
         }
       ];
 
-      // Combine API data with mock data
-      setRooms([...apiRooms, ...mockRooms]);
+      // Combine API data with city accommodations and mock data
+      setRooms([...apiRooms, ...accommodationRooms, ...mockRooms]);
     } catch (error) {
       console.error('Error fetching rooms:', error);
     } finally {

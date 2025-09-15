@@ -8,7 +8,7 @@ import ListingGrid from '../components/ListingGrid';
 
 const MessPlans = () => {
   const { isDark } = useTheme();
-  const { selectedCity } = useCity();
+  const { selectedCity, getCityDetails } = useCity();
   const navigate = useNavigate();
   const [messPlans, setMessPlans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +57,35 @@ const MessPlans = () => {
         source: 'API'
       }));
       
+      // Enrich with city accommodations (mess/tiffin services)
+      let accommodationMeals = [];
+      try {
+        if (selectedCity?.id) {
+          const city = await getCityDetails(selectedCity.id);
+          if (city?.accommodations?.length) {
+            accommodationMeals = city.accommodations
+              .filter(acc => /mess|tiffin/i.test(acc.type))
+              .map((acc, idx) => ({
+                id: `acc-meal-${selectedCity.id}-${idx}`,
+                title: acc.name,
+                description: `${acc.type}${acc.address ? ' • ' + acc.address : ''}`,
+                price: 0,
+                rating: 4.3,
+                location: `${selectedCity.name}, ${selectedCity.state}`,
+                images: acc.images && acc.images.length ? acc.images : ["https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500"],
+                category: 'Local Mess',
+                mealTypes: ["Breakfast", "Lunch", "Dinner"],
+                cuisine: ["Indian"],
+                isAvailable: true,
+                createdAt: new Date(),
+                source: 'CityData'
+              }));
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to enrich mess plans with city accommodations:', e);
+      }
+
       // Add mock data alongside API data
       const mockMessPlans = [
         {
@@ -106,8 +135,8 @@ const MessPlans = () => {
         }
       ];
       
-      // Combine API data with mock data
-      setMessPlans([...transformedPlans, ...mockMessPlans]);
+      // Combine API data with city accommodations and mock data
+      setMessPlans([...transformedPlans, ...accommodationMeals, ...mockMessPlans]);
     } catch (error) {
       console.error('Error fetching mess plans:', error);
       

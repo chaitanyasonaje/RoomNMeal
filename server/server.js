@@ -156,9 +156,25 @@ app.use('/api/notifications', require('./routes/notifications'));
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  socket.on('join', (userId) => {
-    socket.join(userId);
-    console.log(`User ${userId} joined their room`);
+  // Track which user this socket belongs to
+  let currentUserId = null;
+
+  socket.on('join', async (userId) => {
+    try {
+      currentUserId = String(userId);
+      socket.join(currentUserId);
+      console.log(`User ${currentUserId} joined their room`);
+
+      // Mark user online
+      try {
+        const User = require('./models/User');
+        await User.findByIdAndUpdate(currentUserId, { isOnline: true });
+      } catch (e) {
+        console.error('Failed to set user online:', e.message);
+      }
+    } catch (e) {
+      console.error('Join handler error:', e.message);
+    }
   });
 
   socket.on('sendMessage', (data) => {
@@ -173,8 +189,19 @@ io.on('connection', (socket) => {
     io.to(data.userId).emit('serviceStatusChanged', data);
   });
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
     console.log('User disconnected:', socket.id);
+    if (currentUserId) {
+      try {
+        const User = require('./models/User');
+        await User.findByIdAndUpdate(currentUserId, { 
+          isOnline: false,
+          lastSeen: new Date()
+        });
+      } catch (e) {
+        console.error('Failed to set user offline:', e.message);
+      }
+    }
   });
 });
 

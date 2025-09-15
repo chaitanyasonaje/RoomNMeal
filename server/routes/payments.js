@@ -9,6 +9,53 @@ const MessSubscription = require('../models/MessSubscription');
 
 const router = express.Router();
 
+// Razorpay Webhook - must use raw body for signature verification
+router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  try {
+    const webhookSecret = process.env.PAYMENT_WEBHOOK_SECRET || 'dev_webhook_secret';
+    const signature = req.headers['x-razorpay-signature'];
+
+    const expectedSignature = crypto
+      .createHmac('sha256', webhookSecret)
+      .update(req.body)
+      .digest('hex');
+
+    if (signature !== expectedSignature) {
+      return res.status(400).json({ message: 'Invalid webhook signature' });
+    }
+
+    const event = JSON.parse(req.body.toString());
+    const eventType = event?.event;
+
+    if (eventType === 'payment.captured' || eventType === 'order.paid') {
+      const razorpayOrderId = event?.payload?.payment?.entity?.order_id || event?.payload?.order?.entity?.id;
+      const razorpayPaymentId = event?.payload?.payment?.entity?.id;
+
+      if (razorpayOrderId) {
+        const transaction = await Transaction.findOne({ razorpayOrderId });
+        if (transaction) {
+          transaction.status = 'completed';
+          transaction.razorpayPaymentId = razorpayPaymentId || transaction.razorpayPaymentId;
+          await transaction.save();
+        }
+      }
+    }
+
+    if (eventType === 'payment.failed') {
+      const razorpayOrderId = event?.payload?.payment?.entity?.order_id;
+      const failureReason = event?.payload?.payment?.entity?.error_description || 'Payment failed';
+      if (razorpayOrderId) {
+        await Transaction.findOneAndUpdate({ razorpayOrderId }, { status: 'failed', failureReason });
+      }
+    }
+
+    res.json({ status: 'ok' });
+  } catch (error) {
+    console.error('Webhook error:', error);
+    res.status(500).json({ message: 'Webhook processing failed' });
+  }
+});
+
 // Initialize Razorpay with fallback for development
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_dummy',
@@ -74,9 +121,10 @@ router.post('/verify', auth, async (req, res) => {
       transactionId 
     } = req.body;
 
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'dummy_secret';
     const sign = razorpay_order_id + '|' + razorpay_payment_id;
     const expectedSign = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .createHmac('sha256', keySecret)
       .update(sign.toString())
       .digest('hex');
 

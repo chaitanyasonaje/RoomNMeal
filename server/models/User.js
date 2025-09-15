@@ -142,6 +142,15 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  // Presence tracking
+  isOnline: {
+    type: Boolean,
+    default: false
+  },
+  lastSeen: {
+    type: Date,
+    default: null
+  },
   lastLogin: {
     type: Date,
     default: Date.now
