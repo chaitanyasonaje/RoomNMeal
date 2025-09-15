@@ -7,18 +7,8 @@ import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 
-// Register service worker for PWA functionality
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then((registration) => {
-        console.log('SW registered: ', registration);
-      })
-      .catch((registrationError) => {
-        console.log('SW registration failed: ', registrationError);
-      });
-  });
-}
+// Service worker disabled to avoid stale caches breaking new deploys
+// If you want PWA features, replace this with a Workbox-based SW setup
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
