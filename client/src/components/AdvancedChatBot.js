@@ -261,7 +261,7 @@ const AdvancedChatBot = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
           onClick={openChat}
-            className="fixed bottom-20 right-6 z-50 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
+            className="fixed sm:bottom-6 bottom-24 sm:right-6 right-4 z-50 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
           aria-label="Open chatbot"
         >
           <FaRobot className="h-6 w-6" />
@@ -283,7 +283,7 @@ const AdvancedChatBot = () => {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className={`fixed bottom-6 right-6 z-50 w-96 h-[600px] rounded-2xl shadow-2xl border flex flex-col overflow-hidden ${
+            className={`fixed sm:bottom-6 bottom-24 sm:right-6 right-3 z-50 w-[calc(100vw-1.5rem)] max-w-md h-[70vh] max-h-[600px] rounded-2xl shadow-2xl border flex flex-col overflow-hidden ${
               isDark 
                 ? 'bg-gray-800 border-gray-700' 
                 : 'bg-white border-gray-200'
@@ -362,7 +362,11 @@ const AdvancedChatBot = () => {
                     <button
                       key={index}
                       onClick={() => handleSuggestedQuestion(question)}
-                      className="w-full text-left p-2 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors duration-200 text-sm text-primary-700 border border-primary-200"
+                      className={`w-full text-left p-2 rounded-lg transition-colors duration-200 text-sm border ${
+                        isDark
+                          ? 'bg-gray-700 hover:bg-gray-600 text-gray-100 border-gray-600'
+                          : 'bg-primary-50 hover:bg-primary-100 text-primary-700 border-primary-200'
+                      }`}
                     >
                       {question}
                     </button>
@@ -380,7 +384,11 @@ const AdvancedChatBot = () => {
                     <button
                       key={index}
                       onClick={() => handleQuickAction(action.action)}
-                      className="flex items-center space-x-2 p-2 bg-gray-50 hover:bg-primary-50 rounded-lg transition-colors duration-200 text-sm"
+                      className={`flex items-center space-x-2 p-2 rounded-lg transition-colors duration-200 text-sm ${
+                        isDark
+                          ? 'bg-gray-700 hover:bg-gray-600 text-gray-100'
+                          : 'bg-gray-50 hover:bg-primary-50'
+                      }`}
                     >
                       {action.icon}
                       <span>{action.text}</span>
